@@ -7,6 +7,11 @@ const iconSvgContent = fs.readFileSync('icon.svg', 'utf-8');
 const iconBase64 = Buffer.from(iconSvgContent).toString('base64');
 const iconDataUri = `data:image/svg+xml;base64,${iconBase64}`;
 
+let appleTouchBase64 = '';
+if (fs.existsSync('apple-touch-icon.png')) {
+  appleTouchBase64 = fs.readFileSync('apple-touch-icon.png').toString('base64');
+}
+
 const htmlContent = `<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -17,8 +22,14 @@ const htmlContent = `<!DOCTYPE html>
   <meta name="apple-mobile-web-app-title" content="Rotaeno">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#144973">
+  <!-- Favicon & PWA / Mobile App Icons -->
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="icon" type="image/svg+xml" href="${iconDataUri}">
-  <link rel="apple-touch-icon" href="${iconDataUri}">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+  ${appleTouchBase64 ? `<link rel="apple-touch-icon" href="data:image/png;base64,${appleTouchBase64}">` : `<link rel="apple-touch-icon" href="./apple-touch-icon.png">`}
+  <link rel="manifest" href="./manifest.json">
   <title>Rotaeno Rating Tracker</title>
   <style>
     :root {
