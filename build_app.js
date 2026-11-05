@@ -1728,43 +1728,81 @@ const htmlContent = `<!DOCTYPE html>
     /* AP+ Theory Record Table & Toolbar */
     .ap-plus-toolbar {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 10px;
       margin-bottom: 12px;
       background: #ffffff;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid var(--border-color);
+      box-sizing: border-box;
+      width: 100%;
     }
 
-    .ap-plus-toolbar-left {
+    .ap-plus-toolbar-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex: 1;
-      min-width: 220px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    .ap-plus-toolbar-right {
+    .ap-plus-toolbar-meta {
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ap-plus-summary-badge {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--color-primary-dark);
+      white-space: nowrap;
+    }
+
+    .ap-plus-chk-label {
+      border: none !important;
+      padding: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--color-text-main);
+      white-space: nowrap;
+    }
+
+    .ap-plus-toolbar-controls {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      width: 100%;
     }
 
     .ap-plus-search-input {
       flex: 1;
-      padding: 6px 10px;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 7px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 12px;
       outline: none;
+      background: #ffffff;
+      color: var(--color-text-main);
+    }
+    .ap-plus-search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
     }
 
     .ap-plus-select {
-      padding: 6px 8px;
+      flex-shrink: 0;
+      min-width: 0;
+      max-width: 150px;
+      box-sizing: border-box;
+      padding: 7px 8px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 12px;
@@ -1774,29 +1812,79 @@ const htmlContent = `<!DOCTYPE html>
       background: #ffffff;
     }
 
+    .ap-plus-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
     .btn-ap-plus-add {
+      flex: 1;
       background: var(--color-primary-dark);
       color: #ffffff;
       border: none;
       border-radius: 6px;
-      padding: 6px 12px;
+      padding: 8px 12px;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
+      box-sizing: border-box;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .btn-ap-plus-add:hover {
+      background: #0284c7;
     }
 
     .btn-ap-plus-sync {
+      flex: 1;
       background: #f1f5f9;
       color: var(--color-primary-dark);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 8px 10px;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-sizing: border-box;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+    .btn-ap-plus-sync:hover {
+      background: #e2e8f0;
+    }
+
+    @media (min-width: 720px) {
+      .ap-plus-toolbar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .ap-plus-toolbar-meta {
+        width: auto;
+        gap: 16px;
+      }
+      .ap-plus-toolbar-controls {
+        width: auto;
+        flex: 1;
+        max-width: 420px;
+      }
+      .ap-plus-toolbar-actions {
+        width: auto;
+      }
+      .btn-ap-plus-add, .btn-ap-plus-sync {
+        flex: initial;
+      }
     }
 
     .ap-plus-table-wrap {
@@ -2768,11 +2856,15 @@ const htmlContent = `<!DOCTYPE html>
         </div>
 
         <div class="ap-plus-toolbar">
-          <div class="ap-plus-toolbar-left">
-            <span style="font-size: 13px; font-weight: 900; color: var(--color-primary-dark); white-space:nowrap;" id="apPlusSummaryBadge">達成数: - 曲</span>
-            <input type="text" id="apPlusSearchInput" class="ap-plus-search-input" placeholder="🔍 曲名・Noで検索...">
+          <div class="ap-plus-toolbar-row ap-plus-toolbar-meta">
+            <span class="ap-plus-summary-badge" id="apPlusSummaryBadge">達成数: - 曲</span>
+            <label class="checkbox-label ap-plus-chk-label" title="取得日列の表示・非表示を切り替えます">
+              <input type="checkbox" id="chkShowApPlusDate" checked>
+              <span>取得日列を表示</span>
+            </label>
           </div>
-          <div class="ap-plus-toolbar-right">
+          <div class="ap-plus-toolbar-row ap-plus-toolbar-controls">
+            <input type="text" id="apPlusSearchInput" class="ap-plus-search-input" placeholder="🔍 曲名・Noで検索...">
             <select id="apPlusSortSelect" class="ap-plus-select">
               <option value="NO_ASC">No昇順 (達成順)</option>
               <option value="NO_DESC">No降順 (最新順)</option>
@@ -2782,10 +2874,8 @@ const htmlContent = `<!DOCTYPE html>
               <option value="CONST_ASC">定数 (低い順)</option>
               <option value="TITLE">曲名順</option>
             </select>
-            <label class="checkbox-label" title="取得日列の表示・非表示を切り替えます" style="border:none; padding:0;">
-              <input type="checkbox" id="chkShowApPlusDate" checked>
-              <span style="font-size:12px; font-weight:800;">取得日列を表示</span>
-            </label>
+          </div>
+          <div class="ap-plus-toolbar-row ap-plus-toolbar-actions">
             <button class="btn-ap-plus-add" id="btnOpenAddApPlusModal" type="button">＋ 記録追加</button>
             <button class="btn-ap-plus-sync" id="btnAutoSyncApPlus" type="button" title="スコアが1010000点またはAP+のIV/IV-α譜面を一括同期">⚡ スコア自動同期</button>
           </div>
