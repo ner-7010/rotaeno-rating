@@ -3770,6 +3770,51 @@ const htmlContent = `<!DOCTYPE html>
       savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
     }
 
+    function formatApPlusDate(val) {
+      if (!val) return '';
+      const str = String(val).trim();
+      if (!str || str === 'undefined' || str === 'null' || str === '-') return '';
+      // 既に '2025/4/12' や '2025/04/12' のような短い形式
+      if (/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/.test(str)) {
+        return str.replace(/-/g, '/');
+      }
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+      }
+      return str;
+    }
+
+    function normalizeApPlusRecord(r) {
+      if (!r) return r;
+      const title = (r.title || '').trim();
+      const diff = (r.diff || '').trim();
+      
+      const match = masterSongs.find(s => s[1].toLowerCase() === title.toLowerCase() && s[2] === diff);
+      
+      const level = (r.level && r.level !== 'undefined' && r.level !== 'null')
+        ? String(r.level)
+        : (match ? match[3] : '-');
+
+      const constant = (r.constant !== undefined && r.constant !== null && !isNaN(r.constant) && Number(r.constant) > 0)
+        ? Number(r.constant)
+        : (match ? match[4] : 0);
+
+      const chartId = r.chartId || (match ? match[0] : '');
+      const date = formatApPlusDate(r.date);
+
+      return {
+        no: Number(r.no) || 0,
+        title: title,
+        diff: diff,
+        level: level,
+        constant: constant,
+        chartId: chartId,
+        date: date,
+        note: r.note || ''
+      };
+    }
+
     function loadApPlusRecords() {
       const saved = localStorage.getItem(AP_PLUS_KEY);
       if (saved) {
@@ -3781,6 +3826,11 @@ const htmlContent = `<!DOCTYPE html>
         }
       } else {
         apPlusRecords = [];
+        localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
+      }
+
+      if (Array.isArray(apPlusRecords) && apPlusRecords.length > 0) {
+        apPlusRecords = apPlusRecords.map(normalizeApPlusRecord);
         localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
       }
 
@@ -4665,7 +4715,9 @@ const htmlContent = `<!DOCTYPE html>
 
     function parseDateVal(dStr) {
       if (!dStr) return 0;
-      const parts = String(dStr).split('/').map(x => parseInt(x, 10) || 0);
+      const formatted = formatApPlusDate(dStr);
+      if (!formatted) return 0;
+      const parts = formatted.split('/').map(x => parseInt(x, 10) || 0);
       if (parts.length < 3) return 0;
       return parts[0] * 10000 + parts[1] * 100 + parts[2];
     }
@@ -5054,11 +5106,15 @@ const htmlContent = `<!DOCTYPE html>
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'CONST_DESC') {
-          if (b.constant !== a.constant) return b.constant - a.constant;
+          const cB = (b.constant !== undefined && b.constant !== null && !isNaN(b.constant)) ? b.constant : 0;
+          const cA = (a.constant !== undefined && a.constant !== null && !isNaN(a.constant)) ? a.constant : 0;
+          if (cB !== cA) return cB - cA;
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'CONST_ASC') {
-          if (a.constant !== b.constant) return a.constant - b.constant;
+          const cB = (b.constant !== undefined && b.constant !== null && !isNaN(b.constant)) ? b.constant : 0;
+          const cA = (a.constant !== undefined && a.constant !== null && !isNaN(a.constant)) ? a.constant : 0;
+          if (cA !== cB) return cA - cB;
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'TITLE') {
@@ -5072,18 +5128,27 @@ const htmlContent = `<!DOCTYPE html>
         const origIndex = apPlusRecords.indexOf(r);
         const diffClass = getDiffClass(r.diff);
 
+        // Master chart fallback for level and constant
+        const match = masterSongs.find(s => s[1].toLowerCase() === (r.title || '').toLowerCase() && s[2] === r.diff);
+        const level = (r.level && r.level !== 'undefined' && r.level !== 'null') ? r.level : (match ? match[3] : '-');
+        const constantVal = (r.constant !== undefined && r.constant !== null && !isNaN(r.constant) && Number(r.constant) > 0)
+          ? Number(r.constant)
+          : (match ? match[4] : 0);
+        const chartId = r.chartId || (match ? match[0] : '');
+        const dateStr = formatApPlusDate(r.date);
+
         html += 
           '<tr>' +
             '<td class="ap-no-cell">' + r.no + '</td>' +
-            '<td class="ap-title-cell" data-chart-id="' + (r.chartId || '') + '" title="クリックしてスコアを確認・編集">' +
+            '<td class="ap-title-cell" data-chart-id="' + escapeHtml(chartId) + '" title="クリックしてスコアを確認・編集">' +
               escapeHtml(r.title) +
             '</td>' +
             '<td style="text-align:center;">' +
               '<span class="diff-badge ' + diffClass + '" style="display:inline-block; font-size:11px; padding:2px 6px;">' + r.diff + '</span>' +
             '</td>' +
-            '<td style="text-align:center; font-weight:800;">' + r.level + '</td>' +
-            '<td class="ap-const-cell">' + (r.constant || 0).toFixed(1) + '</td>' +
-            '<td class="col-date ap-date-cell">' + escapeHtml(r.date || '-') + '</td>' +
+            '<td style="text-align:center; font-weight:800;">' + escapeHtml(level) + '</td>' +
+            '<td class="ap-const-cell">' + constantVal.toFixed(1) + '</td>' +
+            '<td class="col-date ap-date-cell">' + escapeHtml(dateStr || '-') + '</td>' +
             '<td class="ap-action-cell">' +
               '<button class="btn-table-action" type="button" title="編集" data-action="edit" data-idx="' + origIndex + '">✎</button>' +
               '<button class="btn-table-action del" type="button" title="削除" data-action="del" data-idx="' + origIndex + '">🗑</button>' +
@@ -6791,7 +6856,7 @@ const htmlContent = `<!DOCTYPE html>
 
           // 3. Restore Theory Records
           if (Array.isArray(d.apPlusRecords) && d.apPlusRecords.length > 0) {
-            apPlusRecords = d.apPlusRecords;
+            apPlusRecords = d.apPlusRecords.map(normalizeApPlusRecord);
             saveApPlusRecords();
           }
 

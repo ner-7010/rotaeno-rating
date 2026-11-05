@@ -3504,7 +3504,7 @@
     const GAS_LAST_SYNC_KEY = 'rotaeno_gas_last_sync_v1';
     const AUTO_SYNC_KEY = 'rotaeno_auto_sync_v1';
     const DEFAULT_GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw2W83eJjx1A2HbUH1XnKpBpjPuA66vEo9xoqQJFm2s2rMdqwyfepBCXuUpRMdmJbLV/exec';
-    const GAS_SCRIPT_CODE = "/**\n * Rotaeno Rating Tracker - Google スプレッドシート連携スクリプト (中央連携・個人スプシ両対応)\n * \n * 【仕組み】\n * 管理者がデプロイした単一のWebアプリAPIを経由して、各ユーザーのGoogleスプレッドシート\n * （共有設定: リンクを知っている全員が編集可）に対して安全に読み書きを行います。\n * 一般ユーザーは Apps Script のデプロイ作業を一切行う必要がありません！\n */\n\nconst SHEET_NAMES = {\n  SONGS: 'Songs',\n  SCORES: 'Scores',\n  THEORY: 'TheoryRecords',\n  CONFIG: 'Config'\n};\n\nfunction getOrCreateSheet(ss, name) {\n  let sheet = ss.getSheetByName(name);\n  if (!sheet) {\n    sheet = ss.insertSheet(name);\n  }\n  return sheet;\n}\n\nfunction resolveSpreadsheet(target) {\n  if (!target) {\n    return SpreadsheetApp.getActiveSpreadsheet();\n  }\n  target = String(target).trim();\n  try {\n    if (target.startsWith('http://') || target.startsWith('https://')) {\n      return SpreadsheetApp.openByUrl(target);\n    } else {\n      return SpreadsheetApp.openById(target);\n    }\n  } catch (err) {\n    throw new Error('スプレッドシートを開けませんでした。スプレッドシートの共有設定が「リンクを知っている全員（編集者）」になっているか確認してください。(詳細: ' + err.message + ')');\n  }\n}\n\nfunction doGet(e) {\n  try {\n    const target = (e && e.parameter) ? (e.parameter.url || e.parameter.id) : null;\n    const ss = resolveSpreadsheet(target);\n\n    const data = {\n      songs: readSongsSheet(ss),\n      scores: readScoresSheet(ss),\n      apPlusRecords: readTheorySheet(ss),\n      config: readConfigSheet(ss)\n    };\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      data: data\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\nfunction doPost(e) {\n  try {\n    let payload = null;\n    if (e.postData && e.postData.contents) {\n      payload = JSON.parse(e.postData.contents);\n    } else {\n      throw new Error('No post data received');\n    }\n\n    const target = payload.sheetUrl || payload.sheetId;\n    const ss = resolveSpreadsheet(target);\n    const nowStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');\n\n    if (payload.songs && Array.isArray(payload.songs)) {\n      writeSongsSheet(ss, payload.songs);\n    }\n    if (payload.scores && typeof payload.scores === 'object') {\n      writeScoresSheet(ss, payload.scores, nowStr);\n    }\n    if (payload.apPlusRecords && Array.isArray(payload.apPlusRecords)) {\n      writeTheorySheet(ss, payload.apPlusRecords);\n    }\n    if (payload.config && typeof payload.config === 'object') {\n      payload.config.lastSyncedAt = nowStr;\n      writeConfigSheet(ss, payload.config);\n    }\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      message: '同期が正常に完了しました',\n      syncedAt: nowStr\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\n/* ==========================================================\n * Sheet I/O Helpers\n * ========================================================== */\n\n// 1. Songs Sheet (楽曲マスター: 1曲1行)\nfunction writeSongsSheet(ss, songs) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);\n  sheet.clear();\n  const headers = [\n    '曲名', 'ソングパック', 'バージョン', 'songId',\n    'I_定数', 'I_Lv', 'II_定数', 'II_Lv',\n    'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',\n    'IV-α_定数', 'IV-α_Lv'\n  ];\n  const rows = [headers];\n\n  songs.forEach(s => {\n    const d = s.diffs || {};\n    rows.push([\n      s.title || '',\n      s.pack || '',\n      s.version || '',\n      s.songId || '',\n      d['I'] ? d['I'].constant : '',\n      d['I'] ? d['I'].level : '',\n      d['II'] ? d['II'].constant : '',\n      d['II'] ? d['II'].level : '',\n      d['III'] ? d['III'].constant : '',\n      d['III'] ? d['III'].level : '',\n      d['IV'] ? d['IV'].constant : '',\n      d['IV'] ? d['IV'].level : '',\n      d['IV-α'] ? d['IV-α'].constant : '',\n      d['IV-α'] ? d['IV-α'].level : ''\n    ]);\n  });\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0f2fe');\n  sheet.setFrozenRows(1);\n}\n\nfunction readSongsSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SONGS);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const songs = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (!row[0]) continue;\n    const diffs = {};\n    if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };\n    if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };\n    if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String(row[9] || '') };\n    if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String(row[11] || '') };\n    if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String(row[13] || '') };\n\n    songs.push({\n      title: String(row[0]),\n      pack: String(row[1] || '基本曲'),\n      version: String(row[2] || 'v5.6.0'),\n      songId: String(row[3] || ('song_' + i)),\n      diffs: diffs\n    });\n  }\n  return songs;\n}\n\n// 2. Scores Sheet (プレイ成績)\nfunction writeScoresSheet(ss, scores, nowStr) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SCORES);\n  sheet.clear();\n  const headers = ['チャートID', 'スコア', 'クリアランプ', '最終更新日時'];\n  const rows = [headers];\n\n  Object.keys(scores).forEach(chartId => {\n    const item = scores[chartId];\n    if (item && (item.score > 0 || item.status)) {\n      rows.push([\n        chartId,\n        item.score || 0,\n        item.status || '',\n        nowStr\n      ]);\n    }\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#fef3c7');\n  sheet.setFrozenRows(1);\n}\n\nfunction readScoresSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SCORES);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const scores = {};\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const chartId = String(row[0]);\n    if (!chartId) continue;\n    scores[chartId] = {\n      score: Number(row[1]) || 0,\n      status: String(row[2] || '')\n    };\n  }\n  return scores;\n}\n\n// 3. TheoryRecords Sheet (理論値記録)\nfunction writeTheorySheet(ss, records) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.THEORY);\n  sheet.clear();\n  const headers = ['No', '曲名', '難易度', '達成日', '備考'];\n  const rows = [headers];\n\n  records.forEach(r => {\n    rows.push([\n      r.no || '',\n      r.title || '',\n      r.diff || '',\n      r.date || '',\n      r.note || ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0e7ff');\n  sheet.setFrozenRows(1);\n}\n\nfunction readTheorySheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.THEORY);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const records = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (row[0] === '' && !row[1]) continue;\n    records.push({\n      no: Number(row[0]) || (i),\n      title: String(row[1] || ''),\n      diff: String(row[2] || ''),\n      date: String(row[3] || ''),\n      note: String(row[4] || '')\n    });\n  }\n  return records;\n}\n\n// 4. Config Sheet (設定データ)\nfunction writeConfigSheet(ss, config) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.CONFIG);\n  sheet.clear();\n  const headers = ['キー', '設定値', '説明'];\n  const rows = [\n    headers,\n    ['packOrder', JSON.stringify(config.packOrder || []), 'ソングパック表示順序 (JSON)'],\n    ['statsScope', String(config.statsScope || 'ALL'), 'マイページ統計対象スコープ (ALL / IN_GAME)'],\n    ['showApPlusDate', String(config.showApPlusDate !== false), '理論値一覧の日付列表示設定 (true / false)'],\n    ['lastSyncedAt', String(config.lastSyncedAt || ''), '最終同期日時 (自動更新)']\n  ];\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#f1f5f9');\n  sheet.setFrozenRows(1);\n}\n\nfunction readConfigSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.CONFIG);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const config = {};\n  for (let i = 1; i < values.length; i++) {\n    const key = String(values[i][0]);\n    const val = values[i][1];\n    if (key === 'packOrder') {\n      try { config.packOrder = JSON.parse(val); } catch (e) { config.packOrder = []; }\n    } else if (key === 'statsScope') {\n      config.statsScope = String(val);\n    } else if (key === 'showApPlusDate') {\n      config.showApPlusDate = (val === 'true' || val === true);\n    } else if (key === 'lastSyncedAt') {\n      config.lastSyncedAt = String(val);\n    }\n  }\n  return config;\n}\n";
+    const GAS_SCRIPT_CODE = "/**\n * Rotaeno Rating Tracker - Google スプレッドシート連携スクリプト (中央連携・個人スプシ両対応)\n * \n * 【仕組み】\n * 管理者がデプロイした単一のWebアプリAPIを経由して、各ユーザーのGoogleスプレッドシート\n * （共有設定: リンクを知っている全員が編集可）に対して安全に読み書きを行います。\n * 一般ユーザーは Apps Script のデプロイ作業を一切行う必要がありません！\n */\n\nconst SHEET_NAMES = {\n  SONGS: 'Songs',\n  SCORES: 'Scores',\n  THEORY: 'TheoryRecords',\n  CONFIG: 'Config'\n};\n\nfunction getOrCreateSheet(ss, name) {\n  let sheet = ss.getSheetByName(name);\n  if (!sheet) {\n    sheet = ss.insertSheet(name);\n  }\n  return sheet;\n}\n\nfunction resolveSpreadsheet(target) {\n  if (!target) {\n    return SpreadsheetApp.getActiveSpreadsheet();\n  }\n  target = String(target).trim();\n  try {\n    if (target.startsWith('http://') || target.startsWith('https://')) {\n      return SpreadsheetApp.openByUrl(target);\n    } else {\n      return SpreadsheetApp.openById(target);\n    }\n  } catch (err) {\n    throw new Error('スプレッドシートを開けませんでした。スプレッドシートの共有設定が「リンクを知っている全員（編集者）」になっているか確認してください。(詳細: ' + err.message + ')');\n  }\n}\n\nfunction doGet(e) {\n  try {\n    const target = (e && e.parameter) ? (e.parameter.url || e.parameter.id) : null;\n    const ss = resolveSpreadsheet(target);\n\n    const data = {\n      songs: readSongsSheet(ss),\n      scores: readScoresSheet(ss),\n      apPlusRecords: readTheorySheet(ss),\n      config: readConfigSheet(ss)\n    };\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      data: data\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\nfunction doPost(e) {\n  try {\n    let payload = null;\n    if (e.postData && e.postData.contents) {\n      payload = JSON.parse(e.postData.contents);\n    } else {\n      throw new Error('No post data received');\n    }\n\n    const target = payload.sheetUrl || payload.sheetId;\n    const ss = resolveSpreadsheet(target);\n    const nowStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');\n\n    if (payload.songs && Array.isArray(payload.songs)) {\n      writeSongsSheet(ss, payload.songs);\n    }\n    if (payload.scores && typeof payload.scores === 'object') {\n      writeScoresSheet(ss, payload.scores, nowStr);\n    }\n    if (payload.apPlusRecords && Array.isArray(payload.apPlusRecords)) {\n      writeTheorySheet(ss, payload.apPlusRecords);\n    }\n    if (payload.config && typeof payload.config === 'object') {\n      payload.config.lastSyncedAt = nowStr;\n      writeConfigSheet(ss, payload.config);\n    }\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      message: '同期が正常に完了しました',\n      syncedAt: nowStr\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\n/* ==========================================================\n * Sheet I/O Helpers\n * ========================================================== */\n\n// 1. Songs Sheet (楽曲マスター: 1曲1行)\nfunction writeSongsSheet(ss, songs) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);\n  sheet.clear();\n  const headers = [\n    '曲名', 'ソングパック', 'バージョン', 'songId',\n    'I_定数', 'I_Lv', 'II_定数', 'II_Lv',\n    'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',\n    'IV-α_定数', 'IV-α_Lv'\n  ];\n  const rows = [headers];\n\n  songs.forEach(s => {\n    const d = s.diffs || {};\n    rows.push([\n      s.title || '',\n      s.pack || '',\n      s.version || '',\n      s.songId || '',\n      d['I'] ? d['I'].constant : '',\n      d['I'] ? d['I'].level : '',\n      d['II'] ? d['II'].constant : '',\n      d['II'] ? d['II'].level : '',\n      d['III'] ? d['III'].constant : '',\n      d['III'] ? d['III'].level : '',\n      d['IV'] ? d['IV'].constant : '',\n      d['IV'] ? d['IV'].level : '',\n      d['IV-α'] ? d['IV-α'].constant : '',\n      d['IV-α'] ? d['IV-α'].level : ''\n    ]);\n  });\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0f2fe');\n  sheet.setFrozenRows(1);\n}\n\nfunction readSongsSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SONGS);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const songs = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (!row[0]) continue;\n    const diffs = {};\n    if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };\n    if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };\n    if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String(row[9] || '') };\n    if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String(row[11] || '') };\n    if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String(row[13] || '') };\n\n    songs.push({\n      title: String(row[0]),\n      pack: String(row[1] || '基本曲'),\n      version: String(row[2] || 'v5.6.0'),\n      songId: String(row[3] || ('song_' + i)),\n      diffs: diffs\n    });\n  }\n  return songs;\n}\n\n// 2. Scores Sheet (プレイ成績)\nfunction writeScoresSheet(ss, scores, nowStr) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SCORES);\n  sheet.clear();\n  const headers = ['チャートID', 'スコア', 'クリアランプ', '最終更新日時'];\n  const rows = [headers];\n\n  Object.keys(scores).forEach(chartId => {\n    const item = scores[chartId];\n    if (item && (item.score > 0 || item.status)) {\n      rows.push([\n        chartId,\n        item.score || 0,\n        item.status || '',\n        nowStr\n      ]);\n    }\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#fef3c7');\n  sheet.setFrozenRows(1);\n}\n\nfunction readScoresSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SCORES);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const scores = {};\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const chartId = String(row[0]);\n    if (!chartId) continue;\n    scores[chartId] = {\n      score: Number(row[1]) || 0,\n      status: String(row[2] || '')\n    };\n  }\n  return scores;\n}\n\n// 3. TheoryRecords Sheet (理論値記録)\nfunction writeTheorySheet(ss, records) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.THEORY);\n  sheet.clear();\n  const headers = ['No', '曲名', '難易度', '達成日', '備考'];\n  const rows = [headers];\n\n  records.forEach(r => {\n    rows.push([\n      r.no || '',\n      r.title || '',\n      r.diff || '',\n      r.date || '',\n      r.note || ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0e7ff');\n  sheet.setFrozenRows(1);\n}\n\nfunction readTheorySheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.THEORY);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const records = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (row[0] === '' && !row[1]) continue;\n\n    let dateStr = '';\n    const dateVal = row[3];\n    if (dateVal instanceof Date) {\n      dateStr = Utilities.formatDate(dateVal, 'Asia/Tokyo', 'yyyy/M/d');\n    } else if (dateVal) {\n      dateStr = String(dateVal);\n    }\n\n    records.push({\n      no: Number(row[0]) || (i),\n      title: String(row[1] || ''),\n      diff: String(row[2] || ''),\n      date: dateStr,\n      note: String(row[4] || '')\n    });\n  }\n  return records;\n}\n\n// 4. Config Sheet (設定データ)\nfunction writeConfigSheet(ss, config) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.CONFIG);\n  sheet.clear();\n  const headers = ['キー', '設定値', '説明'];\n  const rows = [\n    headers,\n    ['packOrder', JSON.stringify(config.packOrder || []), 'ソングパック表示順序 (JSON)'],\n    ['statsScope', String(config.statsScope || 'ALL'), 'マイページ統計対象スコープ (ALL / IN_GAME)'],\n    ['showApPlusDate', String(config.showApPlusDate !== false), '理論値一覧の日付列表示設定 (true / false)'],\n    ['lastSyncedAt', String(config.lastSyncedAt || ''), '最終同期日時 (自動更新)']\n  ];\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#f1f5f9');\n  sheet.setFrozenRows(1);\n}\n\nfunction readConfigSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.CONFIG);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const config = {};\n  for (let i = 1; i < values.length; i++) {\n    const key = String(values[i][0]);\n    const val = values[i][1];\n    if (key === 'packOrder') {\n      try { config.packOrder = JSON.parse(val); } catch (e) { config.packOrder = []; }\n    } else if (key === 'statsScope') {\n      config.statsScope = String(val);\n    } else if (key === 'showApPlusDate') {\n      config.showApPlusDate = (val === 'true' || val === true);\n    } else if (key === 'lastSyncedAt') {\n      config.lastSyncedAt = String(val);\n    }\n  }\n  return config;\n}\n";
     let userSheetUrl = localStorage.getItem(USER_SHEET_URL_KEY) || '';
     let gasAppUrl = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_ENDPOINT;
     let autoSyncEnabled = localStorage.getItem(AUTO_SYNC_KEY) === 'true';
@@ -3762,6 +3762,51 @@
       savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
     }
 
+    function formatApPlusDate(val) {
+      if (!val) return '';
+      const str = String(val).trim();
+      if (!str || str === 'undefined' || str === 'null' || str === '-') return '';
+      // 既に '2025/4/12' や '2025/04/12' のような短い形式
+      if (/^d{4}[/-]d{1,2}[/-]d{1,2}$/.test(str)) {
+        return str.replace(/-/g, '/');
+      }
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+      }
+      return str;
+    }
+
+    function normalizeApPlusRecord(r) {
+      if (!r) return r;
+      const title = (r.title || '').trim();
+      const diff = (r.diff || '').trim();
+      
+      const match = masterSongs.find(s => s[1].toLowerCase() === title.toLowerCase() && s[2] === diff);
+      
+      const level = (r.level && r.level !== 'undefined' && r.level !== 'null')
+        ? String(r.level)
+        : (match ? match[3] : '-');
+
+      const constant = (r.constant !== undefined && r.constant !== null && !isNaN(r.constant) && Number(r.constant) > 0)
+        ? Number(r.constant)
+        : (match ? match[4] : 0);
+
+      const chartId = r.chartId || (match ? match[0] : '');
+      const date = formatApPlusDate(r.date);
+
+      return {
+        no: Number(r.no) || 0,
+        title: title,
+        diff: diff,
+        level: level,
+        constant: constant,
+        chartId: chartId,
+        date: date,
+        note: r.note || ''
+      };
+    }
+
     function loadApPlusRecords() {
       const saved = localStorage.getItem(AP_PLUS_KEY);
       if (saved) {
@@ -3773,6 +3818,11 @@
         }
       } else {
         apPlusRecords = [];
+        localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
+      }
+
+      if (Array.isArray(apPlusRecords) && apPlusRecords.length > 0) {
+        apPlusRecords = apPlusRecords.map(normalizeApPlusRecord);
         localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
       }
 
@@ -4657,7 +4707,9 @@
 
     function parseDateVal(dStr) {
       if (!dStr) return 0;
-      const parts = String(dStr).split('/').map(x => parseInt(x, 10) || 0);
+      const formatted = formatApPlusDate(dStr);
+      if (!formatted) return 0;
+      const parts = formatted.split('/').map(x => parseInt(x, 10) || 0);
       if (parts.length < 3) return 0;
       return parts[0] * 10000 + parts[1] * 100 + parts[2];
     }
@@ -5046,11 +5098,15 @@
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'CONST_DESC') {
-          if (b.constant !== a.constant) return b.constant - a.constant;
+          const cB = (b.constant !== undefined && b.constant !== null && !isNaN(b.constant)) ? b.constant : 0;
+          const cA = (a.constant !== undefined && a.constant !== null && !isNaN(a.constant)) ? a.constant : 0;
+          if (cB !== cA) return cB - cA;
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'CONST_ASC') {
-          if (a.constant !== b.constant) return a.constant - b.constant;
+          const cB = (b.constant !== undefined && b.constant !== null && !isNaN(b.constant)) ? b.constant : 0;
+          const cA = (a.constant !== undefined && a.constant !== null && !isNaN(a.constant)) ? a.constant : 0;
+          if (cA !== cB) return cA - cB;
           return (a.no || 0) - (b.no || 0);
         }
         if (apPlusSort === 'TITLE') {
@@ -5064,18 +5120,27 @@
         const origIndex = apPlusRecords.indexOf(r);
         const diffClass = getDiffClass(r.diff);
 
+        // Master chart fallback for level and constant
+        const match = masterSongs.find(s => s[1].toLowerCase() === (r.title || '').toLowerCase() && s[2] === r.diff);
+        const level = (r.level && r.level !== 'undefined' && r.level !== 'null') ? r.level : (match ? match[3] : '-');
+        const constantVal = (r.constant !== undefined && r.constant !== null && !isNaN(r.constant) && Number(r.constant) > 0)
+          ? Number(r.constant)
+          : (match ? match[4] : 0);
+        const chartId = r.chartId || (match ? match[0] : '');
+        const dateStr = formatApPlusDate(r.date);
+
         html += 
           '<tr>' +
             '<td class="ap-no-cell">' + r.no + '</td>' +
-            '<td class="ap-title-cell" data-chart-id="' + (r.chartId || '') + '" title="クリックしてスコアを確認・編集">' +
+            '<td class="ap-title-cell" data-chart-id="' + escapeHtml(chartId) + '" title="クリックしてスコアを確認・編集">' +
               escapeHtml(r.title) +
             '</td>' +
             '<td style="text-align:center;">' +
               '<span class="diff-badge ' + diffClass + '" style="display:inline-block; font-size:11px; padding:2px 6px;">' + r.diff + '</span>' +
             '</td>' +
-            '<td style="text-align:center; font-weight:800;">' + r.level + '</td>' +
-            '<td class="ap-const-cell">' + (r.constant || 0).toFixed(1) + '</td>' +
-            '<td class="col-date ap-date-cell">' + escapeHtml(r.date || '-') + '</td>' +
+            '<td style="text-align:center; font-weight:800;">' + escapeHtml(level) + '</td>' +
+            '<td class="ap-const-cell">' + constantVal.toFixed(1) + '</td>' +
+            '<td class="col-date ap-date-cell">' + escapeHtml(dateStr || '-') + '</td>' +
             '<td class="ap-action-cell">' +
               '<button class="btn-table-action" type="button" title="編集" data-action="edit" data-idx="' + origIndex + '">✎</button>' +
               '<button class="btn-table-action del" type="button" title="削除" data-action="del" data-idx="' + origIndex + '">🗑</button>' +
@@ -6783,7 +6848,7 @@
 
           // 3. Restore Theory Records
           if (Array.isArray(d.apPlusRecords) && d.apPlusRecords.length > 0) {
-            apPlusRecords = d.apPlusRecords;
+            apPlusRecords = d.apPlusRecords.map(normalizeApPlusRecord);
             saveApPlusRecords();
           }
 

@@ -254,11 +254,20 @@ function readTheorySheet(ss) {
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     if (row[0] === '' && !row[1]) continue;
+
+    let dateStr = '';
+    const dateVal = row[3];
+    if (dateVal instanceof Date) {
+      dateStr = Utilities.formatDate(dateVal, 'Asia/Tokyo', 'yyyy/M/d');
+    } else if (dateVal) {
+      dateStr = String(dateVal);
+    }
+
     records.push({
       no: Number(row[0]) || (i),
       title: String(row[1] || ''),
       diff: String(row[2] || ''),
-      date: String(row[3] || ''),
+      date: dateStr,
       note: String(row[4] || '')
     });
   }
