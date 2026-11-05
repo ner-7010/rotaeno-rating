@@ -1,0 +1,992 @@
+[
+  {
+    "no": 1,
+    "title": "Laboratory-018",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.2,
+    "date": "2025/4/12",
+    "chartId": "laboratory-018_IV"
+  },
+  {
+    "no": 2,
+    "title": "Sakura rain",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.3,
+    "date": "2025/8/24",
+    "chartId": "sakura-rain_IV"
+  },
+  {
+    "no": 3,
+    "title": "심장병",
+    "diff": "IV",
+    "level": "9",
+    "constant": 9.5,
+    "date": "2026/6/16",
+    "chartId": "xinzang-bing_IV"
+  },
+  {
+    "no": 4,
+    "title": "Smile-mileS",
+    "diff": "IV",
+    "level": "12+",
+    "constant": 12.6,
+    "date": "2026/6/20",
+    "chartId": "smile-miles_IV"
+  },
+  {
+    "no": 5,
+    "title": "别れの序曲",
+    "diff": "IV",
+    "level": "10",
+    "constant": 10,
+    "date": "2026/7/3",
+    "chartId": "wakare-no-jokyoku_IV"
+  },
+  {
+    "no": 6,
+    "title": "今天不是明天",
+    "diff": "IV",
+    "level": "10",
+    "constant": 10.5,
+    "date": "2026/7/5",
+    "chartId": "today-is-not-tomorrow_IV"
+  },
+  {
+    "no": 7,
+    "title": "After Rain",
+    "diff": "IV",
+    "level": "10+",
+    "constant": 10.7,
+    "date": "2026/7/13",
+    "chartId": "after-rain_IV"
+  },
+  {
+    "no": 8,
+    "title": "LostPuppet",
+    "diff": "IV",
+    "level": "10+",
+    "constant": 10.6,
+    "date": "2026/7/29",
+    "chartId": "lost-puppet_IV"
+  },
+  {
+    "no": 9,
+    "title": "Aqua Theme",
+    "diff": "IV",
+    "level": "10+",
+    "constant": 10.6,
+    "date": "2026/7/30",
+    "chartId": "aqua-theme_IV"
+  },
+  {
+    "no": 10,
+    "title": "Velocity",
+    "diff": "IV",
+    "level": "10+",
+    "constant": 10.7,
+    "date": "2026/7/30",
+    "chartId": "velocity_IV"
+  },
+  {
+    "no": 11,
+    "title": "Autumn Breeze",
+    "diff": "IV",
+    "level": "10+",
+    "constant": 10.7,
+    "date": "2026/8/3",
+    "chartId": "autumn-breeze_IV"
+  },
+  {
+    "no": 12,
+    "title": "A Clock",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/8/5",
+    "chartId": "a-clock_IV"
+  },
+  {
+    "no": 13,
+    "title": "Brave My Soul",
+    "diff": "IV",
+    "level": "12+",
+    "constant": 12.8,
+    "date": "2026/8/5",
+    "chartId": "brave-my-soul_IV"
+  },
+  {
+    "no": 14,
+    "title": "Last Paradise",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.2,
+    "date": "2026/8/16",
+    "chartId": "last-paradise_IV"
+  },
+  {
+    "no": 15,
+    "title": "Infinity Heaven",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.2,
+    "date": "2026/8/16",
+    "chartId": "infinity-heaven_IV"
+  },
+  {
+    "no": 16,
+    "title": "A Time for Everything",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.1,
+    "date": "2026/8/16",
+    "chartId": "a-time-for-everything_IV"
+  },
+  {
+    "no": 17,
+    "title": "Snow Magic",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.2,
+    "date": "2026/8/16",
+    "chartId": "snow-magic_IV"
+  },
+  {
+    "no": 18,
+    "title": "K.moe (VIP)",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/8/16",
+    "chartId": "k-moe-vip_IV"
+  },
+  {
+    "no": 19,
+    "title": "無彩色のディストピア",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/8/23",
+    "chartId": "musaishiki-no-yutopia_IV"
+  },
+  {
+    "no": 20,
+    "title": "Make Up Your World feat. キョンシーのCiちゃん & らっぷびと",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/8/29",
+    "chartId": "make-up-your-world_IV"
+  },
+  {
+    "no": 21,
+    "title": "Edge of bravery",
+    "diff": "IV",
+    "level": "13",
+    "constant": 13.4,
+    "date": "2026/8/29",
+    "chartId": "edge-of-bravery_IV"
+  },
+  {
+    "no": 22,
+    "title": "Ice Festival",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/9/11",
+    "chartId": "ice-festival_IV"
+  },
+  {
+    "no": 23,
+    "title": "ねぇねぇねぇ。",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.3,
+    "date": "2026/9/12",
+    "chartId": "nee-nee-nee_IV"
+  },
+  {
+    "no": 24,
+    "title": "Aurora",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/9/12",
+    "chartId": "aurora_IV"
+  },
+  {
+    "no": 25,
+    "title": "Pure White: Tale of Serissa",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/9/18",
+    "chartId": "pure-white-tale-of-serissa_IV"
+  },
+  {
+    "no": 26,
+    "title": "Converge",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/9/24",
+    "chartId": "converge_IV"
+  },
+  {
+    "no": 27,
+    "title": "Witches' Party",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/9/24",
+    "chartId": "witches-party_IV"
+  },
+  {
+    "no": 28,
+    "title": "Swirling Blue",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "swirling-blue_IV"
+  },
+  {
+    "no": 29,
+    "title": "Obsidian(Short Ver.)",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "obsidian_IV"
+  },
+  {
+    "no": 30,
+    "title": "Star Cape",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "star-cape_IV"
+  },
+  {
+    "no": 31,
+    "title": "Äventyr",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "aventyr_IV"
+  },
+  {
+    "no": 32,
+    "title": "又一遍的歌",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "song-for-again_IV"
+  },
+  {
+    "no": 33,
+    "title": "Sword of Convallaria",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11,
+    "date": "2026/9/24",
+    "chartId": "sword-of-convallaria_IV"
+  },
+  {
+    "no": 34,
+    "title": "Wish Upon Vivid Stars",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.1,
+    "date": "2026/9/24",
+    "chartId": "wish-upon-vivid-stars_IV"
+  },
+  {
+    "no": 35,
+    "title": "トリコロール・ステップ",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.1,
+    "date": "2026/9/24",
+    "chartId": "torikororu-suteppu_IV"
+  },
+  {
+    "no": 36,
+    "title": "1/100 の アイ",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.1,
+    "date": "2026/9/24",
+    "chartId": "one-percent-love_IV"
+  },
+  {
+    "no": 37,
+    "title": "Psalms ∽魂の還るばしょ∽",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.2,
+    "date": "2026/9/24",
+    "chartId": "psalms_IV"
+  },
+  {
+    "no": 38,
+    "title": "Invisible Frenzy",
+    "diff": "IV",
+    "level": "13+",
+    "constant": 13.7,
+    "date": "2026/9/28",
+    "chartId": "invisible-frenzy_IV"
+  },
+  {
+    "no": 39,
+    "title": "Broomstick adventure!",
+    "diff": "IV",
+    "level": "12+",
+    "constant": 12.8,
+    "date": "2026/10/6",
+    "chartId": "broomstick-adventure_IV"
+  },
+  {
+    "no": 40,
+    "title": "Cristalisia (Violin Ver.)",
+    "diff": "IV-α",
+    "level": "13",
+    "constant": 13.1,
+    "date": "2026/10/6",
+    "chartId": "cristalisia_IV-α"
+  },
+  {
+    "no": 41,
+    "title": "ジャンキーナイトタウンオーケストラ",
+    "diff": "IV",
+    "level": "13",
+    "constant": 13.3,
+    "date": "2026/10/7",
+    "chartId": "junky-night-town-orchestra_IV"
+  },
+  {
+    "no": 42,
+    "title": "KING",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "king_IV"
+  },
+  {
+    "no": 43,
+    "title": "アイロニ",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "irony_IV"
+  },
+  {
+    "no": 44,
+    "title": "WILDCARD",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "wildcard_IV"
+  },
+  {
+    "no": 45,
+    "title": "粛聖!! ロリ神レクイエム☆",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "loli-kami_IV"
+  },
+  {
+    "no": 46,
+    "title": "Aorist Hallucination",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "aorist-hallucination_IV"
+  },
+  {
+    "no": 47,
+    "title": "Commotion",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.3,
+    "date": "2026/10/8",
+    "chartId": "commotion_IV"
+  },
+  {
+    "no": 48,
+    "title": "Anthem",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/8",
+    "chartId": "anthem_IV"
+  },
+  {
+    "no": 49,
+    "title": "Eternal calm",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/8",
+    "chartId": "eternal-calm_IV"
+  },
+  {
+    "no": 50,
+    "title": "Piper Hyper Caravan",
+    "diff": "IV",
+    "level": "14",
+    "constant": 14.2,
+    "date": "2026/10/18",
+    "chartId": "piper-hyper-caravan_IV"
+  },
+  {
+    "no": 51,
+    "title": "Apocalypse",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/18",
+    "chartId": "apocalypse_IV"
+  },
+  {
+    "no": 52,
+    "title": "huggy wuggy",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/18",
+    "chartId": "huggy-wuggy_IV"
+  },
+  {
+    "no": 53,
+    "title": "Bystander Knife",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/10/18",
+    "chartId": "bystander-knife_IV"
+  },
+  {
+    "no": 54,
+    "title": "幻影",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/18",
+    "chartId": "phantom_IV"
+  },
+  {
+    "no": 55,
+    "title": "Sweet Dreams feat. 利香 (short ver.)",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/10/18",
+    "chartId": "sweet-dreams_IV"
+  },
+  {
+    "no": 56,
+    "title": "Break Over",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.4,
+    "date": "2026/10/18",
+    "chartId": "break-over_IV"
+  },
+  {
+    "no": 57,
+    "title": "ヴァンパイア",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/10/18",
+    "chartId": "the-vampire_IV"
+  },
+  {
+    "no": 58,
+    "title": "HYPERSYNTHETIC",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/10/18",
+    "chartId": "hypersynthetic_IV"
+  },
+  {
+    "no": 59,
+    "title": "NINJA-ish",
+    "diff": "IV",
+    "level": "11",
+    "constant": 11.5,
+    "date": "2026/10/18",
+    "chartId": "ninja-ish_IV"
+  },
+  {
+    "no": 60,
+    "title": "Beautiful Days",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/18",
+    "chartId": "beautiful-days_IV"
+  },
+  {
+    "no": 61,
+    "title": "The Promised Land",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/19",
+    "chartId": "the-promised-land_IV"
+  },
+  {
+    "no": 62,
+    "title": "Is This Real?",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/19",
+    "chartId": "is-this-real_IV"
+  },
+  {
+    "no": 63,
+    "title": "終焉から命を救う",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/19",
+    "chartId": "shuen-kara-inochi-o-sukuu_IV"
+  },
+  {
+    "no": 64,
+    "title": "Lullaby For an Android",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/19",
+    "chartId": "lullaby-for-an-android_IV"
+  },
+  {
+    "no": 65,
+    "title": "Cristalisia",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/19",
+    "chartId": "cristalisia_IV"
+  },
+  {
+    "no": 66,
+    "title": "静寂に憂う",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/19",
+    "chartId": "shijima-ni-ureu_IV"
+  },
+  {
+    "no": 67,
+    "title": "YUBIKIRI-GENMAN -special edit-",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/21",
+    "chartId": "yubikiri-genman-special_IV"
+  },
+  {
+    "no": 68,
+    "title": "雨に祈りを",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/21",
+    "chartId": "ameni-inoriwo_IV"
+  },
+  {
+    "no": 69,
+    "title": "Journey with You",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/21",
+    "chartId": "journey-with-you_IV"
+  },
+  {
+    "no": 70,
+    "title": "ラグトレイン",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/21",
+    "chartId": "lagtrain_IV"
+  },
+  {
+    "no": 71,
+    "title": "ULTRA SYNERGY MATRIX",
+    "diff": "IV",
+    "level": "13",
+    "constant": 13.4,
+    "date": "2026/10/24",
+    "chartId": "ultra-synergy-matrix_IV"
+  },
+  {
+    "no": 72,
+    "title": "Fall in Me",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.3,
+    "date": "2026/10/24",
+    "chartId": "fall-in-me_IV"
+  },
+  {
+    "no": 73,
+    "title": "Song for Sprites",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/24",
+    "chartId": "song-for-sprites_IV"
+  },
+  {
+    "no": 74,
+    "title": "Invader",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.5,
+    "date": "2026/10/24",
+    "chartId": "invader_IV"
+  },
+  {
+    "no": 75,
+    "title": "Reverie",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/24",
+    "chartId": "reverie_IV"
+  },
+  {
+    "no": 76,
+    "title": "Let you DIVE!",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/24",
+    "chartId": "let-you-dive_IV"
+  },
+  {
+    "no": 77,
+    "title": "Provison",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/24",
+    "chartId": "provison_IV"
+  },
+  {
+    "no": 78,
+    "title": "NO ONE YES MAN",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/24",
+    "chartId": "no-one-yes-man_IV"
+  },
+  {
+    "no": 79,
+    "title": "Moonlight Fragrance",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/24",
+    "chartId": "moonlight-fragrance_IV"
+  },
+  {
+    "no": 80,
+    "title": "Re-waked from Abyss",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/24",
+    "chartId": "re-waked-from-abyss_IV"
+  },
+  {
+    "no": 81,
+    "title": "Aqua Stars",
+    "diff": "IV",
+    "level": "12+",
+    "constant": 12.6,
+    "date": "2026/10/24",
+    "chartId": "aqua-stars_IV"
+  },
+  {
+    "no": 82,
+    "title": "Inverted World",
+    "diff": "IV",
+    "level": "13+",
+    "constant": 13.7,
+    "date": "2026/10/24",
+    "chartId": "inverted-world_IV"
+  },
+  {
+    "no": 83,
+    "title": "A Turtle's Heart",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/25",
+    "chartId": "a-turtles-heart_IV"
+  },
+  {
+    "no": 84,
+    "title": "Summer Time Memory",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/25",
+    "chartId": "summer-time-memory_IV"
+  },
+  {
+    "no": 85,
+    "title": "Clock Paradox",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/25",
+    "chartId": "clock-paradox_IV"
+  },
+  {
+    "no": 86,
+    "title": "You & DIE",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/25",
+    "chartId": "you-n-die_IV"
+  },
+  {
+    "no": 87,
+    "title": "Snapdragon",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/25",
+    "chartId": "snapdragon_IV"
+  },
+  {
+    "no": 88,
+    "title": "咲く星々",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.7,
+    "date": "2026/10/25",
+    "chartId": "saku-hoshiboshi_IV"
+  },
+  {
+    "no": 89,
+    "title": "Sterelogue",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/25",
+    "chartId": "sterelogue_IV"
+  },
+  {
+    "no": 90,
+    "title": "Estaminet",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/26",
+    "chartId": "estaminet_IV"
+  },
+  {
+    "no": 91,
+    "title": "GRAND-i-FLORA",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/26",
+    "chartId": "grand-i-flora_IV"
+  },
+  {
+    "no": 92,
+    "title": "Don't Never Around",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/26",
+    "chartId": "dont-never-around_IV"
+  },
+  {
+    "no": 93,
+    "title": "爱上想象的你",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/26",
+    "chartId": "love-you-i-imagined_IV"
+  },
+  {
+    "no": 94,
+    "title": "Forever Never Lasts",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.8,
+    "date": "2026/10/26",
+    "chartId": "forever-never-lasts_IV"
+  },
+  {
+    "no": 95,
+    "title": "Night Sky feat. Mashilo & ichika",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/26",
+    "chartId": "night-sky_IV"
+  },
+  {
+    "no": 96,
+    "title": "enchanted love",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.9,
+    "date": "2026/10/26",
+    "chartId": "enchanted-love_IV"
+  },
+  {
+    "no": 97,
+    "title": "Slide Down",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/10/28",
+    "chartId": "slide-down_IV"
+  },
+  {
+    "no": 98,
+    "title": "Within the Horizon",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/10/28",
+    "chartId": "within-the-horizon_IV"
+  },
+  {
+    "no": 99,
+    "title": "UN1TE feat.YUC'e",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/10/28",
+    "chartId": "un1te_IV"
+  },
+  {
+    "no": 100,
+    "title": "Awaking Beat -From the next generation-",
+    "diff": "IV",
+    "level": "13+",
+    "constant": 13.7,
+    "date": "2026/10/30",
+    "chartId": "awaking-beat_IV"
+  },
+  {
+    "no": 101,
+    "title": "The Promised Land (New Era Remix)",
+    "diff": "IV",
+    "level": "13",
+    "constant": 13.3,
+    "date": "2026/10/30",
+    "chartId": "the-promised-land-new-era-remix_IV"
+  },
+  {
+    "no": 102,
+    "title": "Silvano Theme",
+    "diff": "IV",
+    "level": "11+",
+    "constant": 11.6,
+    "date": "2026/10/30",
+    "chartId": "silvano-theme_IV"
+  },
+  {
+    "no": 103,
+    "title": "恶修女——永火熔铸",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/11/1",
+    "chartId": "burn-it-up_IV"
+  },
+  {
+    "no": 104,
+    "title": "A City in Serenity",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/11/1",
+    "chartId": "a-city-in-serenity_IV"
+  },
+  {
+    "no": 105,
+    "title": "Extraordinary",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12,
+    "date": "2026/11/1",
+    "chartId": "extraordinary_IV"
+  },
+  {
+    "no": 106,
+    "title": "Chrysanthemum",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.1,
+    "date": "2026/11/1",
+    "chartId": "chrysanthemum_IV"
+  },
+  {
+    "no": 107,
+    "title": "Cosmic Starter",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.1,
+    "date": "2026/11/1",
+    "chartId": "cosmic-starter_IV"
+  },
+  {
+    "no": 108,
+    "title": "星降る夜と一輪の花",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.1,
+    "date": "2026/11/1",
+    "chartId": "hoshifuruyoru-to-ichirin-no-hana_IV"
+  },
+  {
+    "no": 109,
+    "title": "死んでしまった季節のかけら",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.1,
+    "date": "2026/11/4",
+    "chartId": "shinde-shimatta-kisetsu-no-kakera_IV"
+  },
+  {
+    "no": 110,
+    "title": "天使であれたら",
+    "diff": "IV",
+    "level": "12",
+    "constant": 12.1,
+    "date": "2026/11/4",
+    "chartId": "tenshidearetara_IV"
+  }
+]
