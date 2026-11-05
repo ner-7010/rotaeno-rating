@@ -3777,10 +3777,10 @@ const htmlContent = `<!DOCTYPE html>
           apPlusRecords = JSON.parse(saved);
         } catch (e) {
           console.error(e);
-          apPlusRecords = JSON.parse(JSON.stringify(DEFAULT_AP_PLUS_RECORDS));
+          apPlusRecords = [];
         }
       } else {
-        apPlusRecords = JSON.parse(JSON.stringify(DEFAULT_AP_PLUS_RECORDS));
+        apPlusRecords = [];
         localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
       }
 
@@ -3873,18 +3873,8 @@ const htmlContent = `<!DOCTYPE html>
         }
       }
       userScores = {};
-      masterSongs.forEach(s => {
-        if (s[9] && s[9] > 0) {
-          const score = s[9];
-          const status = score === 1010000 ? 'AP+' : (s[10] || '');
-          userScores[s[0]] = {
-            score: score,
-            status: status
-          };
-        }
-      });
+      savedScores = {};
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userScores));
-      savedScores = JSON.parse(JSON.stringify(userScores));
     }
 
     function saveScores() {

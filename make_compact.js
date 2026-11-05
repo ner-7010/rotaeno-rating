@@ -11,8 +11,8 @@ const compact = songs.map(s => [
   s.pack,                // 6
   s.songId,              // 7
   s.endOfSale,           // 8
-  s.initialScore || 0,   // 9
-  s.initialStatus || '', // 10
+  0,                     // 9: initialScore (0: 未入力)
+  '',                    // 10: initialStatus ('': 未クリア)
   s.version || '',       // 11
   s.initId || 0          // 12
 ]);
