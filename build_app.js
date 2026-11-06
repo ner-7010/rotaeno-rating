@@ -2142,6 +2142,36 @@ const htmlContent = `<!DOCTYPE html>
       line-height: 1.5;
     }
 
+    .disclaimer-panel {
+      border-left: 4px solid var(--color-text-muted);
+      background: var(--bg-card);
+    }
+
+    /* Disclaimer Footer */
+    .app-disclaimer-footer {
+      margin-top: 32px;
+      margin-bottom: 16px;
+      padding: 16px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+    }
+
+    .disclaimer-title {
+      font-weight: 800;
+      color: var(--color-text-sub);
+      margin-bottom: 4px;
+      font-size: 11.5px;
+    }
+
+    .disclaimer-text {
+      margin: 0;
+    }
+
     .action-btn-group {
       display: flex;
       gap: 8px;
@@ -3427,7 +3457,30 @@ const htmlContent = `<!DOCTYPE html>
           <button class="panel-btn danger-zone" id="btnResetData">全データをリセット</button>
         </div>
       </div>
+
+      <!-- Section: Disclaimer & Rights -->
+      <div class="settings-panel disclaimer-panel">
+        <h3>📌 免責事項・権利表記</h3>
+        <p style="font-size: 12.5px; line-height: 1.6; color: var(--color-text-main); margin-bottom: 8px;">
+          当サイト（Rotaeno Rating Tracker）は、個人が運営する<strong>非公式ファンツール</strong>です。<strong>Dream Engine Games 様及びその関連会社とは一切関係がありません</strong>。
+        </p>
+        <ul style="font-size: 11.5px; line-height: 1.6; color: var(--color-text-sub); margin: 0 0 10px 0; padding-left: 18px;">
+          <li>『Rotaeno（ロテーノ）』に関する著作権、商標権、楽曲データ等の知的財産権は、Dream Engine Games 様および各権利所有者に帰属します。</li>
+          <li>当ツール内では、公式ゲーム画像（ジャケット・キャラクター・UI等）および音声・楽曲データ等の公式アセットは一切使用しておりません。</li>
+          <li>当ツールの利用により生じた損害や不利益等について、開発者は一切の責任を負いかねますのであらかじめご了承ください。</li>
+        </ul>
+      </div>
     </div>
+
+    <!-- Common App Footer (Disclaimer) -->
+    <footer class="app-disclaimer-footer">
+      <div class="disclaimer-title">【非公式ファンツール】</div>
+      <p class="disclaimer-text">
+        当サイトは非公式のファンツールであり、<strong>Dream Engine Games 様及びその関連会社とは一切関係がありません</strong>。<br>
+        『Rotaeno』の著作権・商標権は Dream Engine Games 様および各権利所有者に帰属します。<br>
+        ※当ツールでは公式ゲーム画像・ジャケット画像等のアセットは一切使用しておりません。
+      </p>
+    </footer>
   </main>
 
   <!-- Unsaved Changes Floating Bar -->
