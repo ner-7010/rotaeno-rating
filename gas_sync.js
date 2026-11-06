@@ -111,7 +111,7 @@ function writeSongsSheet(ss, songs) {
   const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);
   sheet.clear();
   const headers = [
-    'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId',
+    'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId', '販売終了',
     'I_定数', 'I_Lv', 'II_定数', 'II_Lv',
     'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',
     'IV-α_定数', 'IV-α_Lv'
@@ -122,14 +122,14 @@ function writeSongsSheet(ss, songs) {
     const d = s.diffs || {};
     const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
     const titleStr = String(s.title || '');
-    // If title is 'true' or 'false' (any casing), prefix with apostrophe to store as text in Google Sheets
-    const cellTitle = (/^(true|false)$/i.test(titleStr)) ? ("'" + titleStr) : titleStr;
+    const isEndOfSale = (s.endOfSale === 1 || s.endOfSale === true || String(s.endOfSale) === '1') ? 1 : 0;
     rows.push([
       orderNo,
-      cellTitle,
+      titleStr,
       s.pack || '',
       s.version || '',
       s.songId || '',
+      isEndOfSale,
       d['I'] ? d['I'].constant : '',
       d['I'] ? d['I'].level : '',
       d['II'] ? d['II'].constant : '',
@@ -147,6 +147,7 @@ function writeSongsSheet(ss, songs) {
     sheet.getRange(2, 2, rows.length - 1, 4).setNumberFormat('@');
     sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
     sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');
+    sheet.getRange(1, 6, rows.length, 1).setHorizontalAlignment('center');
   } else {
     sheet.getRange(1, 1, 1, headers.length).setValues(rows);
   }
@@ -162,53 +163,84 @@ function readSongsSheet(ss) {
   const displayValues = range.getDisplayValues();
   if (values.length <= 1) return [];
 
-  // Check if header row contains 'デフォルト順' (backward compatible)
-  const headerCol0 = String((displayValues[0] && displayValues[0][0]) || values[0][0] || '').trim();
-  const hasOrderCol = (headerCol0 === 'デフォルト順' || headerCol0 === 'No' || headerCol0 === '順序' || headerCol0 === 'ID');
+  // Match columns dynamically by header names
+  const headers = displayValues[0].map(h => String(h || '').trim());
+  const colOrder = headers.findIndex(h => /^(デフォルト順|No|順序|ID)$/i.test(h));
+  const colTitle = headers.indexOf('曲名');
+  const colPack = headers.indexOf('ソングパック');
+  const colVer = headers.indexOf('バージョン');
+  const colSongId = headers.indexOf('songId');
+  const colEndOfSale = headers.findIndex(h => /^(販売終了|endOfSale|削除フラグ)$/i.test(h));
+  const colConstI = headers.indexOf('I_定数');
+  const colLvI = headers.indexOf('I_Lv');
+  const colConstII = headers.indexOf('II_定数');
+  const colLvII = headers.indexOf('II_Lv');
+  const colConstIII = headers.indexOf('III_定数');
+  const colLvIII = headers.indexOf('III_Lv');
+  const colConstIV = headers.indexOf('IV_定数');
+  const colLvIV = headers.indexOf('IV_Lv');
+  const colConstIVAlpha = headers.findIndex(h => /^(IV-α_定数|IV-a_定数)$/i.test(h));
+  const colLvIVAlpha = headers.findIndex(h => /^(IV-α_Lv|IV-a_Lv)$/i.test(h));
+
+  const hasOrderCol = colOrder !== -1;
+  const idxTitle = colTitle !== -1 ? colTitle : (hasOrderCol ? 1 : 0);
+  const idxPack = colPack !== -1 ? colPack : (hasOrderCol ? 2 : 1);
+  const idxVer = colVer !== -1 ? colVer : (hasOrderCol ? 3 : 2);
+  const idxSongId = colSongId !== -1 ? colSongId : (hasOrderCol ? 4 : 3);
 
   const songs = [];
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     const disp = displayValues[i];
-    if (hasOrderCol) {
-      // Use displayValues for string fields so boolean cells like TRUE/FALSE preserve their exact cell text!
-      const title = (disp && disp[1] !== '') ? disp[1] : String(row[1] || '');
-      if (!title) continue;
-      const initId = (row[0] !== '' && !isNaN(row[0])) ? Number(row[0]) : i;
-      const diffs = {};
-      if (row[5] !== '') diffs['I'] = { constant: Number(row[5]), level: String((disp && disp[6]) || row[6] || '') };
-      if (row[7] !== '') diffs['II'] = { constant: Number(row[7]), level: String((disp && disp[8]) || row[8] || '') };
-      if (row[9] !== '') diffs['III'] = { constant: Number(row[9]), level: String((disp && disp[10]) || row[10] || '') };
-      if (row[11] !== '') diffs['IV'] = { constant: Number(row[11]), level: String((disp && disp[12]) || row[12] || '') };
-      if (row[13] !== '') diffs['IV-α'] = { constant: Number(row[13]), level: String((disp && disp[14]) || row[14] || '') };
 
-      songs.push({
-        initId: initId,
-        title: title,
-        pack: String((disp && disp[2]) || row[2] || '基本曲'),
-        version: String((disp && disp[3]) || row[3] || 'v5.6.0'),
-        songId: String((disp && disp[4]) || row[4] || ('song_' + i)),
-        diffs: diffs
-      });
-    } else {
-      const title = (disp && disp[0] !== '') ? disp[0] : String(row[0] || '');
-      if (!title) continue;
-      const diffs = {};
-      if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String((disp && disp[5]) || row[5] || '') };
-      if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String((disp && disp[7]) || row[7] || '') };
-      if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String((disp && disp[9]) || row[9] || '') };
-      if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String((disp && disp[11]) || row[11] || '') };
-      if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String((disp && disp[13]) || row[13] || '') };
+    const title = (disp && disp[idxTitle] !== '') ? disp[idxTitle] : String(row[idxTitle] || '');
+    if (!title) continue;
 
-      songs.push({
-        initId: i,
-        title: title,
-        pack: String((disp && disp[1]) || row[1] || '基本曲'),
-        version: String((disp && disp[2]) || row[2] || 'v5.6.0'),
-        songId: String((disp && disp[3]) || row[3] || ('song_' + i)),
-        diffs: diffs
-      });
+    const initId = (hasOrderCol && row[colOrder] !== '' && !isNaN(row[colOrder])) ? Number(row[colOrder]) : i;
+
+    let endOfSale = 0;
+    if (colEndOfSale !== -1) {
+      const val = row[colEndOfSale];
+      if (val === 1 || String(val).trim() === '1' || String(val).toUpperCase() === 'TRUE') {
+        endOfSale = 1;
+      }
     }
+
+    const diffs = {};
+    function parseDiff(cIdx, lIdx, key) {
+      if (cIdx !== -1 && row[cIdx] !== '' && !isNaN(row[cIdx])) {
+        diffs[key] = {
+          constant: Number(row[cIdx]),
+          level: String((lIdx !== -1 && disp && disp[lIdx]) || (lIdx !== -1 && row[lIdx]) || '')
+        };
+      }
+    }
+
+    if (colConstI !== -1) {
+      parseDiff(colConstI, colLvI, 'I');
+      parseDiff(colConstII, colLvII, 'II');
+      parseDiff(colConstIII, colLvIII, 'III');
+      parseDiff(colConstIV, colLvIV, 'IV');
+      parseDiff(colConstIVAlpha, colLvIVAlpha, 'IV-α');
+    } else {
+      // Legacy positional layout fallback
+      const baseDiffIdx = (colEndOfSale !== -1 && colEndOfSale < 6) ? 6 : (hasOrderCol ? 5 : 4);
+      parseDiff(baseDiffIdx, baseDiffIdx + 1, 'I');
+      parseDiff(baseDiffIdx + 2, baseDiffIdx + 3, 'II');
+      parseDiff(baseDiffIdx + 4, baseDiffIdx + 5, 'III');
+      parseDiff(baseDiffIdx + 6, baseDiffIdx + 7, 'IV');
+      parseDiff(baseDiffIdx + 8, baseDiffIdx + 9, 'IV-α');
+    }
+
+    songs.push({
+      initId: initId,
+      title: title,
+      pack: String((disp && disp[idxPack]) || row[idxPack] || '基本曲'),
+      version: String((disp && disp[idxVer]) || row[idxVer] || 'v5.6.0'),
+      songId: String((disp && disp[idxSongId]) || row[idxSongId] || ('song_' + i)),
+      endOfSale: endOfSale,
+      diffs: diffs
+    });
   }
   songs.sort((a, b) => (a.initId || 0) - (b.initId || 0));
   return songs;

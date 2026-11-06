@@ -4130,7 +4130,7 @@ const htmlContent = `<!DOCTYPE html>
           0,
           song.pack || '基本曲',
           song.songId,
-          0,
+          Number(song.endOfSale) || 0,
           0,
           '',
           song.version || 'v5.6.0',
@@ -6940,22 +6940,17 @@ const htmlContent = `<!DOCTYPE html>
           const curTitle = String(firstTuple[1] || '').trim();
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
-          let offTitle = (typeof song.title === 'boolean') ? (song.title ? 'TRUE' : 'FALSE') : String(song.title || '').trim();
+          let offTitle = String(song.title || '').trim();
 
           const changes = [];
 
           if (offTitle && curTitle !== offTitle) {
-            // Guard against Google Sheets boolean auto-typecast artifact (e.g. 'TRUE' vs 'true')
-            const isBoolArtifact = (curTitle.toLowerCase() === 'true' && offTitle.toLowerCase() === 'true') ||
-                                   (curTitle.toLowerCase() === 'false' && offTitle.toLowerCase() === 'false');
-            if (!isBoolArtifact) {
-              changes.push({
-                field: 'title',
-                label: '曲名',
-                oldVal: curTitle,
-                newVal: offTitle
-              });
-            }
+            changes.push({
+              field: 'title',
+              label: '曲名',
+              oldVal: curTitle,
+              newVal: offTitle
+            });
           }
 
           if (curPack !== offPack) {
@@ -6973,6 +6968,17 @@ const htmlContent = `<!DOCTYPE html>
               label: 'Ver',
               oldVal: curVer,
               newVal: offVer
+            });
+          }
+
+          const curEndOfSale = Number(firstTuple[8]) || 0;
+          const offEndOfSale = Number(song.endOfSale) || 0;
+          if (curEndOfSale !== offEndOfSale) {
+            changes.push({
+              field: 'endOfSale',
+              label: '販売状態',
+              oldVal: curEndOfSale === 1 ? '販売終了' : '通常販売',
+              newVal: offEndOfSale === 1 ? '販売終了' : '通常販売'
             });
           }
 
@@ -7259,7 +7265,7 @@ const htmlContent = `<!DOCTYPE html>
               0,
               song.pack || '基本曲',
               song.songId,
-              0,
+              Number(song.endOfSale) || 0,
               0,
               '',
               song.version || 'v5.6.0',
@@ -7289,6 +7295,9 @@ const htmlContent = `<!DOCTYPE html>
             s[1] = officialSong.title;
             s[6] = officialSong.pack || s[6];
             s[11] = officialSong.version || s[11];
+            if (officialSong.endOfSale !== undefined) {
+              s[8] = Number(officialSong.endOfSale) || 0;
+            }
 
             // Update constants / levels if revised
             if (officialSong.diffs && officialSong.diffs[s[2]]) {
@@ -7315,7 +7324,7 @@ const htmlContent = `<!DOCTYPE html>
                 0,
                 officialSong.pack || baseTuple[6],
                 baseTuple[7],
-                baseTuple[8] || 0,
+                officialSong.endOfSale !== undefined ? (Number(officialSong.endOfSale) || 0) : (baseTuple[8] || 0),
                 0,
                 '',
                 officialSong.version || baseTuple[11],
@@ -7903,7 +7912,7 @@ const htmlContent = `<!DOCTYPE html>
                   0,
                   song.pack || '基本曲',
                   song.songId || ('song_' + songInitId),
-                  0,
+                  Number(song.endOfSale) || 0,
                   0,
                   '',
                   song.version || 'v5.6.0',
@@ -8144,7 +8153,7 @@ const htmlContent = `<!DOCTYPE html>
                   0,
                   song.pack || '基本曲',
                   song.songId || ('song_' + songInitId),
-                  0,
+                  Number(song.endOfSale) || 0,
                   0,
                   '',
                   song.version || 'v5.6.0',
