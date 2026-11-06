@@ -1,6 +1,5 @@
 const fs = require('fs');
 
-const compactData = fs.readFileSync('compact_songs.json', 'utf-8');
 const defaultApPlusData = fs.readFileSync('default_ap_plus_records.json', 'utf-8');
 const gasScriptContent = fs.readFileSync('gas_sync.js', 'utf-8');
 const iconSvgContent = fs.readFileSync('icon.svg', 'utf-8');
@@ -2866,6 +2865,31 @@ const htmlContent = `<!DOCTYPE html>
 </head>
 <body>
 
+  <!-- First Boot / Initial Setup Loader -->
+  <div id="firstBootLoadingOverlay" style="display: none; position: fixed; inset: 0; background: #0b0f19; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="font-size: 48px; margin-bottom: 16px; animation: fbPulse 1.8s ease-in-out infinite;">💿</div>
+    <h2 style="margin: 0 0 8px 0; color: #f8fafc; font-size: 20px; font-weight: 800; letter-spacing: 0.05em;">Rotaeno Rating Tracker</h2>
+    <p id="firstBootStatus" style="font-size: 13px; color: #94a3b8; margin: 0 0 24px 0; line-height: 1.5;">管理スプレッドシートから最新楽曲データを取得しています...<br><span style="font-size: 11px; color: #64748b;">（初回のみ実行されます）</span></p>
+    <div id="firstBootProgressWrap" style="width: 240px; height: 6px; background: #1e293b; border-radius: 9999px; overflow: hidden; position: relative;">
+      <div id="firstBootProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); transform-origin: 0% 50%; animation: fbIndeterminate 1.4s infinite ease-in-out;"></div>
+    </div>
+    <div id="firstBootErrorWrap" style="display: none; margin-top: 20px; flex-direction: column; align-items: center;">
+      <div id="firstBootErrorMsg" style="color: #f87171; font-size: 12px; margin-bottom: 14px; max-width: 320px; line-height: 1.5; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 10px 14px;"></div>
+      <button type="button" id="btnFirstBootRetry" class="panel-btn" style="background: #38bdf8; color: #0f172a; font-weight: 800; padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;">🔄 再試行</button>
+    </div>
+  </div>
+  <style>
+    @keyframes fbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    @keyframes fbIndeterminate {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(0%); }
+      100% { transform: translateX(100%); }
+    }
+  </style>
+
   <!-- Top Header -->
   <header>
     <div class="rating-banner">
@@ -3915,8 +3939,6 @@ const htmlContent = `<!DOCTYPE html>
   </div>
 
   <script>
-    // Master data: [id, title, diff, level, constant, notes, pack, songId, endOfSale, initScore, initStatus, version, initId]
-    const DEFAULT_SONGS = ${compactData};
     const DEFAULT_AP_PLUS_RECORDS = ${defaultApPlusData};
     const STORAGE_KEY = 'rotaeno_user_scores_v1';
     const MASTER_SONGS_KEY = 'rotaeno_master_songs_v2';
@@ -4023,7 +4045,7 @@ const htmlContent = `<!DOCTYPE html>
       } else {
         packOrder = [...GAME_PACK_ORDER];
       }
-      const existingPacks = [...new Set((masterSongs.length ? masterSongs : DEFAULT_SONGS).map(s => s[6]))].filter(Boolean);
+      const existingPacks = [...new Set(masterSongs.map(s => s[6]))].filter(Boolean);
       existingPacks.forEach(p => {
         if (!packOrder.includes(p)) packOrder.push(p);
       });
@@ -4185,8 +4207,6 @@ const htmlContent = `<!DOCTYPE html>
       return tuples;
     }
 
-    let isFirstBoot = false;
-
     function loadMasterSongs() {
       const saved = localStorage.getItem(MASTER_SONGS_KEY);
       if (saved) {
@@ -4196,38 +4216,16 @@ const htmlContent = `<!DOCTYPE html>
             masterSongs = normalizeMasterSongOrders(masterSongs);
             savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
             saveMasterSongs();
-            return;
+            return true;
           }
         } catch (e) {
-          console.error(e);
+          console.error('Error loading masterSongs from localStorage:', e);
         }
       }
 
-      isFirstBoot = true;
-
-      // Initial Seed Load from DEFAULT_SONGS (Zero-latency offline baseline)
-      masterSongs = JSON.parse(JSON.stringify(DEFAULT_SONGS));
-
-      // Auto-migrate any previously added songs from legacy key
-      const oldCustom = localStorage.getItem(OLD_CUSTOM_SONGS_KEY);
-      if (oldCustom) {
-        try {
-          const oldList = JSON.parse(oldCustom);
-          if (Array.isArray(oldList)) {
-            let currentMaxInitId = masterSongs.length;
-            oldList.forEach(song => {
-              const tuples = songObjToTuples(song, currentMaxInitId + 1);
-              currentMaxInitId += tuples.length;
-              masterSongs.push(...tuples);
-            });
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      masterSongs = normalizeMasterSongOrders(masterSongs);
-      saveMasterSongs();
+      masterSongs = [];
+      savedMasterSongs = [];
+      return false;
     }
 
     function saveMasterSongs() {
@@ -7627,24 +7625,13 @@ const htmlContent = `<!DOCTYPE html>
     });
 
     document.getElementById('btnResetData').addEventListener('click', () => {
-      if (confirm('すべての入力済みスコア、追加した楽曲、ソングパック順序、および理論値(AP+)記録を初期状態にリセットしますか？この操作は取り消せません。')) {
-        userScores = {};
-        masterSongs = JSON.parse(JSON.stringify(DEFAULT_SONGS));
-        packOrder = [...GAME_PACK_ORDER];
-        const existingPacks = [...new Set(masterSongs.map(s => s[6]))].filter(Boolean);
-        existingPacks.forEach(p => {
-          if (!packOrder.includes(p)) packOrder.push(p);
-        });
-        apPlusRecords = JSON.parse(JSON.stringify(DEFAULT_AP_PLUS_RECORDS));
-        saveScores();
-        saveMasterSongs();
-        savePackOrder();
-        saveApPlusRecords();
-        renderPackOrderList();
-        initFormDatalists();
-        initApPlusForm();
-        checkUnsavedChanges();
-        refresh();
+      if (confirm('すべての入力済みスコア、設定、理論値記録をリセットし、管理スプレッドシートから最新楽曲データを再取得しますか？この操作は取り消せません。')) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(MASTER_SONGS_KEY);
+        localStorage.removeItem(PACK_ORDER_KEY);
+        localStorage.removeItem(AP_PLUS_KEY);
+        localStorage.removeItem(GAS_LAST_SYNC_KEY);
+        location.reload();
       }
     });
 
@@ -8094,9 +8081,23 @@ const htmlContent = `<!DOCTYPE html>
       }
     });
 
-    async function initFetchFromManagementSheet() {
+    async function startFirstBootFetch() {
+      const overlay = document.getElementById('firstBootLoadingOverlay');
+      const errorWrap = document.getElementById('firstBootErrorWrap');
+      const errorMsg = document.getElementById('firstBootErrorMsg');
+      const progressWrap = document.getElementById('firstBootProgressWrap');
+
+      if (overlay) overlay.style.display = 'flex';
+      if (errorWrap) errorWrap.style.display = 'none';
+      if (progressWrap) progressWrap.style.display = 'block';
+
       const endpoint = getActiveGasEndpoint();
-      if (!endpoint) return;
+      if (!endpoint) {
+        if (errorWrap) errorWrap.style.display = 'flex';
+        if (progressWrap) progressWrap.style.display = 'none';
+        if (errorMsg) errorMsg.textContent = '中央連携APIエンドポイントが未設定です。';
+        return;
+      }
 
       try {
         const res = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
@@ -8149,17 +8150,28 @@ const htmlContent = `<!DOCTYPE html>
               renderEditSongSearchResult();
               refresh();
 
-              showSaveToast('✨ 管理スプシから最新楽曲データ（計 ' + liveSongs.length + '曲）を初期ロードしました！');
+              if (overlay) overlay.style.display = 'none';
+              showSaveToast('✨ 管理スプシから最新楽曲データ（計 ' + liveSongs.length + '曲）をロードしました！');
+              return;
             }
           }
         }
+
+        const msg = (json && json.message) ? json.message : '管理スプレッドシートの楽曲データが空です。管理スプシの「Songs」シートを確認してください。';
+        throw new Error(msg);
       } catch (err) {
-        console.warn('Initial management sheet fetch fallback to embedded seed:', err);
+        console.error('First boot fetch failed:', err);
+        if (progressWrap) progressWrap.style.display = 'none';
+        if (errorWrap) errorWrap.style.display = 'flex';
+        if (errorMsg) errorMsg.textContent = '楽曲データの取得に失敗しました:\\n' + (err.message || err);
       }
     }
 
+    const btnFirstBootRetry = document.getElementById('btnFirstBootRetry');
+    if (btnFirstBootRetry) btnFirstBootRetry.addEventListener('click', startFirstBootFetch);
+
     loadPackOrder();
-    loadMasterSongs();
+    const hasCachedMaster = loadMasterSongs();
     loadInitialScores();
     loadApPlusRecords();
     initFormDatalists();
@@ -8170,8 +8182,8 @@ const htmlContent = `<!DOCTYPE html>
     checkUnsavedChanges();
     updateGasSyncUI();
 
-    if (isFirstBoot) {
-      initFetchFromManagementSheet();
+    if (!hasCachedMaster) {
+      startFirstBootFetch();
     }
   </script>
 </body>
