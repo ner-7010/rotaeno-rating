@@ -4193,12 +4193,21 @@ const htmlContent = `<!DOCTYPE html>
       return oA - oB;
     }
 
+    function cleanTitle(val) {
+      if (val === null || val === undefined) return '';
+      const str = String(val).trim();
+      if (str.toLowerCase() === 'true') return 'True';
+      if (str.toLowerCase() === 'false') return 'False';
+      return str;
+    }
+
     function normalizeMasterSongOrders(tuples) {
       if (!Array.isArray(tuples) || tuples.length === 0) return tuples;
       const songGroups = getSongGroups(tuples);
       const songOrderMap = new Map();
       songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
       tuples.forEach(t => {
+        t[1] = cleanTitle(t[1]);
         if (songOrderMap.has(t[7])) {
           t[12] = songOrderMap.get(t[7]);
         }
@@ -6906,7 +6915,7 @@ const htmlContent = `<!DOCTYPE html>
       const localByTitle = new Map();
       const localById = new Map();
       masterSongs.forEach(t => {
-        const titleKey = String(t[1] || '').trim().toLowerCase();
+        const titleKey = cleanTitle(t[1]).toLowerCase();
         const idKey = String(t[7] || '').trim().toLowerCase();
         if (titleKey) {
           if (!localByTitle.has(titleKey)) localByTitle.set(titleKey, []);
@@ -6922,7 +6931,7 @@ const htmlContent = `<!DOCTYPE html>
       const detectedMod = [];
 
       officialSongs.forEach(song => {
-        const titleKey = String(song.title || '').trim().toLowerCase();
+        const titleKey = cleanTitle(song.title).toLowerCase();
         const idKey = String(song.songId || '').trim().toLowerCase();
 
         // Match existing tuples: prefer idKey, then titleKey
@@ -6936,14 +6945,14 @@ const htmlContent = `<!DOCTYPE html>
           const firstTuple = existingTuples[0];
           const curPack = String(firstTuple[6] || '基本曲').trim();
           const curVer = String(firstTuple[11] || 'v5.6.0').trim();
-          const curTitle = String(firstTuple[1] || '').trim();
+          const curTitle = cleanTitle(firstTuple[1]);
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
-          const offTitle = String(song.title || '').trim();
+          const offTitle = cleanTitle(song.title);
 
           const changes = [];
 
-          if (offTitle && curTitle !== offTitle) {
+          if (offTitle && curTitle !== offTitle && curTitle.toLowerCase() !== offTitle.toLowerCase()) {
             changes.push({
               field: 'title',
               label: '曲名',
@@ -7246,7 +7255,7 @@ const htmlContent = `<!DOCTYPE html>
             if (!dObj || isNaN(dObj.constant)) return;
             masterSongs.push([
               song.songId + '_' + diff,
-              song.title,
+              cleanTitle(song.title),
               diff,
               dObj.level || calcLevelFromConstant(dObj.constant),
               dObj.constant,
@@ -7280,7 +7289,7 @@ const htmlContent = `<!DOCTYPE html>
 
           // Update common metadata
           existingTuples.forEach(s => {
-            s[1] = officialSong.title;
+            s[1] = cleanTitle(officialSong.title);
             s[6] = officialSong.pack || s[6];
             s[11] = officialSong.version || s[11];
 
@@ -7302,7 +7311,7 @@ const htmlContent = `<!DOCTYPE html>
               const baseTuple = existingTuples[0];
               const newTuple = [
                 baseTuple[7] + '_' + diff,
-                officialSong.title,
+                cleanTitle(officialSong.title),
                 diff,
                 d.level || calcLevelFromConstant(d.constant),
                 Number(d.constant),
@@ -7890,7 +7899,7 @@ const htmlContent = `<!DOCTYPE html>
                 if (!diffObj || isNaN(diffObj.constant) || Number(diffObj.constant) <= 0) return;
                 restoredMaster.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  song.title || '',
+                  cleanTitle(song.title) || '',
                   diff,
                   diffObj.level || calcLevelFromConstant(diffObj.constant),
                   Number(diffObj.constant),
@@ -8131,7 +8140,7 @@ const htmlContent = `<!DOCTYPE html>
                 if (!d || isNaN(d.constant) || Number(d.constant) <= 0) return;
                 builtTuples.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  song.title || '',
+                  cleanTitle(song.title) || '',
                   diff,
                   d.level || calcLevelFromConstant(d.constant),
                   Number(d.constant),

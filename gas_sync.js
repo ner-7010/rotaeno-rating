@@ -106,6 +106,14 @@ function doPost(e) {
  * Sheet I/O Helpers
  * ========================================================== */
 
+function cleanTitle(val) {
+  if (val === null || val === undefined) return '';
+  const str = String(val).trim();
+  if (str.toLowerCase() === 'true') return 'True';
+  if (str.toLowerCase() === 'false') return 'False';
+  return str;
+}
+
 // 1. Songs Sheet (楽曲マスター: 1曲1行)
 function writeSongsSheet(ss, songs) {
   const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);
@@ -121,9 +129,11 @@ function writeSongsSheet(ss, songs) {
   songs.forEach((s, idx) => {
     const d = s.diffs || {};
     const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
+    const titleStr = cleanTitle(s.title);
+    const cellTitle = (titleStr.toLowerCase() === 'true' || titleStr.toLowerCase() === 'false') ? ("'" + titleStr) : titleStr;
     rows.push([
       orderNo,
-      s.title || '',
+      cellTitle,
       s.pack || '',
       s.version || '',
       s.songId || '',
@@ -141,6 +151,7 @@ function writeSongsSheet(ss, songs) {
   });
 
   if (rows.length > 1) {
+    sheet.getRange(2, 2, rows.length - 1, 1).setNumberFormat('@');
     sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
     sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');
   } else {
@@ -164,7 +175,7 @@ function readSongsSheet(ss) {
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     if (hasOrderCol) {
-      if (!row[1]) continue;
+      if (row[1] === null || row[1] === undefined || row[1] === '') continue;
       const initId = (row[0] !== '' && !isNaN(row[0])) ? Number(row[0]) : i;
       const diffs = {};
       if (row[5] !== '') diffs['I'] = { constant: Number(row[5]), level: String(row[6] || '') };
@@ -175,14 +186,14 @@ function readSongsSheet(ss) {
 
       songs.push({
         initId: initId,
-        title: String(row[1]),
+        title: cleanTitle(row[1]),
         pack: String(row[2] || '基本曲'),
         version: String(row[3] || 'v5.6.0'),
         songId: String(row[4] || ('song_' + i)),
         diffs: diffs
       });
     } else {
-      if (!row[0]) continue;
+      if (row[0] === null || row[0] === undefined || row[0] === '') continue;
       const diffs = {};
       if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };
       if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };
@@ -192,7 +203,7 @@ function readSongsSheet(ss) {
 
       songs.push({
         initId: i,
-        title: String(row[0]),
+        title: cleanTitle(row[0]),
         pack: String(row[1] || '基本曲'),
         version: String(row[2] || 'v5.6.0'),
         songId: String(row[3] || ('song_' + i)),
