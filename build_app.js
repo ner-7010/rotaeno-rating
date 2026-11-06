@@ -716,6 +716,67 @@ const htmlContent = `<!DOCTYPE html>
       margin-top: 1px;
     }
 
+    /* Rate +0.001 Target Displays */
+    .rate-up-info {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 800;
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+    .rate-up-badge {
+      color: #0369a1;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+    .rate-up-score {
+      color: var(--color-text-sub);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .modal-rate-up-section {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 4px 10px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #166534;
+    }
+    .modal-rate-up-label {
+      color: #15803d;
+    }
+    .modal-rate-up-score {
+      color: var(--color-text-main);
+    }
+    .modal-rate-up-pts {
+      color: #0369a1;
+      background: #e0f2fe;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #bae6fd;
+    }
+
+    .b40-rate-up {
+      font-size: 10px;
+      color: #0284c7;
+      font-weight: 800;
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+
     /* Lamps */
     .lamp-tag {
       display: inline-block;
@@ -3350,6 +3411,34 @@ const htmlContent = `<!DOCTYPE html>
       border-color: rgba(74, 222, 128, 0.4);
     }
 
+    [data-theme="dark"] .rate-up-badge {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+    [data-theme="dark"] .rate-up-score {
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .modal-rate-up-section {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+    [data-theme="dark"] .modal-rate-up-label {
+      color: #4ade80;
+    }
+    [data-theme="dark"] .modal-rate-up-score {
+      color: #f1f5f9;
+    }
+    [data-theme="dark"] .modal-rate-up-pts {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    [data-theme="dark"] .b40-rate-up {
+      color: #38bdf8;
+    }
+
     [data-theme="dark"] .btn-pack-jump {
       background: var(--bg-surface-soft);
       border-color: var(--border-color);
@@ -4071,6 +4160,7 @@ const htmlContent = `<!DOCTYPE html>
             <div class="sort-label">並び替え :</div>
             <select id="sortSelect" class="sort-select">
               <option value="DEFAULT">デフォルト</option>
+              <option value="RATE_UP">🎯 +0.001まであと (詰めやすい順)</option>
               <option value="PACK">ソングパック順</option>
               <option value="TITLE">タイトル順</option>
               <option value="RATING">単曲レート順</option>
@@ -4283,6 +4373,11 @@ const htmlContent = `<!DOCTYPE html>
         </div>
         <div class="calc-info">
           <div class="calc-rating-text" id="modalPreviewRating">Rating 0.000</div>
+          <div id="modalRateUpSection" class="modal-rate-up-section" style="display: none;">
+            <span class="modal-rate-up-label">🎯 レート+0.001目標:</span>
+            <span class="modal-rate-up-score" id="modalRateUpScore">-</span>
+            <span class="modal-rate-up-pts" id="modalRateUpPts">-</span>
+          </div>
         </div>
       </div>
 
@@ -5115,6 +5210,131 @@ const htmlContent = `<!DOCTYPE html>
       return { ad, diffJudge };
     }
 
+    // Inverse Rating Formula: Calculate minimum score required to achieve targetRating
+    function calcScoreFromRating(targetRating, constant) {
+      const diff = targetRating - constant;
+      let targetScore = 0;
+      if (diff >= 3.4) {
+        targetScore = 1008000 + (diff - 3.4) * 10000;
+      } else if (diff >= 2.4) {
+        targetScore = 1004000 + (diff - 2.4) * 4000;
+      } else if (diff >= 2.0) {
+        targetScore = 1000000 + (diff - 2.0) * 10000;
+      } else if (diff >= 1.0) {
+        targetScore = 980000 + (diff - 1.0) * 20000;
+      } else if (diff >= 0.0) {
+        targetScore = 950000 + (diff - 0.0) * 30000;
+      } else if (diff >= -1.0) {
+        targetScore = 900000 + (diff + 1.0) * 50000;
+      } else if (diff >= -5.0) {
+        targetScore = 500000 + (diff + 5.0) * 100000;
+      } else {
+        targetScore = Math.max(0, 250000 * (diff + 9999) / 4997);
+      }
+      return Math.ceil(targetScore);
+    }
+
+    // Rate +0.001 Target Score Engine
+    function computeRateUpTargets(calcResult) {
+      const { chartMap, b10, b20, b40, totalRating } = calcResult;
+      const allCharts = Object.values(chartMap);
+
+      // Borders from B40 ranks
+      const b10Border = (b10 && b10.length >= 10) ? (b10[9].effectiveRating || 0) : 0;
+      const b20Border = (b20 && b20.length >= 10) ? (b20[9].effectiveRating || 0) : 0;
+      const b40Border = (b40 && b40.length >= 20) ? (b40[19].effectiveRating || 0) : 0;
+
+      // Delta total needed to advance totalRating to next 0.001 boundary
+      const floor3 = Math.floor((totalRating + 1e-9) * 1000) / 1000;
+      let deltaTotal = (floor3 + 0.001) - totalRating;
+      if (deltaTotal <= 0.00001 || deltaTotal > 0.0010001) {
+        deltaTotal = 0.001;
+      }
+
+      // Step 1: Calculate raw needed rating (RatingNoAlphaNEED) for all charts
+      const noAlphaNeedMap = {};
+
+      allCharts.forEach(c => {
+        if (c.endOfSale === 1) {
+          noAlphaNeedMap[c.id] = null;
+          return;
+        }
+
+        const U = c.effectiveRating || 0;
+        const rank = c.b40Rank || 999;
+        let needDelta = 0;
+
+        if (rank <= 10) {
+          needDelta = deltaTotal / 0.06;
+        } else if (rank <= 20) {
+          const optA = deltaTotal / 0.02;
+          const optB = (deltaTotal + 0.04 * (b10Border - U)) / 0.06;
+          needDelta = Math.min(optA, optB);
+        } else if (rank <= 40) {
+          const optA = deltaTotal / 0.01;
+          const optB = (deltaTotal + 0.01 * (b20Border - U)) / 0.02;
+          const optC = (deltaTotal + 0.04 * (b10Border - U) + 0.01 * (b20Border - U)) / 0.06;
+          needDelta = Math.min(optA, optB, optC);
+        } else {
+          // Out of B40 (Rank > 40 or not played)
+          const optA = deltaTotal / 0.01;
+          const optB = (deltaTotal + 0.01 * (b20Border - b40Border)) / 0.02;
+          const optC = (deltaTotal + 0.04 * (b10Border - b40Border) + 0.01 * (b20Border - b40Border)) / 0.06;
+          needDelta = (b40Border - U) + Math.min(optA, optB, optC);
+        }
+
+        if (needDelta <= 0 || !isFinite(needDelta)) {
+          noAlphaNeedMap[c.id] = null;
+          return;
+        }
+
+        // AO3 = U + (INT(10000 * needDelta)) / 10000
+        const needRatingNoAlpha = U + (Math.floor(needDelta * 10000 + 1e-9)) / 10000;
+        noAlphaNeedMap[c.id] = needRatingNoAlpha;
+      });
+
+      // Step 2: Apply exclusivity (RatingNEED) and determine targetScore
+      allCharts.forEach(c => {
+        c.rateUp = null;
+
+        if (c.endOfSale === 1 || c.score >= 1010000) return;
+        const rawNeed = noAlphaNeedMap[c.id];
+        if (rawNeed === null || rawNeed === undefined) return;
+
+        let targetRating = rawNeed;
+
+        // IV & IV-alpha exclusivity
+        if (c.diff === 'IV' || c.diff === 'IV-α') {
+          const partnerDiff = (c.diff === 'IV') ? 'IV-α' : 'IV';
+          const partner = allCharts.find(x => x.songId === c.songId && x.diff === partnerDiff);
+          if (partner) {
+            const partnerNeed = noAlphaNeedMap[partner.id] || 0;
+            targetRating = Math.max(targetRating, partnerNeed);
+          }
+        }
+
+        // Theoretical maximum check: constant + 3.6
+        // If targetRating > constant + 3.6, cannot raise rate even with AP+
+        if (targetRating > (c.constant + 3.6 + 1e-9)) {
+          return;
+        }
+
+        const targetScore = calcScoreFromRating(targetRating, c.constant);
+        if (targetScore > 1010000 || targetScore <= (c.score || 0)) {
+          return;
+        }
+
+        const ptsNeeded = targetScore - (c.score || 0);
+        if (ptsNeeded <= 0) return;
+
+        c.rateUp = {
+          targetRating: targetRating,
+          targetScore: targetScore,
+          ptsNeeded: ptsNeeded
+        };
+      });
+    }
+
     // Theoretical Max Rating Calculation (Top 40 with IV & IV-alpha exclusivity)
     function calcTheoreticalMaxRating() {
       const eligible = [];
@@ -5260,7 +5480,7 @@ const htmlContent = `<!DOCTYPE html>
 
       const totalRating = (b10Sum * 0.06) + (b20Sum * 0.02) + (b40Sum * 0.01);
 
-      return {
+      const calcResult = {
         chartMap,
         activeCharts,
         b10, b20, b40,
@@ -5269,6 +5489,10 @@ const htmlContent = `<!DOCTYPE html>
         b40Set,
         totalCompletionSum
       };
+
+      computeRateUpTargets(calcResult);
+
+      return calcResult;
     }
 
     let currentCalc = null;
@@ -5479,6 +5703,15 @@ const htmlContent = `<!DOCTYPE html>
         ratingDisplay = c.effectiveRating.toFixed(4);
       }
 
+      let rateUpHtml = '';
+      if (c.rateUp) {
+        rateUpHtml = 
+          '<div class="rate-up-info" title="レート+0.001の目標スコア: ' + c.rateUp.targetScore.toLocaleString() + ' (あと ' + c.rateUp.ptsNeeded.toLocaleString() + ' 点)">' +
+            '<span class="rate-up-badge">+0.001まで +' + c.rateUp.ptsNeeded.toLocaleString() + '</span>' +
+            '<span class="rate-up-score">目標 ' + c.rateUp.targetScore.toLocaleString() + '</span>' +
+          '</div>';
+      }
+
       return (
         '<div class="song-row ' + (inB40 ? 'in-b40' : '') + '" onclick="openInputModal(\\\'' + c.id + '\\\')">' +
           '<div class="song-left-col">' +
@@ -5498,6 +5731,7 @@ const htmlContent = `<!DOCTYPE html>
           '<div class="song-right-col">' +
             '<div class="score-display-text">' + scoreDisplay + ' ' + (c.status ? '<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>' : '') + '</div>' +
             '<div class="rating-display-text">' + ratingDisplay + '</div>' +
+            rateUpHtml +
           '</div>' +
         '</div>'
       );
@@ -5549,8 +5783,21 @@ const htmlContent = `<!DOCTYPE html>
       }
 
       if (!isGroupedSort || list.length === 0) {
-        // Flat sort for DEFAULT or RATING
+        // Flat sort for DEFAULT, RATING, or RATE_UP
         list.sort((a, b) => {
+          if (currentSort === 'RATE_UP') {
+            const aHas = !!a.rateUp;
+            const bHas = !!b.rateUp;
+            if (aHas && !bHas) return -1;
+            if (!aHas && bHas) return 1;
+            if (aHas && bHas) {
+              if (a.rateUp.ptsNeeded !== b.rateUp.ptsNeeded) {
+                return a.rateUp.ptsNeeded - b.rateUp.ptsNeeded;
+              }
+              return b.constant - a.constant;
+            }
+            return compareDefaultOrder(a, b);
+          }
           if (currentSort === 'RATING') {
             const rateA = a.effectiveRating || 0;
             const rateB = b.effectiveRating || 0;
@@ -5753,6 +6000,7 @@ const htmlContent = `<!DOCTYPE html>
                 <div style="font-size: 13px; font-weight: 800; color: var(--color-primary-dark);">
                   \${c.effectiveRating.toFixed(4)}
                 </div>
+                \${c.rateUp ? \`<div class="b40-rate-up" title="目標: \${c.rateUp.targetScore.toLocaleString()} (あと +\${c.rateUp.ptsNeeded.toLocaleString()} 点)">+\${c.rateUp.ptsNeeded.toLocaleString()}</div>\` : ''}
               </div>
             </div>
           \`;
@@ -6446,6 +6694,17 @@ const htmlContent = `<!DOCTYPE html>
       } else if (selectedChart) {
         const rate = calcSingleRating(currentInputScore, selectedChart.constant, selectedChart.endOfSale);
         document.getElementById('modalPreviewRating').textContent = \`Rating \${rate.toFixed(4)}\`;
+      }
+
+      const rateUpSec = document.getElementById('modalRateUpSection');
+      if (rateUpSec) {
+        if (selectedChart && selectedChart.rateUp) {
+          rateUpSec.style.display = 'inline-flex';
+          document.getElementById('modalRateUpScore').textContent = '目標 ' + selectedChart.rateUp.targetScore.toLocaleString();
+          document.getElementById('modalRateUpPts').textContent = '(あと +' + selectedChart.rateUp.ptsNeeded.toLocaleString() + ' 点)';
+        } else {
+          rateUpSec.style.display = 'none';
+        }
       }
     }
 
