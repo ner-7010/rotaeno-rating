@@ -1739,14 +1739,51 @@
       min-width: 0;
     }
 
+    .pack-stat-search-input {
+      padding: 6px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+      max-width: 180px;
+      background: var(--bg-surface-soft);
+      color: var(--color-text-main);
+      transition: border-color var(--theme-transition-time), background var(--theme-transition-time), color var(--theme-transition-time);
+    }
+    .pack-stat-search-input:focus {
+      border-color: var(--color-primary);
+      background: var(--bg-card);
+    }
+
     .pack-badge-pill {
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 6px;
-      background: #fef3c7;
-      color: #b45309;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .pack-badge-pill.badge-ap-plus {
+      background: #fce7f3;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+    }
+    .pack-badge-pill.badge-ap {
+      background: #ffedd5;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+    }
+    .pack-badge-pill.badge-fc {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+    .pack-badge-pill.badge-clear {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
     }
 
     .pack-stat-meta {
@@ -3276,9 +3313,25 @@
       border-color: var(--border-color);
     }
 
-    [data-theme="dark"] .pack-badge-pill {
-      background: rgba(251, 191, 36, 0.2);
-      color: #fbbf24;
+    [data-theme="dark"] .pack-badge-pill.badge-ap-plus {
+      background: rgba(244, 114, 182, 0.2);
+      color: #f472b6;
+      border-color: rgba(244, 114, 182, 0.4);
+    }
+    [data-theme="dark"] .pack-badge-pill.badge-ap {
+      background: rgba(251, 146, 60, 0.2);
+      color: #fb923c;
+      border-color: rgba(251, 146, 60, 0.4);
+    }
+    [data-theme="dark"] .pack-badge-pill.badge-fc {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    [data-theme="dark"] .pack-badge-pill.badge-clear {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.4);
     }
 
     [data-theme="dark"] .btn-pack-jump {
@@ -3574,7 +3627,7 @@
         <div class="stats-panel-box">
           <div class="stats-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <div class="stats-panel-title" id="packStatHeaderTitle" style="margin-bottom:0;"><span>🎵</span> ソングパック別 進捗一覧 (全パック)</div>
-            <input type="text" id="packStatSearch" placeholder="🔍 パック名で検索..." style="padding:6px 10px; border:1px solid var(--border-color); border-radius:6px; font-size:12px; outline:none; max-width:180px;">
+            <input type="text" id="packStatSearch" class="pack-stat-search-input" placeholder="🔍 パック名で検索...">
           </div>
           <div id="packStatContainer">
             <!-- Dynamically populated pack cards -->
@@ -5994,13 +6047,13 @@
 
         let badgeHtml = '';
         if (pApPlus === pCharts.length && pCharts.length > 0) {
-          badgeHtml = '<span class="pack-badge-pill" style="background:#fce7f3; color:#be185d;">👑 全AP+コンプリート！</span>';
+          badgeHtml = '<span class="pack-badge-pill badge-ap-plus">👑 全AP+コンプリート！</span>';
         } else if (pApTotal === pCharts.length && pCharts.length > 0) {
-          badgeHtml = '<span class="pack-badge-pill" style="background:#ffedd5; color:#c2410c;">🌟 全APコンプリート！</span>';
+          badgeHtml = '<span class="pack-badge-pill badge-ap">🌟 全APコンプリート！</span>';
         } else if ((pApTotal + pFc) === pCharts.length && pCharts.length > 0) {
-          badgeHtml = '<span class="pack-badge-pill" style="background:#e0f2fe; color:#0369a1;">🔷 全FCコンプリート！</span>';
+          badgeHtml = '<span class="pack-badge-pill badge-fc">🔷 全FCコンプリート！</span>';
         } else if (pFilled.length === pCharts.length && pCharts.length > 0) {
-          badgeHtml = '<span class="pack-badge-pill" style="background:#dcfce7; color:#15803d;">✅ 全曲クリア！</span>';
+          badgeHtml = '<span class="pack-badge-pill badge-clear">✅ 全曲クリア！</span>';
         }
 
         html += 
