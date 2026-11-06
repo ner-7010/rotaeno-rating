@@ -3948,7 +3948,7 @@ const htmlContent = `<!DOCTYPE html>
     let apPlusSort = 'NO_ASC';
 
     // Game Official Song Pack Order (Matching in-game selection list)
-    const GAME_PACK_ORDER = [
+    let GAME_PACK_ORDER = [
       '基本曲',
       '第1章 - 旅の始まり',
       '第2章 - 災難と希望',
@@ -6783,18 +6783,31 @@ const htmlContent = `<!DOCTYPE html>
 
       try {
         let officialSongs = [];
+        let officialPackOrder = [];
 
         // 1. Try fetching from Central Official DB (no url parameter)
         const centralRes = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
         const centralJson = await centralRes.json();
-        if (centralJson.status === 'success' && centralJson.data && Array.isArray(centralJson.data.songs) && centralJson.data.songs.length > 0) {
-          officialSongs = centralJson.data.songs;
-        } else if (userSheetUrl) {
+        if (centralJson.status === 'success' && centralJson.data) {
+          if (Array.isArray(centralJson.data.songs) && centralJson.data.songs.length > 0) {
+            officialSongs = centralJson.data.songs;
+          }
+          if (centralJson.data.config && Array.isArray(centralJson.data.config.packOrder) && centralJson.data.config.packOrder.length > 0) {
+            officialPackOrder = centralJson.data.config.packOrder;
+          }
+        }
+
+        if (officialSongs.length === 0 && userSheetUrl) {
           // Fallback to userSheetUrl if central sheet Songs is empty
           const userRes = await fetch(endpoint + '?url=' + encodeURIComponent(userSheetUrl) + '&t=' + Date.now(), { method: 'GET' });
           const userJson = await userRes.json();
-          if (userJson.status === 'success' && userJson.data && Array.isArray(userJson.data.songs) && userJson.data.songs.length > 0) {
-            officialSongs = userJson.data.songs;
+          if (userJson.status === 'success' && userJson.data) {
+            if (Array.isArray(userJson.data.songs) && userJson.data.songs.length > 0) {
+              officialSongs = userJson.data.songs;
+            }
+            if (officialPackOrder.length === 0 && userJson.data.config && Array.isArray(userJson.data.config.packOrder)) {
+              officialPackOrder = userJson.data.config.packOrder;
+            }
           }
         }
 
@@ -6809,7 +6822,7 @@ const htmlContent = `<!DOCTYPE html>
         }
 
         // 2. Run Diff Engine
-        diffOfficialSongs(officialSongs);
+        diffOfficialSongs(officialSongs, officialPackOrder);
 
       } catch (err) {
         console.error('fetchOfficialSongUpdates error:', err);
@@ -6821,7 +6834,7 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
-    function diffOfficialSongs(officialSongs) {
+    function diffOfficialSongs(officialSongs, officialPackOrder = []) {
       const elSummary = document.getElementById('officialUpdateSummary');
       const elEmpty = document.getElementById('officialUpdateEmpty');
       const elContent = document.getElementById('officialUpdateDiffContent');
@@ -6932,7 +6945,7 @@ const htmlContent = `<!DOCTYPE html>
         }
       });
 
-      officialUpdatesState = { detectedNew, detectedMod };
+      officialUpdatesState = { detectedNew, detectedMod, officialSongs, officialPackOrder };
 
       if (detectedNew.length === 0 && detectedMod.length === 0) {
         if (elEmpty) elEmpty.style.display = 'block';
@@ -6945,9 +6958,26 @@ const htmlContent = `<!DOCTYPE html>
       if (elContent) elContent.style.display = 'block';
       if (elSummary) elSummary.style.display = 'flex';
 
+      // Detect newly introduced packs
+      const existingPacks = new Set(packOrder);
+      const newPacksFound = [];
+      if (Array.isArray(officialPackOrder)) {
+        officialPackOrder.forEach(p => {
+          if (p && !existingPacks.has(p) && !newPacksFound.includes(p)) newPacksFound.push(p);
+        });
+      }
+      detectedNew.forEach(s => {
+        if (s.pack && !existingPacks.has(s.pack) && !newPacksFound.includes(s.pack)) newPacksFound.push(s.pack);
+      });
+
       // Summary text
       if (summaryText) {
-        summaryText.textContent = '最新アプデ情報: （新規 ' + detectedNew.length + '曲 / 更新 ' + detectedMod.length + '曲）';
+        let txt = '最新アプデ情報: （新規 ' + detectedNew.length + '曲 / 更新 ' + detectedMod.length + '曲';
+        if (newPacksFound.length > 0) {
+          txt += ' / 新パック: ' + newPacksFound.join(', ');
+        }
+        txt += '）';
+        summaryText.textContent = txt;
       }
 
       // 1. Render New Songs
@@ -7044,12 +7074,74 @@ const htmlContent = `<!DOCTYPE html>
       }
     }
 
+    function mergeOfficialPackOrder(currentPackOrder, officialPackOrder, newPacks = []) {
+      const merged = [...currentPackOrder];
+      if (!Array.isArray(officialPackOrder) || officialPackOrder.length === 0) {
+        newPacks.forEach(p => {
+          if (p && !merged.includes(p)) merged.push(p);
+        });
+        return merged;
+      }
+
+      const packsToAdd = [];
+      officialPackOrder.forEach(p => {
+        if (p && !merged.includes(p) && !packsToAdd.includes(p)) {
+          packsToAdd.push(p);
+        }
+      });
+      newPacks.forEach(p => {
+        if (p && !merged.includes(p) && !packsToAdd.includes(p)) {
+          packsToAdd.push(p);
+        }
+      });
+
+      packsToAdd.forEach(p => {
+        const offIdx = officialPackOrder.indexOf(p);
+        if (offIdx === -1) {
+          merged.push(p);
+          return;
+        }
+
+        let insertIdx = -1;
+        // Search backwards in officialPackOrder for an existing predecessor in merged
+        for (let i = offIdx - 1; i >= 0; i--) {
+          const prev = officialPackOrder[i];
+          const pos = merged.indexOf(prev);
+          if (pos !== -1) {
+            insertIdx = pos + 1;
+            break;
+          }
+        }
+
+        // If no predecessor found in merged, search forwards for an existing successor
+        if (insertIdx === -1) {
+          for (let i = offIdx + 1; i < officialPackOrder.length; i++) {
+            const next = officialPackOrder[i];
+            const pos = merged.indexOf(next);
+            if (pos !== -1) {
+              insertIdx = pos;
+              break;
+            }
+          }
+        }
+
+        if (insertIdx !== -1) {
+          merged.splice(insertIdx, 0, p);
+        } else {
+          merged.push(p);
+        }
+      });
+
+      return merged;
+    }
+
     function applyOfficialUpdates() {
       const chks = document.querySelectorAll('.chk-official-update-item:checked');
       if (chks.length === 0) return;
 
-      const { detectedNew, detectedMod } = officialUpdatesState;
+      const { detectedNew, detectedMod, officialSongs, officialPackOrder } = officialUpdatesState;
       let appliedCount = 0;
+      const newPacks = [];
 
       // 1. Process Checked New Songs
       let maxInitId = masterSongs.length;
@@ -7086,8 +7178,8 @@ const htmlContent = `<!DOCTYPE html>
             ]);
           });
 
-          if (song.pack && !packOrder.includes(song.pack)) {
-            packOrder.push(song.pack);
+          if (song.pack && !newPacks.includes(song.pack)) {
+            newPacks.push(song.pack);
           }
           appliedCount++;
         }
@@ -7144,12 +7236,35 @@ const htmlContent = `<!DOCTYPE html>
             }
           });
 
-          if (officialSong.pack && !packOrder.includes(officialSong.pack)) {
-            packOrder.push(officialSong.pack);
+          if (officialSong.pack && !newPacks.includes(officialSong.pack)) {
+            newPacks.push(officialSong.pack);
           }
           appliedCount++;
         }
       });
+
+      // Synchronize packOrder relative position using officialPackOrder
+      packOrder = mergeOfficialPackOrder(packOrder, officialPackOrder, newPacks);
+      if (Array.isArray(officialPackOrder) && officialPackOrder.length > 0) {
+        GAME_PACK_ORDER = [...officialPackOrder];
+      }
+
+      // Synchronize default order (songInitId) with official spreadsheet
+      if (Array.isArray(officialSongs) && officialSongs.length > 0) {
+        const officialInitIdMap = new Map();
+        officialSongs.forEach((song, idx) => {
+          const normTitle = String(song.title || '').trim().toLowerCase();
+          const initId = (song.initId !== undefined && !isNaN(song.initId)) ? Number(song.initId) : (idx + 1);
+          officialInitIdMap.set(normTitle, initId);
+        });
+
+        masterSongs.forEach(s => {
+          const normTitle = String(s[1] || '').trim().toLowerCase();
+          if (officialInitIdMap.has(normTitle)) {
+            s[12] = officialInitIdMap.get(normTitle);
+          }
+        });
+      }
 
       masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
       closeOfficialUpdateModal();
