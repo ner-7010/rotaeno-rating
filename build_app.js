@@ -2360,6 +2360,188 @@ const htmlContent = `<!DOCTYPE html>
       border-color: #ef4444;
     }
 
+    /* Contact & Feedback Panel */
+    .contact-panel {
+      border-left: 4px solid var(--color-primary);
+      background: var(--bg-card);
+      margin-bottom: 14px;
+    }
+    .contact-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .contact-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .contact-header h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+    }
+    .contact-desc {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--color-text-main);
+      margin: 2px 0 8px 0;
+    }
+    .contact-x-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: #0f1419;
+      color: #ffffff !important;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      width: fit-content;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .contact-x-badge:hover {
+      background: #272c30;
+      transform: translateY(-1px);
+    }
+    .contact-x-badge .contact-x-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .contact-x-badge {
+      background: #1d2837;
+      border: 1px solid #334155;
+    }
+    [data-theme="dark"] .contact-x-badge:hover {
+      background: #26354a;
+    }
+
+    /* Footer Contact Link */
+    .footer-contact-link {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-color);
+      font-size: 11px;
+    }
+    .footer-contact-link a {
+      color: var(--color-primary);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .footer-contact-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Generate B40 Button */
+    .btn-generate-b40 {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+      transition: transform 0.1s, opacity 0.15s;
+    }
+    .btn-generate-b40:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-generate-b40:active {
+      transform: scale(0.97);
+    }
+
+    /* B40 Image Modal */
+    .b40-image-modal-box {
+      max-width: 680px;
+      width: 94%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .b40-image-modal-body {
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .b40-image-guide {
+      width: 100%;
+      background: var(--bg-surface-soft);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--color-text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .b40-image-preview-wrap {
+      width: 100%;
+      background: #080d16;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .b40-image-result {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+    .b40-image-modal-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .b40-action-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .b40-action-btn.primary {
+      background: var(--color-primary-dark);
+      color: #ffffff;
+      border: none;
+      text-decoration: none;
+    }
+    .b40-action-btn.share {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+    }
+    .b40-action-btn.secondary {
+      background: var(--bg-surface-soft);
+      color: var(--color-text-main);
+      border: 1px solid var(--border-color);
+    }
+
     /* Custom Song Addition Form */
     .new-song-form {
       margin-top: 10px;
@@ -3744,8 +3926,11 @@ const htmlContent = `<!DOCTYPE html>
       <div class="mypage-subview" id="mypageSubB40" style="display: none;">
         <div class="b40-top-bar">
           <button class="btn-subview-back" id="btnBackToStatsFromB40" type="button">← 総合進捗に戻る</button>
-          <div class="b40-subview-title">👑 BEST 40 一覧</div>
+          <button type="button" class="btn-generate-b40" id="btnOpenB40Image">
+            <span>📸</span> B40画像を生成 (5×8)
+          </button>
         </div>
+        <div class="b40-subview-title" style="margin-bottom: 8px;">👑 BEST 40 一覧</div>
         <div class="b40-title">
           <span>BEST 1-10 (金枠 / 係数 0.06)</span>
           <span id="b10Avg" style="color: var(--color-gold);">平均: 0.000</span>
@@ -4082,6 +4267,26 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </div>
 
+      <!-- Section: Contact & Feedback -->
+      <div class="settings-panel contact-panel">
+        <div class="contact-card-content">
+          <div class="contact-header">
+            <span class="contact-icon">💬</span>
+            <h3>改善提案・不具合のご連絡</h3>
+          </div>
+          <p class="contact-desc">
+            ツールの改善提案、新機能のご要望、または計算ミスや表示崩れ等の不具合を見つけた際は、開発者の X (旧Twitter) アカウントまでお気軽にご連絡ください！
+          </p>
+          <a href="https://x.com/omu2298_rhythm" target="_blank" rel="noopener noreferrer" class="contact-x-badge">
+            <svg class="x-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span class="contact-x-handle">@omu2298_rhythm</span>
+            <span class="contact-x-sub">（X / 旧Twitterへ）↗</span>
+          </a>
+        </div>
+      </div>
+
       <!-- Section: Disclaimer & Rights -->
       <div class="settings-panel disclaimer-panel">
         <h3>📌 免責事項・権利表記</h3>
@@ -4104,6 +4309,9 @@ const htmlContent = `<!DOCTYPE html>
         『Rotaeno』の著作権・商標権は Dream Engine Games 様および各権利所有者に帰属します。<br>
         ※当ツールでは公式ゲーム画像・ジャケット画像等のアセットは一切使用しておりません。
       </p>
+      <div class="footer-contact-link">
+        💬 ご意見・改善提案・不具合連絡: <a href="https://x.com/omu2298_rhythm" target="_blank" rel="noopener noreferrer">X @omu2298_rhythm ↗</a>
+      </div>
     </footer>
   </main>
 
@@ -4552,6 +4760,40 @@ const htmlContent = `<!DOCTYPE html>
         <button class="btn-cancel" id="btnEditSongModalCancel" type="button">キャンセル</button>
         <button class="btn-danger" id="btnEditSongModalDelete" type="button">🗑️ 削除</button>
         <button class="btn-save" id="btnEditSongModalSave" type="button">変更を適用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: B40 Image Generator & Export -->
+  <div class="modal-overlay" id="b40ImageModal">
+    <div class="modal-box b40-image-modal-box">
+      <div class="modal-head">
+        <div class="modal-song-name">📸 BEST 40 一覧画像 (5×8)</div>
+        <button type="button" class="modal-close-btn" id="btnB40ImageModalClose">&times;</button>
+      </div>
+      <div class="b40-image-modal-body">
+        <div class="b40-image-guide">
+          <div>📱 <strong>スマホ</strong>: 画像を<strong>長押し</strong>して「画像を保存」または「写真に追加」してください。</div>
+          <div>💻 <strong>PC</strong>: 下の「📥 画像をダウンロード」ボタンを押すか、画像を<strong>右クリック</strong>して保存してください。</div>
+        </div>
+        <div class="b40-image-preview-wrap" id="b40ImagePreviewWrap">
+          <div class="b40-image-loading" id="b40ImageLoading" style="text-align: center; padding: 40px; color: #94a3b8;">
+            <div style="font-size: 32px; margin-bottom: 10px;">⏳</div>
+            <div style="font-size: 13px; font-weight: 700;">BEST 40 高解像度画像を生成中...</div>
+          </div>
+          <img id="b40ImageResult" class="b40-image-result" alt="Rotaeno Best 40 Summary" style="display: none;">
+        </div>
+        <div class="b40-image-modal-actions">
+          <a id="btnB40ImageDownload" class="b40-action-btn primary" download="rotaeno_best40.png" style="text-decoration: none;">
+            <span>📥</span> 画像をダウンロード
+          </a>
+          <button type="button" id="btnB40ImageShare" class="b40-action-btn share" style="display: none;">
+            <span>📤</span> シェアする
+          </button>
+          <button type="button" class="b40-action-btn secondary" id="btnB40ImageModalCancel">
+            閉じる
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -8952,6 +9194,419 @@ const htmlContent = `<!DOCTYPE html>
     if (officialModalOverlay) {
       officialModalOverlay.addEventListener('click', (e) => {
         if (e.target.id === 'officialUpdateModal') closeOfficialUpdateModal();
+      });
+    }
+
+    /* ==========================================================
+     * B40 Image Generator (5x8 Canvas Renderer)
+     * ========================================================== */
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function truncateCanvasText(ctx, text, maxWidth) {
+      if (!text) return '';
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let low = 0;
+      let high = text.length;
+      let fit = '';
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const sub = text.substring(0, mid) + '…';
+        if (ctx.measureText(sub).width <= maxWidth) {
+          fit = sub;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+      return fit || (text[0] + '…');
+    }
+
+    let generatedB40Blob = null;
+
+    function generateB40Canvas() {
+      const W = 1600;
+      const H = 2040;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Background (Cosmic Deep Space Gradient)
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#060b13');
+      bgGrad.addColorStop(0.3, '#0b1422');
+      bgGrad.addColorStop(0.7, '#08111e');
+      bgGrad.addColorStop(1, '#050911');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle celestial particles
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      for (let p = 0; p < 80; p++) {
+        const px = (p * 7919) % W;
+        const py = (p * 6397) % H;
+        const pr = ((p % 3) + 1) * 0.8;
+        ctx.beginPath();
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2. Header Box (Y: 0 - 200px)
+      const headY = 40;
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('ROTAENO RATING TRACKER', 45, headY + 16);
+
+      // Total Rating
+      const trStr = currentCalc ? currentCalc.totalRating.toFixed(4) : '0.0000';
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = '900 60px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(trStr, 45, headY + 80);
+
+      // Theo Rating & Completion
+      const theoRate = calcTheoreticalMaxRating();
+      const trWidth = ctx.measureText(trStr).width;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('/ 理論値 ' + theoRate.toFixed(4), 45 + trWidth + 14, headY + 68);
+
+      const compSum = currentCalc ? currentCalc.totalCompletionSum.toFixed(3) : '0.000';
+      const maxComp = getMaxCompletionCount();
+      const compPct = maxComp > 0 ? ((parseFloat(compSum) / maxComp) * 100).toFixed(2) : '0.00';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '700 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('完成度: ' + compSum + ' / ' + maxComp + ' (' + compPct + '%)', 45, headY + 115);
+
+      // Right Header Breakdown Panels
+      const rBoxX = W - 45 - 474;
+      const b10Sum = currentCalc ? currentCalc.b10Sum.toFixed(4) : '0.0000';
+      const b20Sum = currentCalc ? currentCalc.b20Sum.toFixed(4) : '0.0000';
+      const b40Sum = currentCalc ? currentCalc.b40Sum.toFixed(4) : '0.0000';
+      const b10Cont = (parseFloat(b10Sum) * 0.06).toFixed(4);
+      const b20Cont = (parseFloat(b20Sum) * 0.02).toFixed(4);
+      const b40Cont = (parseFloat(b40Sum) * 0.01).toFixed(4);
+
+      const pills = [
+        { label: 'BEST 1-10 (×0.06)', sum: b10Sum, cont: b10Cont, bg: 'rgba(251, 191, 36, 0.12)', border: '#f59e0b', color: '#fbbf24' },
+        { label: 'BEST 11-20 (×0.02)', sum: b20Sum, cont: b20Cont, bg: 'rgba(56, 189, 248, 0.12)', border: '#0284c7', color: '#38bdf8' },
+        { label: 'BEST 21-40 (×0.01)', sum: b40Sum, cont: b40Cont, bg: 'rgba(148, 163, 184, 0.12)', border: '#475569', color: '#cbd5e1' }
+      ];
+
+      pills.forEach((p, idx) => {
+        const px = rBoxX + idx * 162;
+        const py = headY + 10;
+        ctx.fillStyle = p.bg;
+        ctx.strokeStyle = p.border;
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, px, py, 150, 85, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = p.color;
+        ctx.font = '800 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(p.label, px + 8, py + 22);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(p.sum, px + 8, py + 48);
+
+        ctx.fillStyle = p.color;
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('+' + p.cont, px + 8, py + 72);
+      });
+
+      // Date in Header
+      const now = new Date();
+      const dateStr = now.getFullYear() + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + String(now.getDate()).padStart(2, '0');
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('DATE: ' + dateStr, W - 45, headY + 125);
+      ctx.textAlign = 'left';
+
+      // Header Separator Line
+      const sepGrad = ctx.createLinearGradient(45, 175, W - 45, 175);
+      sepGrad.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+      sepGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.6)');
+      sepGrad.addColorStop(1, 'rgba(148, 163, 184, 0.3)');
+      ctx.strokeStyle = sepGrad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(45, 175);
+      ctx.lineTo(W - 45, 175);
+      ctx.stroke();
+
+      // 3. Grid (5 columns x 8 rows = 40 charts)
+      const top40 = currentCalc ? currentCalc.activeCharts.slice(0, 40) : [];
+      const gridStartX = 45;
+      const gridStartY = 195;
+      const cardW = 288;
+      const cardH = 200;
+      const gapX = 17;
+      const gapY = 18;
+
+      for (let i = 0; i < 40; i++) {
+        const col = i % 5;
+        const row = Math.floor(i / 5);
+        const x = gridStartX + col * (cardW + gapX);
+        const y = gridStartY + row * (cardH + gapY);
+        const rank = i + 1;
+        const c = top40[i];
+
+        const isB10 = rank <= 10;
+        const isB20 = rank > 10 && rank <= 20;
+
+        let borderColor = '#253549';
+        let cardBgGrad = ctx.createLinearGradient(x, y, x, y + cardH);
+        if (isB10) {
+          borderColor = '#f59e0b';
+          cardBgGrad.addColorStop(0, '#172233');
+          cardBgGrad.addColorStop(1, '#0e1826');
+        } else if (isB20) {
+          borderColor = '#0284c7';
+          cardBgGrad.addColorStop(0, '#131e2e');
+          cardBgGrad.addColorStop(1, '#0c1522');
+        } else {
+          borderColor = '#1e293b';
+          cardBgGrad.addColorStop(0, '#0f1724');
+          cardBgGrad.addColorStop(1, '#090e17');
+        }
+
+        ctx.fillStyle = cardBgGrad;
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = isB10 ? 2 : (isB20 ? 1.8 : 1.2);
+        roundRect(ctx, x, y, cardW, cardH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        if (isB10) {
+          ctx.fillStyle = '#f59e0b';
+          roundRect(ctx, x + 1, y + 1, cardW - 2, 3, 2);
+          ctx.fill();
+        } else if (isB20) {
+          ctx.fillStyle = '#0284c7';
+          roundRect(ctx, x + 1, y + 1, cardW - 2, 3, 2);
+          ctx.fill();
+        }
+
+        if (!c) {
+          ctx.fillStyle = '#475569';
+          ctx.font = '800 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.fillText('#' + rank, x + 14, y + 36);
+          ctx.fillStyle = '#334155';
+          ctx.font = '700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.fillText('NO RECORD', x + 14, y + 70);
+          continue;
+        }
+
+        // Rank Number
+        ctx.fillStyle = isB10 ? '#fbbf24' : (isB20 ? '#38bdf8' : '#94a3b8');
+        ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('#' + rank, x + 12, y + 34);
+
+        // Difficulty Pill
+        let diffBg = '#0284c7';
+        let diffBorder = '#38bdf8';
+        if (c.diff === 'IV-α') {
+          diffBg = '#b91c1c';
+          diffBorder = '#fbbf24';
+        } else if (c.diff === 'IV') {
+          diffBg = '#7c3aed';
+          diffBorder = '#c084fc';
+        } else if (c.diff === 'III') {
+          diffBg = '#0369a1';
+          diffBorder = '#38bdf8';
+        } else if (c.diff === 'II') {
+          diffBg = '#15803d';
+          diffBorder = '#4ade80';
+        } else if (c.diff === 'I') {
+          diffBg = '#0e7490';
+          diffBorder = '#22d3ee';
+        }
+
+        const diffStr = c.diff + ' ' + c.constant.toFixed(1);
+        ctx.font = '800 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const dStrW = ctx.measureText(diffStr).width;
+        const dPillW = dStrW + 14;
+        const dPillX = x + cardW - dPillW - 10;
+        const dPillY = y + 14;
+
+        ctx.fillStyle = diffBg;
+        ctx.strokeStyle = diffBorder;
+        ctx.lineWidth = 1.2;
+        roundRect(ctx, dPillX, dPillY, dPillW, 22, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(diffStr, dPillX + 7, dPillY + 16);
+
+        // Song Title
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '800 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif';
+        const maxTitleW = cardW - 24;
+        const fitTitle = truncateCanvasText(ctx, c.title, maxTitleW);
+        ctx.fillText(fitTitle, x + 12, y + 68);
+
+        // Pack & Version
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif';
+        const metaStr = 'v' + c.version + ' | ' + c.pack;
+        const fitMeta = truncateCanvasText(ctx, metaStr, maxTitleW);
+        ctx.fillText(fitMeta, x + 12, y + 90);
+
+        // Score (Large)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 23px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const scoreStr = (c.score || 0).toLocaleString();
+        ctx.fillText(scoreStr, x + 12, y + 128);
+
+        // Lamp Badge
+        if (c.status) {
+          const lampX = x + 12;
+          const lampY = y + 142;
+          let lampBg = '#334155';
+          let lampColor = '#ffffff';
+          if (c.status === 'AP+') {
+            lampBg = '#ec4899';
+            lampColor = '#ffffff';
+          } else if (c.status === 'AP') {
+            lampBg = '#ea580c';
+            lampColor = '#ffffff';
+          } else if (c.status === 'FC') {
+            lampBg = '#0284c7';
+            lampColor = '#ffffff';
+          } else if (c.status === 'CLEAR') {
+            lampBg = '#16a34a';
+            lampColor = '#ffffff';
+          }
+          ctx.font = '800 10.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          const lampW = ctx.measureText(c.status).width + 10;
+          ctx.fillStyle = lampBg;
+          roundRect(ctx, lampX, lampY, lampW, 18, 4);
+          ctx.fill();
+          ctx.fillStyle = lampColor;
+          ctx.fillText(c.status, lampX + 5, lampY + 13);
+        }
+
+        // Single Rating (Right Bottom)
+        const rateValStr = c.effectiveRating.toFixed(4);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#64748b';
+        ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('RATING', x + cardW - 12, y + 158);
+
+        ctx.fillStyle = isB10 ? '#fbbf24' : (isB20 ? '#38bdf8' : '#7dd3fc');
+        ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(rateValStr, x + cardW - 12, y + 180);
+        ctx.textAlign = 'left';
+      }
+
+      // 4. Footer Line & Credits
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 12.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Rotaeno Rating Tracker (Unofficial Fan Tool)   |   Feedback / Bug Report: X @omu2298_rhythm', W / 2, H - 24);
+      ctx.textAlign = 'left';
+
+      return canvas;
+    }
+
+    function openB40ImageModal() {
+      const modal = document.getElementById('b40ImageModal');
+      const img = document.getElementById('b40ImageResult');
+      const loading = document.getElementById('b40ImageLoading');
+      const btnDownload = document.getElementById('btnB40ImageDownload');
+      const btnShare = document.getElementById('btnB40ImageShare');
+
+      if (!modal) return;
+      modal.classList.add('open');
+
+      if (img) img.style.display = 'none';
+      if (loading) loading.style.display = 'block';
+
+      setTimeout(() => {
+        try {
+          const canvas = generateB40Canvas();
+          const dataUrl = canvas.toDataURL('image/png');
+
+          if (img) {
+            img.src = dataUrl;
+            img.style.display = 'block';
+          }
+          if (loading) loading.style.display = 'none';
+
+          const filename = 'rotaeno_b40_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.png';
+          if (btnDownload) {
+            btnDownload.href = dataUrl;
+            btnDownload.download = filename;
+          }
+
+          canvas.toBlob(blob => {
+            generatedB40Blob = blob;
+            if (navigator.canShare && blob) {
+              const file = new File([blob], filename, { type: 'image/png' });
+              if (navigator.canShare({ files: [file] })) {
+                if (btnShare) btnShare.style.display = 'inline-flex';
+              }
+            }
+          }, 'image/png');
+
+        } catch (err) {
+          console.error('B40 image generation failed:', err);
+          if (loading) loading.textContent = '画像の生成に失敗しました: ' + err.message;
+        }
+      }, 80);
+    }
+
+    function closeB40ImageModal() {
+      const modal = document.getElementById('b40ImageModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    const btnOpenB40Image = document.getElementById('btnOpenB40Image');
+    if (btnOpenB40Image) btnOpenB40Image.addEventListener('click', openB40ImageModal);
+
+    const btnB40Close = document.getElementById('btnB40ImageModalClose');
+    if (btnB40Close) btnB40Close.addEventListener('click', closeB40ImageModal);
+
+    const btnB40Cancel = document.getElementById('btnB40ImageModalCancel');
+    if (btnB40Cancel) btnB40Cancel.addEventListener('click', closeB40ImageModal);
+
+    const modalB40Overlay = document.getElementById('b40ImageModal');
+    if (modalB40Overlay) {
+      modalB40Overlay.addEventListener('click', (e) => {
+        if (e.target.id === 'b40ImageModal') closeB40ImageModal();
+      });
+    }
+
+    const btnB40Share = document.getElementById('btnB40ImageShare');
+    if (btnB40Share) {
+      btnB40Share.addEventListener('click', async () => {
+        if (!generatedB40Blob) return;
+        try {
+          const filename = 'rotaeno_b40_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.png';
+          const file = new File([generatedB40Blob], filename, { type: 'image/png' });
+          await navigator.share({
+            title: 'Rotaeno BEST 40',
+            text: '私の Rotaeno BEST 40 (Rating: ' + (currentCalc ? currentCalc.totalRating.toFixed(4) : '') + ') #Rotaeno',
+            files: [file]
+          });
+        } catch (err) {
+          if (err.name !== 'AbortError') console.error('Share error:', err);
+        }
       });
     }
 
