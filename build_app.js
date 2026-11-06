@@ -4130,15 +4130,27 @@ const htmlContent = `<!DOCTYPE html>
             pack: t[6],
             version: t[11],
             endOfSale: t[8] || 0,
+            initId: (t[12] !== undefined && !isNaN(t[12])) ? Number(t[12]) : 999999,
             diffs: {}
           });
+        }
+        if (t[2] === 'IV' && t[12] !== undefined && !isNaN(t[12])) {
+          map.get(songId).initId = Number(t[12]);
         }
         map.get(songId).diffs[t[2]] = {
           constant: t[4],
           level: t[3]
         };
       });
-      return Array.from(map.values());
+      const list = Array.from(map.values());
+      // Sort by initId so songs are in true game default order
+      list.sort((a, b) => (a.initId || 0) - (b.initId || 0));
+
+      // Re-index consecutive integers 1, 2, 3...
+      list.forEach((s, idx) => {
+        s.initId = idx + 1;
+      });
+      return list;
     }
 
     function getAllSongs() {
@@ -7047,9 +7059,32 @@ const htmlContent = `<!DOCTYPE html>
 
         if (type === 'new' && detectedNew[idx]) {
           const song = detectedNew[idx];
-          const tuples = songObjToTuples(song, maxInitId + 1);
-          maxInitId += tuples.length;
-          masterSongs.push(...tuples);
+          const songInitId = (song.initId !== undefined && !isNaN(song.initId))
+            ? Number(song.initId)
+            : (++maxInitId);
+
+          const diffKeys = ['I', 'II', 'III', 'IV'];
+          if (song.diffs && song.diffs['IV-α']) diffKeys.push('IV-α');
+
+          diffKeys.forEach(diff => {
+            const dObj = song.diffs && song.diffs[diff];
+            if (!dObj || isNaN(dObj.constant)) return;
+            masterSongs.push([
+              song.songId + '_' + diff,
+              song.title,
+              diff,
+              dObj.level || calcLevelFromConstant(dObj.constant),
+              dObj.constant,
+              0,
+              song.pack || '基本曲',
+              song.songId,
+              0,
+              0,
+              '',
+              song.version || 'v5.6.0',
+              songInitId
+            ]);
+          });
 
           if (song.pack && !packOrder.includes(song.pack)) {
             packOrder.push(song.pack);
@@ -7116,6 +7151,7 @@ const htmlContent = `<!DOCTYPE html>
         }
       });
 
+      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
       closeOfficialUpdateModal();
       initFormDatalists();
       renderPackOrderList();
@@ -7565,9 +7601,20 @@ const htmlContent = `<!DOCTYPE html>
         btn.textContent = '⏳ スプシへ送信中...';
       }
 
+      const songGroups = getSongGroups(masterSongs);
+      const songOrderMap = new Map();
+      songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
+      masterSongs.forEach(t => {
+        if (songOrderMap.has(t[7])) {
+          t[12] = songOrderMap.get(t[7]);
+        }
+      });
+      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+      saveMasterSongs();
+
       const payload = {
         sheetUrl: userSheetUrl,
-        songs: getSongGroups(masterSongs),
+        songs: songGroups,
         scores: userScores,
         apPlusRecords: apPlusRecords,
         config: {
@@ -7640,25 +7687,53 @@ const htmlContent = `<!DOCTYPE html>
             const songMap = new Map();
             d.songs.forEach(s => songMap.set(s.songId, s));
 
-            // Sync constants if edited in sheet
+            // Sync constants & initId if edited in sheet
             restoredMaster.forEach(t => {
               const song = songMap.get(t[7]);
-              if (song && song.diffs && song.diffs[t[2]]) {
-                const diffObj = song.diffs[t[2]];
-                if (!isNaN(diffObj.constant)) t[4] = diffObj.constant;
-                if (diffObj.level) t[3] = diffObj.level;
+              if (song) {
+                if (song.initId !== undefined && !isNaN(song.initId)) t[12] = Number(song.initId);
+                if (song.diffs && song.diffs[t[2]]) {
+                  const diffObj = song.diffs[t[2]];
+                  if (!isNaN(diffObj.constant)) t[4] = diffObj.constant;
+                  if (diffObj.level) t[3] = diffObj.level;
+                }
               }
             });
 
-            // Add any user added songs from sheet
-            let maxId = restoredMaster.length;
+            // Add any user added songs from sheet with their exact initId
+            let fallbackId = restoredMaster.length;
             d.songs.forEach(song => {
               if (!defaultSongIds.has(song.songId)) {
-                const tuples = songObjToTuples(song, maxId + 1);
-                maxId += tuples.length;
-                restoredMaster.push(...tuples);
+                const songInitId = (song.initId !== undefined && !isNaN(song.initId)) 
+                  ? Number(song.initId) 
+                  : (++fallbackId);
+
+                const diffKeys = ['I', 'II', 'III', 'IV'];
+                if (song.diffs && song.diffs['IV-α']) diffKeys.push('IV-α');
+
+                diffKeys.forEach(diff => {
+                  const dObj = song.diffs && song.diffs[diff];
+                  if (!dObj || isNaN(dObj.constant)) return;
+                  restoredMaster.push([
+                    song.songId + '_' + diff,
+                    song.title,
+                    diff,
+                    dObj.level || calcLevelFromConstant(dObj.constant),
+                    dObj.constant,
+                    0,
+                    song.pack || '基本曲',
+                    song.songId,
+                    0,
+                    0,
+                    '',
+                    song.version || 'v5.6.0',
+                    songInitId
+                  ]);
+                });
               }
             });
+
+            restoredMaster.sort((a, b) => (a[12] || 0) - (b[12] || 0));
             masterSongs = restoredMaster;
             saveMasterSongs();
           }
@@ -7729,9 +7804,20 @@ const htmlContent = `<!DOCTYPE html>
 
       showSaveToast('☁️ スプシへ自動同期中...');
 
+      const songGroups = getSongGroups(masterSongs);
+      const songOrderMap = new Map();
+      songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
+      masterSongs.forEach(t => {
+        if (songOrderMap.has(t[7])) {
+          t[12] = songOrderMap.get(t[7]);
+        }
+      });
+      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+      saveMasterSongs();
+
       const payload = {
         sheetUrl: userSheetUrl,
-        songs: getSongGroups(masterSongs),
+        songs: songGroups,
         scores: userScores,
         apPlusRecords: apPlusRecords,
         config: {

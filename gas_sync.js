@@ -111,16 +111,18 @@ function writeSongsSheet(ss, songs) {
   const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);
   sheet.clear();
   const headers = [
-    '曲名', 'ソングパック', 'バージョン', 'songId',
+    'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId',
     'I_定数', 'I_Lv', 'II_定数', 'II_Lv',
     'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',
     'IV-α_定数', 'IV-α_Lv'
   ];
   const rows = [headers];
 
-  songs.forEach(s => {
+  songs.forEach((s, idx) => {
     const d = s.diffs || {};
+    const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
     rows.push([
+      orderNo,
       s.title || '',
       s.pack || '',
       s.version || '',
@@ -138,7 +140,12 @@ function writeSongsSheet(ss, songs) {
     ]);
   });
 
-  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
+  if (rows.length > 1) {
+    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
+    sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');
+  } else {
+    sheet.getRange(1, 1, 1, headers.length).setValues(rows);
+  }
   sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0f2fe');
   sheet.setFrozenRows(1);
 }
@@ -149,25 +156,51 @@ function readSongsSheet(ss) {
   const values = sheet.getDataRange().getValues();
   if (values.length <= 1) return [];
 
+  // Check if header row contains 'デフォルト順' (backward compatible)
+  const headerCol0 = String(values[0][0] || '').trim();
+  const hasOrderCol = (headerCol0 === 'デフォルト順' || headerCol0 === 'No' || headerCol0 === '順序' || headerCol0 === 'ID');
+
   const songs = [];
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
-    if (!row[0]) continue;
-    const diffs = {};
-    if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };
-    if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };
-    if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String(row[9] || '') };
-    if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String(row[11] || '') };
-    if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String(row[13] || '') };
+    if (hasOrderCol) {
+      if (!row[1]) continue;
+      const initId = (row[0] !== '' && !isNaN(row[0])) ? Number(row[0]) : i;
+      const diffs = {};
+      if (row[5] !== '') diffs['I'] = { constant: Number(row[5]), level: String(row[6] || '') };
+      if (row[7] !== '') diffs['II'] = { constant: Number(row[7]), level: String(row[8] || '') };
+      if (row[9] !== '') diffs['III'] = { constant: Number(row[9]), level: String(row[10] || '') };
+      if (row[11] !== '') diffs['IV'] = { constant: Number(row[11]), level: String(row[12] || '') };
+      if (row[13] !== '') diffs['IV-α'] = { constant: Number(row[13]), level: String(row[14] || '') };
 
-    songs.push({
-      title: String(row[0]),
-      pack: String(row[1] || '基本曲'),
-      version: String(row[2] || 'v5.6.0'),
-      songId: String(row[3] || ('song_' + i)),
-      diffs: diffs
-    });
+      songs.push({
+        initId: initId,
+        title: String(row[1]),
+        pack: String(row[2] || '基本曲'),
+        version: String(row[3] || 'v5.6.0'),
+        songId: String(row[4] || ('song_' + i)),
+        diffs: diffs
+      });
+    } else {
+      if (!row[0]) continue;
+      const diffs = {};
+      if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };
+      if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };
+      if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String(row[9] || '') };
+      if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String(row[11] || '') };
+      if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String(row[13] || '') };
+
+      songs.push({
+        initId: i,
+        title: String(row[0]),
+        pack: String(row[1] || '基本曲'),
+        version: String(row[2] || 'v5.6.0'),
+        songId: String(row[3] || ('song_' + i)),
+        diffs: diffs
+      });
+    }
   }
+  songs.sort((a, b) => (a.initId || 0) - (b.initId || 0));
   return songs;
 }
 
