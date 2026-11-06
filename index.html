@@ -1564,7 +1564,7 @@
     }
 
     .lamp-stat-cell {
-      background: #f8fafc;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 10px 6px;
@@ -1599,7 +1599,7 @@
     }
 
     .stats-meta-pill {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       padding: 8px 10px;
       border-radius: 8px;
       display: flex;
@@ -1674,7 +1674,7 @@
       align-items: center;
       gap: 10px;
       padding: 8px 12px;
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       margin-bottom: 6px;
@@ -1686,7 +1686,7 @@
       font-size: 12px;
       font-weight: 900;
       color: var(--color-text-main);
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       padding: 4px 6px;
       border-radius: 6px;
     }
@@ -1709,7 +1709,7 @@
 
     /* Song Pack Stat Cards */
     .pack-stat-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 12px 14px;
@@ -1762,7 +1762,7 @@
     }
 
     .btn-pack-jump {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 4px 8px;
@@ -1774,7 +1774,7 @@
     }
 
     .btn-pack-jump:hover {
-      background: #e2e8f0;
+      background: var(--bg-surface);
     }
 
     /* AP+ Theory Record Table & Toolbar */
@@ -1783,7 +1783,7 @@
       flex-direction: column;
       gap: 10px;
       margin-bottom: 12px;
-      background: #ffffff;
+      background: var(--bg-card);
       padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid var(--border-color);
@@ -1895,7 +1895,7 @@
 
     .btn-ap-plus-sync {
       flex: 1;
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       color: var(--color-primary-dark);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -2236,6 +2236,15 @@
       color: #dc2626;
       border-color: #fca5a5;
     }
+    [data-theme="dark"] .panel-btn.danger-zone {
+      background: rgba(220, 38, 38, 0.2);
+      color: #f87171;
+      border-color: rgba(220, 38, 38, 0.45);
+    }
+    [data-theme="dark"] .panel-btn.danger-zone:hover {
+      background: rgba(220, 38, 38, 0.35);
+      border-color: #ef4444;
+    }
 
     /* Custom Song Addition Form */
     .new-song-form {
@@ -2294,13 +2303,13 @@
     }
 
     .form-input:focus {
-      background: #ffffff;
+      background: var(--bg-card);
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.12);
     }
 
     .form-diff-section {
-      background: #f8fafc;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 10px;
@@ -2362,7 +2371,7 @@
       font-size: 11px;
       font-weight: 800;
       color: var(--color-primary-dark);
-      background: #eaf3fb;
+      background: var(--bg-surface-soft);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -2381,7 +2390,7 @@
     }
 
     .diff-num-input:focus {
-      background: #ffffff;
+      background: var(--bg-card);
       border-color: var(--color-primary);
     }
 
@@ -2614,7 +2623,7 @@
     }
 
     .btn-pack-order {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       color: var(--color-text-main);
       border-radius: 4px;
@@ -2630,8 +2639,8 @@
     }
 
     .btn-pack-order:hover:not(:disabled) {
-      background: #e2e8f0;
-      border-color: #cbd5e1;
+      background: var(--bg-card);
+      border-color: var(--color-primary);
     }
 
     .btn-pack-order:disabled {
@@ -2674,6 +2683,56 @@
     .gas-sync-badge.connected {
       background: #dcfce7;
       color: #15803d;
+    }
+
+    .auto-sync-banner {
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .auto-sync-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .auto-sync-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      color: #9f1239;
+    }
+    .auto-sync-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #e11d48;
+    }
+    .auto-sync-state-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: #ffe4e6;
+      color: #be123c;
+    }
+    .auto-sync-warning {
+      font-size: 11px;
+      line-height: 1.5;
+      color: #b91c1c;
+    }
+    .auto-sync-note {
+      font-size: 10.5px;
+      line-height: 1.4;
+      color: #e11d48;
+      margin-top: 5px;
     }
     .gas-guide-details {
       background: #ffffff;
@@ -3207,6 +3266,81 @@
       background: var(--bg-surface);
       border-color: var(--border-color);
     }
+
+    [data-theme="dark"] .diff-stat-table th {
+      background: var(--bg-surface);
+      color: var(--color-text-sub);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .diff-stat-table td {
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .pack-badge-pill {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+
+    [data-theme="dark"] .btn-pack-jump {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+    [data-theme="dark"] .btn-pack-jump:hover {
+      background: var(--bg-surface);
+    }
+
+    [data-theme="dark"] .btn-ap-plus-sync {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .calc-level-tag {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-pack-order {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-text-main);
+    }
+    [data-theme="dark"] .btn-pack-order:hover:not(:disabled) {
+      background: var(--bg-surface);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-pack-delete {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.45);
+      color: #f87171;
+    }
+
+    [data-theme="dark"] .btn-card-action {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.45);
+      color: #f87171;
+    }
+
+    [data-theme="dark"] .auto-sync-banner {
+      background: #230f14;
+      border-color: #611824;
+    }
+    [data-theme="dark"] .auto-sync-label {
+      color: #fb7185;
+    }
+    [data-theme="dark"] .auto-sync-state-pill {
+      background: #4c111a;
+      color: #fda4af;
+    }
+    [data-theme="dark"] .auto-sync-warning {
+      color: #fca5a5;
+    }
+    [data-theme="dark"] .auto-sync-note {
+      color: #fb7185;
+    }
   </style>
 </head>
 <body>
@@ -3707,19 +3841,19 @@
         </div>
 
         <!-- Sync Mode & Important Warning Box -->
-        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-            <label for="autoSyncToggle" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 800; color: #9f1239;">
-              <input type="checkbox" id="autoSyncToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: #e11d48;">
+        <div class="auto-sync-banner">
+          <div class="auto-sync-header">
+            <label for="autoSyncToggle" class="auto-sync-label">
+              <input type="checkbox" id="autoSyncToggle" class="auto-sync-checkbox">
               <span>💾 変更保存時にスプシへ自動同期する</span>
             </label>
-            <span id="autoSyncStateLabel" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 9999px; background: #ffe4e6; color: #be123c;">OFF (手動同期)</span>
+            <span id="autoSyncStateLabel" class="auto-sync-state-pill">OFF (手動同期)</span>
           </div>
           
-          <div style="font-size: 11px; line-height: 1.5; color: #b91c1c;">
+          <div class="auto-sync-warning">
             <strong>⚠️ 重要：</strong> デフォルト（OFF）の場合、アプリ内でスコアや曲追加を保存してもスプレッドシート側には反映されません。必ず下の<strong>「☁️ スプシへ保存 (同期)」</strong>ボタンを押して明示的に同期を行ってください。
           </div>
-          <div style="font-size: 10.5px; line-height: 1.4; color: #e11d48; margin-top: 5px;">
+          <div class="auto-sync-note">
             ※自動同期を【ON】にすると、アプリ下部の「💾 保存する」を押した瞬間に裏でスプシへの送信が自動実行されます。通信環境によっては<strong>動作が重くなったり、通信量を消費する可能性があるためご注意ください</strong>。
           </div>
         </div>
@@ -4339,7 +4473,7 @@
     const AUTO_SYNC_KEY = 'rotaeno_auto_sync_v1';
     const THEME_PREF_KEY = 'rotaeno_theme_preference_v1';
     const DEFAULT_GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw2W83eJjx1A2HbUH1XnKpBpjPuA66vEo9xoqQJFm2s2rMdqwyfepBCXuUpRMdmJbLV/exec';
-    const GAS_SCRIPT_CODE = "/**\n * Rotaeno Rating Tracker - Google スプレッドシート連携スクリプト (中央連携・個人スプシ両対応)\n * \n * 【仕組み】\n * 管理者がデプロイした単一のWebアプリAPIを経由して、各ユーザーのGoogleスプレッドシート\n * （共有設定: リンクを知っている全員が編集可）に対して安全に読み書きを行います。\n * 一般ユーザーは Apps Script のデプロイ作業を一切行う必要がありません！\n */\n\nconst SHEET_NAMES = {\n  SONGS: 'Songs',\n  SCORES: 'Scores',\n  THEORY: 'TheoryRecords',\n  CONFIG: 'Config'\n};\n\nfunction getOrCreateSheet(ss, name) {\n  let sheet = ss.getSheetByName(name);\n  if (!sheet) {\n    sheet = ss.insertSheet(name);\n  }\n  return sheet;\n}\n\nfunction resolveSpreadsheet(target) {\n  if (!target) {\n    return SpreadsheetApp.getActiveSpreadsheet();\n  }\n  target = String(target).trim();\n  try {\n    if (target.startsWith('http://') || target.startsWith('https://')) {\n      return SpreadsheetApp.openByUrl(target);\n    } else {\n      return SpreadsheetApp.openById(target);\n    }\n  } catch (err) {\n    throw new Error('スプレッドシートを開けませんでした。スプレッドシートの共有設定が「リンクを知っている全員（編集者）」になっているか確認してください。(詳細: ' + err.message + ')');\n  }\n}\n\nfunction doGet(e) {\n  try {\n    const target = (e && e.parameter) ? (e.parameter.url || e.parameter.id) : null;\n    const ss = resolveSpreadsheet(target);\n\n    const data = {\n      songs: readSongsSheet(ss),\n      scores: readScoresSheet(ss),\n      apPlusRecords: readTheorySheet(ss),\n      config: readConfigSheet(ss)\n    };\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      data: data\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\nfunction doPost(e) {\n  try {\n    let payload = null;\n    if (e.postData && e.postData.contents) {\n      payload = JSON.parse(e.postData.contents);\n    } else {\n      throw new Error('No post data received');\n    }\n\n    const target = payload.sheetUrl || payload.sheetId;\n    const ss = resolveSpreadsheet(target);\n    const nowStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');\n\n    if (payload.songs && Array.isArray(payload.songs)) {\n      writeSongsSheet(ss, payload.songs);\n    }\n    if (payload.scores && typeof payload.scores === 'object') {\n      writeScoresSheet(ss, payload.scores, nowStr);\n    }\n    if (payload.apPlusRecords && Array.isArray(payload.apPlusRecords)) {\n      writeTheorySheet(ss, payload.apPlusRecords);\n    }\n    if (payload.config && typeof payload.config === 'object') {\n      payload.config.lastSyncedAt = nowStr;\n      writeConfigSheet(ss, payload.config);\n    }\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      message: '同期が正常に完了しました',\n      syncedAt: nowStr\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\n/* ==========================================================\n * Sheet I/O Helpers\n * ========================================================== */\n\n// 1. Songs Sheet (楽曲マスター: 1曲1行)\nfunction writeSongsSheet(ss, songs) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);\n  sheet.clear();\n  const headers = [\n    'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId', '販売終了',\n    'I_定数', 'I_Lv', 'II_定数', 'II_Lv',\n    'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',\n    'IV-α_定数', 'IV-α_Lv'\n  ];\n  const rows = [headers];\n\n  songs.forEach((s, idx) => {\n    const d = s.diffs || {};\n    const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);\n    const titleStr = String(s.title || '');\n    const isEndOfSale = (s.endOfSale === 1 || s.endOfSale === true || String(s.endOfSale) === '1') ? 1 : 0;\n    rows.push([\n      orderNo,\n      titleStr,\n      s.pack || '',\n      s.version || '',\n      s.songId || '',\n      isEndOfSale,\n      d['I'] ? d['I'].constant : '',\n      d['I'] ? d['I'].level : '',\n      d['II'] ? d['II'].constant : '',\n      d['II'] ? d['II'].level : '',\n      d['III'] ? d['III'].constant : '',\n      d['III'] ? d['III'].level : '',\n      d['IV'] ? d['IV'].constant : '',\n      d['IV'] ? d['IV'].level : '',\n      d['IV-α'] ? d['IV-α'].constant : '',\n      d['IV-α'] ? d['IV-α'].level : ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(2, 2, rows.length - 1, 4).setNumberFormat('@');\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n    sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');\n    sheet.getRange(1, 6, rows.length, 1).setHorizontalAlignment('center');\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0f2fe');\n  sheet.setFrozenRows(1);\n}\n\nfunction readSongsSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SONGS);\n  if (!sheet) return [];\n  const range = sheet.getDataRange();\n  const values = range.getValues();\n  const displayValues = range.getDisplayValues();\n  if (values.length <= 1) return [];\n\n  // Match columns dynamically by header names\n  const headers = displayValues[0].map(h => String(h || '').trim());\n  const colOrder = headers.findIndex(h => /^(デフォルト順|No|順序|ID)$/i.test(h));\n  const colTitle = headers.indexOf('曲名');\n  const colPack = headers.indexOf('ソングパック');\n  const colVer = headers.indexOf('バージョン');\n  const colSongId = headers.indexOf('songId');\n  const colEndOfSale = headers.findIndex(h => /^(販売終了|endOfSale|削除フラグ)$/i.test(h));\n  const colConstI = headers.indexOf('I_定数');\n  const colLvI = headers.indexOf('I_Lv');\n  const colConstII = headers.indexOf('II_定数');\n  const colLvII = headers.indexOf('II_Lv');\n  const colConstIII = headers.indexOf('III_定数');\n  const colLvIII = headers.indexOf('III_Lv');\n  const colConstIV = headers.indexOf('IV_定数');\n  const colLvIV = headers.indexOf('IV_Lv');\n  const colConstIVAlpha = headers.findIndex(h => /^(IV-α_定数|IV-a_定数)$/i.test(h));\n  const colLvIVAlpha = headers.findIndex(h => /^(IV-α_Lv|IV-a_Lv)$/i.test(h));\n\n  const hasOrderCol = colOrder !== -1;\n  const idxTitle = colTitle !== -1 ? colTitle : (hasOrderCol ? 1 : 0);\n  const idxPack = colPack !== -1 ? colPack : (hasOrderCol ? 2 : 1);\n  const idxVer = colVer !== -1 ? colVer : (hasOrderCol ? 3 : 2);\n  const idxSongId = colSongId !== -1 ? colSongId : (hasOrderCol ? 4 : 3);\n\n  const songs = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const disp = displayValues[i];\n\n    const title = (disp && disp[idxTitle] !== '') ? disp[idxTitle] : String(row[idxTitle] || '');\n    if (!title) continue;\n\n    const initId = (hasOrderCol && row[colOrder] !== '' && !isNaN(row[colOrder])) ? Number(row[colOrder]) : i;\n\n    let endOfSale = 0;\n    if (colEndOfSale !== -1) {\n      const val = row[colEndOfSale];\n      if (val === 1 || String(val).trim() === '1' || String(val).toUpperCase() === 'TRUE') {\n        endOfSale = 1;\n      }\n    }\n\n    const diffs = {};\n    function parseDiff(cIdx, lIdx, key) {\n      if (cIdx !== -1 && row[cIdx] !== '' && !isNaN(row[cIdx])) {\n        diffs[key] = {\n          constant: Number(row[cIdx]),\n          level: String((lIdx !== -1 && disp && disp[lIdx]) || (lIdx !== -1 && row[lIdx]) || '')\n        };\n      }\n    }\n\n    if (colConstI !== -1) {\n      parseDiff(colConstI, colLvI, 'I');\n      parseDiff(colConstII, colLvII, 'II');\n      parseDiff(colConstIII, colLvIII, 'III');\n      parseDiff(colConstIV, colLvIV, 'IV');\n      parseDiff(colConstIVAlpha, colLvIVAlpha, 'IV-α');\n    } else {\n      // Legacy positional layout fallback\n      const baseDiffIdx = (colEndOfSale !== -1 && colEndOfSale < 6) ? 6 : (hasOrderCol ? 5 : 4);\n      parseDiff(baseDiffIdx, baseDiffIdx + 1, 'I');\n      parseDiff(baseDiffIdx + 2, baseDiffIdx + 3, 'II');\n      parseDiff(baseDiffIdx + 4, baseDiffIdx + 5, 'III');\n      parseDiff(baseDiffIdx + 6, baseDiffIdx + 7, 'IV');\n      parseDiff(baseDiffIdx + 8, baseDiffIdx + 9, 'IV-α');\n    }\n\n    songs.push({\n      initId: initId,\n      title: title,\n      pack: String((disp && disp[idxPack]) || row[idxPack] || '基本曲'),\n      version: String((disp && disp[idxVer]) || row[idxVer] || 'v5.6.0'),\n      songId: String((disp && disp[idxSongId]) || row[idxSongId] || ('song_' + i)),\n      endOfSale: endOfSale,\n      diffs: diffs\n    });\n  }\n  songs.sort((a, b) => (a.initId || 0) - (b.initId || 0));\n  return songs;\n}\n\n// 2. Scores Sheet (プレイ成績)\nfunction writeScoresSheet(ss, scores, nowStr) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SCORES);\n  sheet.clear();\n  const headers = ['チャートID', 'スコア', 'クリアランプ', '最終更新日時'];\n  const rows = [headers];\n\n  Object.keys(scores).forEach(chartId => {\n    const item = scores[chartId];\n    if (item && (item.score > 0 || item.status)) {\n      rows.push([\n        chartId,\n        item.score || 0,\n        item.status || '',\n        nowStr\n      ]);\n    }\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#fef3c7');\n  sheet.setFrozenRows(1);\n}\n\nfunction readScoresSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SCORES);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const scores = {};\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const chartId = String(row[0]);\n    if (!chartId) continue;\n    scores[chartId] = {\n      score: Number(row[1]) || 0,\n      status: String(row[2] || '')\n    };\n  }\n  return scores;\n}\n\n// 3. TheoryRecords Sheet (理論値記録)\nfunction writeTheorySheet(ss, records) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.THEORY);\n  sheet.clear();\n  const headers = ['No', '曲名', '難易度', '達成日', '備考'];\n  const rows = [headers];\n\n  records.forEach(r => {\n    rows.push([\n      r.no || '',\n      r.title || '',\n      r.diff || '',\n      r.date || '',\n      r.note || ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0e7ff');\n  sheet.setFrozenRows(1);\n}\n\nfunction readTheorySheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.THEORY);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const records = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (row[0] === '' && !row[1]) continue;\n\n    let dateStr = '';\n    const dateVal = row[3];\n    if (dateVal instanceof Date) {\n      dateStr = Utilities.formatDate(dateVal, 'Asia/Tokyo', 'yyyy/M/d');\n    } else if (dateVal) {\n      dateStr = String(dateVal);\n    }\n\n    records.push({\n      no: Number(row[0]) || (i),\n      title: String(row[1] || ''),\n      diff: String(row[2] || ''),\n      date: dateStr,\n      note: String(row[4] || '')\n    });\n  }\n  return records;\n}\n\n// 4. Config Sheet (設定データ)\nfunction writeConfigSheet(ss, config) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.CONFIG);\n  sheet.clear();\n  const headers = ['キー', '設定値', '説明'];\n  const rows = [\n    headers,\n    ['packOrder', JSON.stringify(config.packOrder || []), 'ソングパック表示順序 (JSON)'],\n    ['statsScope', String(config.statsScope || 'ALL'), 'マイページ統計対象スコープ (ALL / IN_GAME)'],\n    ['showApPlusDate', String(config.showApPlusDate !== false), '理論値一覧の日付列表示設定 (true / false)'],\n    ['lastSyncedAt', String(config.lastSyncedAt || ''), '最終同期日時 (自動更新)']\n  ];\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#f1f5f9');\n  sheet.setFrozenRows(1);\n}\n\nfunction readConfigSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.CONFIG);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const config = {};\n  for (let i = 1; i < values.length; i++) {\n    const key = String(values[i][0]);\n    const val = values[i][1];\n    if (key === 'packOrder') {\n      try { config.packOrder = JSON.parse(val); } catch (e) { config.packOrder = []; }\n    } else if (key === 'statsScope') {\n      config.statsScope = String(val);\n    } else if (key === 'showApPlusDate') {\n      config.showApPlusDate = (val === 'true' || val === true);\n    } else if (key === 'lastSyncedAt') {\n      config.lastSyncedAt = String(val);\n    }\n  }\n  return config;\n}\n";
+    const GAS_SCRIPT_CODE = "/**\n * Rotaeno Rating Tracker - Google スプレッドシート連携スクリプト (中央連携・個人スプシ両対応)\n * \n * 【仕組み】\n * 管理者がデプロイした単一のWebアプリAPIを経由して、各ユーザーのGoogleスプレッドシート\n * （共有設定: リンクを知っている全員が編集可）に対して安全に読み書きを行います。\n * 一般ユーザーは Apps Script のデプロイ作業を一切行う必要がありません！\n */\n\nconst SHEET_NAMES = {\n  SONGS: 'Songs',\n  SCORES: 'Scores',\n  THEORY: 'TheoryRecords',\n  CONFIG: 'Config'\n};\n\nfunction getOrCreateSheet(ss, name) {\n  let sheet = ss.getSheetByName(name);\n  if (!sheet) {\n    sheet = ss.insertSheet(name);\n  }\n  return sheet;\n}\n\nfunction resolveSpreadsheet(target) {\n  if (!target) {\n    return SpreadsheetApp.getActiveSpreadsheet();\n  }\n  target = String(target).trim();\n  try {\n    if (target.startsWith('http://') || target.startsWith('https://')) {\n      return SpreadsheetApp.openByUrl(target);\n    } else {\n      return SpreadsheetApp.openById(target);\n    }\n  } catch (err) {\n    throw new Error('スプレッドシートを開けませんでした。スプレッドシートの共有設定が「リンクを知っている全員（編集者）」になっているか確認してください。(詳細: ' + err.message + ')');\n  }\n}\n\nfunction doGet(e) {\n  try {\n    const target = (e && e.parameter) ? (e.parameter.url || e.parameter.id) : null;\n    const ss = resolveSpreadsheet(target);\n\n    const data = {\n      songs: readSongsSheet(ss),\n      scores: readScoresSheet(ss),\n      apPlusRecords: readTheorySheet(ss),\n      config: readConfigSheet(ss)\n    };\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      data: data\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\nfunction doPost(e) {\n  try {\n    let payload = null;\n    if (e.postData && e.postData.contents) {\n      payload = JSON.parse(e.postData.contents);\n    } else {\n      throw new Error('No post data received');\n    }\n\n    const target = payload.sheetUrl || payload.sheetId;\n    const ss = resolveSpreadsheet(target);\n    const nowStr = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');\n\n    if (payload.songs && Array.isArray(payload.songs)) {\n      writeSongsSheet(ss, payload.songs);\n    }\n    if (payload.scores && typeof payload.scores === 'object') {\n      writeScoresSheet(ss, payload.scores, nowStr);\n    }\n    if (payload.apPlusRecords && Array.isArray(payload.apPlusRecords)) {\n      writeTheorySheet(ss, payload.apPlusRecords);\n    }\n    if (payload.config && typeof payload.config === 'object') {\n      payload.config.lastSyncedAt = nowStr;\n      writeConfigSheet(ss, payload.config);\n    }\n\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'success',\n      message: '同期が正常に完了しました',\n      syncedAt: nowStr\n    })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) {\n    return ContentService.createTextOutput(JSON.stringify({\n      status: 'error',\n      message: err.message || err.toString()\n    })).setMimeType(ContentService.MimeType.JSON);\n  }\n}\n\n/* ==========================================================\n * Sheet I/O Helpers\n * ========================================================== */\n\nfunction safeFormatTitleForSheet(val) {\n  if (val === null || val === undefined) return '';\n  const str = (typeof val === 'boolean') ? (val ? 'True' : 'False') : String(val).trim();\n  const normalized = (str.toLowerCase() === 'true') ? 'True' : ((str.toLowerCase() === 'false') ? 'False' : str);\n  // Google Sheets の自動 Boolean 型変換を防止するため、True/False に該当する場合は先頭に ' を付与\n  return /^(true|false)$/i.test(normalized) ? (\"'\" + normalized) : normalized;\n}\n\n// 1. Songs Sheet (楽曲マスター: 1曲1行)\nfunction writeSongsSheet(ss, songs) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);\n  sheet.clear();\n  const headers = [\n    'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId', '販売終了',\n    'I_定数', 'I_Lv', 'II_定数', 'II_Lv',\n    'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',\n    'IV-α_定数', 'IV-α_Lv'\n  ];\n  const rows = [headers];\n\n  songs.forEach((s, idx) => {\n    const d = s.diffs || {};\n    const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);\n    const titleStr = safeFormatTitleForSheet(s.title);\n    const isEndOfSale = (s.endOfSale === 1 || s.endOfSale === true || String(s.endOfSale) === '1') ? 1 : 0;\n    rows.push([\n      orderNo,\n      titleStr,\n      s.pack || '',\n      s.version || '',\n      s.songId || '',\n      isEndOfSale,\n      d['I'] ? d['I'].constant : '',\n      d['I'] ? d['I'].level : '',\n      d['II'] ? d['II'].constant : '',\n      d['II'] ? d['II'].level : '',\n      d['III'] ? d['III'].constant : '',\n      d['III'] ? d['III'].level : '',\n      d['IV'] ? d['IV'].constant : '',\n      d['IV'] ? d['IV'].level : '',\n      d['IV-α'] ? d['IV-α'].constant : '',\n      d['IV-α'] ? d['IV-α'].level : ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(2, 2, rows.length - 1, 4).setNumberFormat('@');\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n    sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');\n    sheet.getRange(1, 6, rows.length, 1).setHorizontalAlignment('center');\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0f2fe');\n  sheet.setFrozenRows(1);\n}\n\nfunction readSongsSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SONGS);\n  if (!sheet) return [];\n  const range = sheet.getDataRange();\n  const values = range.getValues();\n  const displayValues = range.getDisplayValues();\n  if (values.length <= 1) return [];\n\n  // Match columns dynamically by header names\n  const headers = displayValues[0].map(h => String(h || '').trim());\n  const colOrder = headers.findIndex(h => /^(デフォルト順|No|順序|ID)$/i.test(h));\n  const colTitle = headers.indexOf('曲名');\n  const colPack = headers.indexOf('ソングパック');\n  const colVer = headers.indexOf('バージョン');\n  const colSongId = headers.indexOf('songId');\n  const colEndOfSale = headers.findIndex(h => /^(販売終了|endOfSale|削除フラグ)$/i.test(h));\n  const colConstI = headers.indexOf('I_定数');\n  const colLvI = headers.indexOf('I_Lv');\n  const colConstII = headers.indexOf('II_定数');\n  const colLvII = headers.indexOf('II_Lv');\n  const colConstIII = headers.indexOf('III_定数');\n  const colLvIII = headers.indexOf('III_Lv');\n  const colConstIV = headers.indexOf('IV_定数');\n  const colLvIV = headers.indexOf('IV_Lv');\n  const colConstIVAlpha = headers.findIndex(h => /^(IV-α_定数|IV-a_定数)$/i.test(h));\n  const colLvIVAlpha = headers.findIndex(h => /^(IV-α_Lv|IV-a_Lv)$/i.test(h));\n\n  const hasOrderCol = colOrder !== -1;\n  const idxTitle = colTitle !== -1 ? colTitle : (hasOrderCol ? 1 : 0);\n  const idxPack = colPack !== -1 ? colPack : (hasOrderCol ? 2 : 1);\n  const idxVer = colVer !== -1 ? colVer : (hasOrderCol ? 3 : 2);\n  const idxSongId = colSongId !== -1 ? colSongId : (hasOrderCol ? 4 : 3);\n\n  const songs = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const disp = displayValues[i];\n\n    let rawTitle = (disp && disp[idxTitle] !== '') ? disp[idxTitle] : row[idxTitle];\n    let title = '';\n    if (typeof rawTitle === 'boolean') {\n      title = rawTitle ? 'True' : 'False';\n    } else {\n      title = String(rawTitle || '').trim();\n      if (title.toLowerCase() === 'true') title = 'True';\n      if (title.toLowerCase() === 'false') title = 'False';\n    }\n    if (!title) continue;\n\n    const initId = (hasOrderCol && row[colOrder] !== '' && !isNaN(row[colOrder])) ? Number(row[colOrder]) : i;\n\n    let endOfSale = 0;\n    if (colEndOfSale !== -1) {\n      const val = row[colEndOfSale];\n      if (val === 1 || String(val).trim() === '1' || String(val).toUpperCase() === 'TRUE') {\n        endOfSale = 1;\n      }\n    }\n\n    const diffs = {};\n    function parseDiff(cIdx, lIdx, key) {\n      if (cIdx !== -1 && row[cIdx] !== '' && !isNaN(row[cIdx])) {\n        diffs[key] = {\n          constant: Number(row[cIdx]),\n          level: String((lIdx !== -1 && disp && disp[lIdx]) || (lIdx !== -1 && row[lIdx]) || '')\n        };\n      }\n    }\n\n    if (colConstI !== -1) {\n      parseDiff(colConstI, colLvI, 'I');\n      parseDiff(colConstII, colLvII, 'II');\n      parseDiff(colConstIII, colLvIII, 'III');\n      parseDiff(colConstIV, colLvIV, 'IV');\n      parseDiff(colConstIVAlpha, colLvIVAlpha, 'IV-α');\n    } else {\n      // Legacy positional layout fallback\n      const baseDiffIdx = (colEndOfSale !== -1 && colEndOfSale < 6) ? 6 : (hasOrderCol ? 5 : 4);\n      parseDiff(baseDiffIdx, baseDiffIdx + 1, 'I');\n      parseDiff(baseDiffIdx + 2, baseDiffIdx + 3, 'II');\n      parseDiff(baseDiffIdx + 4, baseDiffIdx + 5, 'III');\n      parseDiff(baseDiffIdx + 6, baseDiffIdx + 7, 'IV');\n      parseDiff(baseDiffIdx + 8, baseDiffIdx + 9, 'IV-α');\n    }\n\n    songs.push({\n      initId: initId,\n      title: title,\n      pack: String((disp && disp[idxPack]) || row[idxPack] || '基本曲'),\n      version: String((disp && disp[idxVer]) || row[idxVer] || 'v5.6.0'),\n      songId: String((disp && disp[idxSongId]) || row[idxSongId] || ('song_' + i)),\n      endOfSale: endOfSale,\n      diffs: diffs\n    });\n  }\n  songs.sort((a, b) => (a.initId || 0) - (b.initId || 0));\n  return songs;\n}\n\n// 2. Scores Sheet (プレイ成績)\nfunction writeScoresSheet(ss, scores, nowStr) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.SCORES);\n  sheet.clear();\n  const headers = ['チャートID', 'スコア', 'クリアランプ', '最終更新日時'];\n  const rows = [headers];\n\n  Object.keys(scores).forEach(chartId => {\n    const item = scores[chartId];\n    if (item && (item.score > 0 || item.status)) {\n      rows.push([\n        chartId,\n        item.score || 0,\n        item.status || '',\n        nowStr\n      ]);\n    }\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#fef3c7');\n  sheet.setFrozenRows(1);\n}\n\nfunction readScoresSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.SCORES);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const scores = {};\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    const chartId = String(row[0]);\n    if (!chartId) continue;\n    scores[chartId] = {\n      score: Number(row[1]) || 0,\n      status: String(row[2] || '')\n    };\n  }\n  return scores;\n}\n\n// 3. TheoryRecords Sheet (理論値記録)\nfunction writeTheorySheet(ss, records) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.THEORY);\n  sheet.clear();\n  const headers = ['No', '曲名', '難易度', '達成日', '備考'];\n  const rows = [headers];\n\n  records.forEach(r => {\n    rows.push([\n      r.no || '',\n      r.title || '',\n      r.diff || '',\n      r.date || '',\n      r.note || ''\n    ]);\n  });\n\n  if (rows.length > 1) {\n    sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  } else {\n    sheet.getRange(1, 1, 1, headers.length).setValues(rows);\n  }\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#e0e7ff');\n  sheet.setFrozenRows(1);\n}\n\nfunction readTheorySheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.THEORY);\n  if (!sheet) return [];\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return [];\n\n  const records = [];\n  for (let i = 1; i < values.length; i++) {\n    const row = values[i];\n    if (row[0] === '' && !row[1]) continue;\n\n    let dateStr = '';\n    const dateVal = row[3];\n    if (dateVal instanceof Date) {\n      dateStr = Utilities.formatDate(dateVal, 'Asia/Tokyo', 'yyyy/M/d');\n    } else if (dateVal) {\n      dateStr = String(dateVal);\n    }\n\n    records.push({\n      no: Number(row[0]) || (i),\n      title: String(row[1] || ''),\n      diff: String(row[2] || ''),\n      date: dateStr,\n      note: String(row[4] || '')\n    });\n  }\n  return records;\n}\n\n// 4. Config Sheet (設定データ)\nfunction writeConfigSheet(ss, config) {\n  const sheet = getOrCreateSheet(ss, SHEET_NAMES.CONFIG);\n  sheet.clear();\n  const headers = ['キー', '設定値', '説明'];\n  const rows = [\n    headers,\n    ['packOrder', JSON.stringify(config.packOrder || []), 'ソングパック表示順序 (JSON)'],\n    ['statsScope', String(config.statsScope || 'ALL'), 'マイページ統計対象スコープ (ALL / IN_GAME)'],\n    ['showApPlusDate', String(config.showApPlusDate !== false), '理論値一覧の日付列表示設定 (true / false)'],\n    ['lastSyncedAt', String(config.lastSyncedAt || ''), '最終同期日時 (自動更新)']\n  ];\n\n  sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);\n  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#f1f5f9');\n  sheet.setFrozenRows(1);\n}\n\nfunction readConfigSheet(ss) {\n  const sheet = ss.getSheetByName(SHEET_NAMES.CONFIG);\n  if (!sheet) return {};\n  const values = sheet.getDataRange().getValues();\n  if (values.length <= 1) return {};\n\n  const config = {};\n  for (let i = 1; i < values.length; i++) {\n    const key = String(values[i][0]);\n    const val = values[i][1];\n    if (key === 'packOrder') {\n      try { config.packOrder = JSON.parse(val); } catch (e) { config.packOrder = []; }\n    } else if (key === 'statsScope') {\n      config.statsScope = String(val);\n    } else if (key === 'showApPlusDate') {\n      config.showApPlusDate = (val === 'true' || val === true);\n    } else if (key === 'lastSyncedAt') {\n      config.lastSyncedAt = String(val);\n    }\n  }\n  return config;\n}\n";
     let userSheetUrl = localStorage.getItem(USER_SHEET_URL_KEY) || '';
     let gasAppUrl = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_ENDPOINT;
     let autoSyncEnabled = localStorage.getItem(AUTO_SYNC_KEY) === 'true';
@@ -4536,7 +4670,7 @@
         if (!map.has(songId)) {
           map.set(songId, {
             songId: t[7],
-            title: t[1],
+            title: safeSongTitle(t[1]),
             pack: t[6],
             version: t[11],
             endOfSale: t[8] || 0,
@@ -4581,13 +4715,22 @@
       return oA - oB;
     }
 
+    function safeSongTitle(val) {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'boolean') return val ? 'True' : 'False';
+      const str = String(val).trim();
+      if (str.toLowerCase() === 'true') return 'True';
+      if (str.toLowerCase() === 'false') return 'False';
+      return str;
+    }
+
     function normalizeMasterSongOrders(tuples) {
       if (!Array.isArray(tuples) || tuples.length === 0) return tuples;
       const songGroups = getSongGroups(tuples);
       const songOrderMap = new Map();
       songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
       tuples.forEach(t => {
-        t[1] = String(t[1] || '').trim();
+        t[1] = safeSongTitle(t[1]);
         if (songOrderMap.has(t[7])) {
           t[12] = songOrderMap.get(t[7]);
         }
@@ -7295,7 +7438,7 @@
       const localByTitle = new Map();
       const localById = new Map();
       masterSongs.forEach(t => {
-        const titleKey = String(t[1] || '').trim().toLowerCase();
+        const titleKey = safeSongTitle(t[1]).toLowerCase();
         const idKey = String(t[7] || '').trim().toLowerCase();
         if (titleKey) {
           if (!localByTitle.has(titleKey)) localByTitle.set(titleKey, []);
@@ -7311,7 +7454,7 @@
       const detectedMod = [];
 
       officialSongs.forEach(song => {
-        const titleKey = String(song.title || '').trim().toLowerCase();
+        const titleKey = safeSongTitle(song.title).toLowerCase();
         const idKey = String(song.songId || '').trim().toLowerCase();
 
         // Match existing tuples: prefer idKey, then titleKey
@@ -7325,10 +7468,13 @@
           const firstTuple = existingTuples[0];
           const curPack = String(firstTuple[6] || '基本曲').trim();
           const curVer = String(firstTuple[11] || 'v5.6.0').trim();
-          const curTitle = String(firstTuple[1] || '').trim();
+          const curTitle = safeSongTitle(firstTuple[1]);
+          if (firstTuple[1] !== curTitle) {
+            existingTuples.forEach(t => { t[1] = curTitle; });
+          }
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
-          let offTitle = String(song.title || '').trim();
+          let offTitle = safeSongTitle(song.title);
 
           const changes = [];
 
@@ -7646,7 +7792,7 @@
             if (!dObj || isNaN(dObj.constant)) return;
             masterSongs.push([
               song.songId + '_' + diff,
-              song.title,
+              safeSongTitle(song.title),
               diff,
               dObj.level || calcLevelFromConstant(dObj.constant),
               dObj.constant,
@@ -7680,7 +7826,7 @@
 
           // Update common metadata
           existingTuples.forEach(s => {
-            s[1] = officialSong.title;
+            s[1] = safeSongTitle(officialSong.title);
             s[6] = officialSong.pack || s[6];
             s[11] = officialSong.version || s[11];
             if (officialSong.endOfSale !== undefined) {
@@ -8293,7 +8439,7 @@
                 if (!diffObj || isNaN(diffObj.constant) || Number(diffObj.constant) <= 0) return;
                 restoredMaster.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  String(song.title || ''),
+                  safeSongTitle(song.title),
                   diff,
                   diffObj.level || calcLevelFromConstant(diffObj.constant),
                   Number(diffObj.constant),
@@ -8534,7 +8680,7 @@
                 if (!d || isNaN(d.constant) || Number(d.constant) <= 0) return;
                 builtTuples.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  String(song.title || ''),
+                  safeSongTitle(song.title),
                   diff,
                   d.level || calcLevelFromConstant(d.constant),
                   Number(d.constant),

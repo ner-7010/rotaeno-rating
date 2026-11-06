@@ -106,6 +106,14 @@ function doPost(e) {
  * Sheet I/O Helpers
  * ========================================================== */
 
+function safeFormatTitleForSheet(val) {
+  if (val === null || val === undefined) return '';
+  const str = (typeof val === 'boolean') ? (val ? 'True' : 'False') : String(val).trim();
+  const normalized = (str.toLowerCase() === 'true') ? 'True' : ((str.toLowerCase() === 'false') ? 'False' : str);
+  // Google Sheets の自動 Boolean 型変換を防止するため、True/False に該当する場合は先頭に ' を付与
+  return /^(true|false)$/i.test(normalized) ? ("'" + normalized) : normalized;
+}
+
 // 1. Songs Sheet (楽曲マスター: 1曲1行)
 function writeSongsSheet(ss, songs) {
   const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);
@@ -121,7 +129,7 @@ function writeSongsSheet(ss, songs) {
   songs.forEach((s, idx) => {
     const d = s.diffs || {};
     const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
-    const titleStr = String(s.title || '');
+    const titleStr = safeFormatTitleForSheet(s.title);
     const isEndOfSale = (s.endOfSale === 1 || s.endOfSale === true || String(s.endOfSale) === '1') ? 1 : 0;
     rows.push([
       orderNo,
@@ -193,7 +201,15 @@ function readSongsSheet(ss) {
     const row = values[i];
     const disp = displayValues[i];
 
-    const title = (disp && disp[idxTitle] !== '') ? disp[idxTitle] : String(row[idxTitle] || '');
+    let rawTitle = (disp && disp[idxTitle] !== '') ? disp[idxTitle] : row[idxTitle];
+    let title = '';
+    if (typeof rawTitle === 'boolean') {
+      title = rawTitle ? 'True' : 'False';
+    } else {
+      title = String(rawTitle || '').trim();
+      if (title.toLowerCase() === 'true') title = 'True';
+      if (title.toLowerCase() === 'false') title = 'False';
+    }
     if (!title) continue;
 
     const initId = (hasOrderCol && row[colOrder] !== '' && !isNaN(row[colOrder])) ? Number(row[colOrder]) : i;

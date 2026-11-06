@@ -1577,7 +1577,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .lamp-stat-cell {
-      background: #f8fafc;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 10px 6px;
@@ -1612,7 +1612,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .stats-meta-pill {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       padding: 8px 10px;
       border-radius: 8px;
       display: flex;
@@ -1687,7 +1687,7 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       gap: 10px;
       padding: 8px 12px;
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       margin-bottom: 6px;
@@ -1699,7 +1699,7 @@ const htmlContent = `<!DOCTYPE html>
       font-size: 12px;
       font-weight: 900;
       color: var(--color-text-main);
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       padding: 4px 6px;
       border-radius: 6px;
     }
@@ -1722,7 +1722,7 @@ const htmlContent = `<!DOCTYPE html>
 
     /* Song Pack Stat Cards */
     .pack-stat-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 12px 14px;
@@ -1775,7 +1775,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-pack-jump {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 4px 8px;
@@ -1787,7 +1787,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-pack-jump:hover {
-      background: #e2e8f0;
+      background: var(--bg-surface);
     }
 
     /* AP+ Theory Record Table & Toolbar */
@@ -1796,7 +1796,7 @@ const htmlContent = `<!DOCTYPE html>
       flex-direction: column;
       gap: 10px;
       margin-bottom: 12px;
-      background: #ffffff;
+      background: var(--bg-card);
       padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid var(--border-color);
@@ -1908,7 +1908,7 @@ const htmlContent = `<!DOCTYPE html>
 
     .btn-ap-plus-sync {
       flex: 1;
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       color: var(--color-primary-dark);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -2249,6 +2249,15 @@ const htmlContent = `<!DOCTYPE html>
       color: #dc2626;
       border-color: #fca5a5;
     }
+    [data-theme="dark"] .panel-btn.danger-zone {
+      background: rgba(220, 38, 38, 0.2);
+      color: #f87171;
+      border-color: rgba(220, 38, 38, 0.45);
+    }
+    [data-theme="dark"] .panel-btn.danger-zone:hover {
+      background: rgba(220, 38, 38, 0.35);
+      border-color: #ef4444;
+    }
 
     /* Custom Song Addition Form */
     .new-song-form {
@@ -2307,13 +2316,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .form-input:focus {
-      background: #ffffff;
+      background: var(--bg-card);
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.12);
     }
 
     .form-diff-section {
-      background: #f8fafc;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 10px;
@@ -2375,7 +2384,7 @@ const htmlContent = `<!DOCTYPE html>
       font-size: 11px;
       font-weight: 800;
       color: var(--color-primary-dark);
-      background: #eaf3fb;
+      background: var(--bg-surface-soft);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -2394,7 +2403,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .diff-num-input:focus {
-      background: #ffffff;
+      background: var(--bg-card);
       border-color: var(--color-primary);
     }
 
@@ -2627,7 +2636,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-pack-order {
-      background: #f1f5f9;
+      background: var(--bg-surface-soft);
       border: 1px solid var(--border-color);
       color: var(--color-text-main);
       border-radius: 4px;
@@ -2643,8 +2652,8 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-pack-order:hover:not(:disabled) {
-      background: #e2e8f0;
-      border-color: #cbd5e1;
+      background: var(--bg-card);
+      border-color: var(--color-primary);
     }
 
     .btn-pack-order:disabled {
@@ -2687,6 +2696,56 @@ const htmlContent = `<!DOCTYPE html>
     .gas-sync-badge.connected {
       background: #dcfce7;
       color: #15803d;
+    }
+
+    .auto-sync-banner {
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .auto-sync-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .auto-sync-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      color: #9f1239;
+    }
+    .auto-sync-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #e11d48;
+    }
+    .auto-sync-state-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: #ffe4e6;
+      color: #be123c;
+    }
+    .auto-sync-warning {
+      font-size: 11px;
+      line-height: 1.5;
+      color: #b91c1c;
+    }
+    .auto-sync-note {
+      font-size: 10.5px;
+      line-height: 1.4;
+      color: #e11d48;
+      margin-top: 5px;
     }
     .gas-guide-details {
       background: #ffffff;
@@ -3220,6 +3279,81 @@ const htmlContent = `<!DOCTYPE html>
       background: var(--bg-surface);
       border-color: var(--border-color);
     }
+
+    [data-theme="dark"] .diff-stat-table th {
+      background: var(--bg-surface);
+      color: var(--color-text-sub);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .diff-stat-table td {
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .pack-badge-pill {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+
+    [data-theme="dark"] .btn-pack-jump {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+    [data-theme="dark"] .btn-pack-jump:hover {
+      background: var(--bg-surface);
+    }
+
+    [data-theme="dark"] .btn-ap-plus-sync {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .calc-level-tag {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-pack-order {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-text-main);
+    }
+    [data-theme="dark"] .btn-pack-order:hover:not(:disabled) {
+      background: var(--bg-surface);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-pack-delete {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.45);
+      color: #f87171;
+    }
+
+    [data-theme="dark"] .btn-card-action {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: rgba(220, 38, 38, 0.45);
+      color: #f87171;
+    }
+
+    [data-theme="dark"] .auto-sync-banner {
+      background: #230f14;
+      border-color: #611824;
+    }
+    [data-theme="dark"] .auto-sync-label {
+      color: #fb7185;
+    }
+    [data-theme="dark"] .auto-sync-state-pill {
+      background: #4c111a;
+      color: #fda4af;
+    }
+    [data-theme="dark"] .auto-sync-warning {
+      color: #fca5a5;
+    }
+    [data-theme="dark"] .auto-sync-note {
+      color: #fb7185;
+    }
   </style>
 </head>
 <body>
@@ -3720,19 +3854,19 @@ const htmlContent = `<!DOCTYPE html>
         </div>
 
         <!-- Sync Mode & Important Warning Box -->
-        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-            <label for="autoSyncToggle" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 800; color: #9f1239;">
-              <input type="checkbox" id="autoSyncToggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: #e11d48;">
+        <div class="auto-sync-banner">
+          <div class="auto-sync-header">
+            <label for="autoSyncToggle" class="auto-sync-label">
+              <input type="checkbox" id="autoSyncToggle" class="auto-sync-checkbox">
               <span>💾 変更保存時にスプシへ自動同期する</span>
             </label>
-            <span id="autoSyncStateLabel" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 9999px; background: #ffe4e6; color: #be123c;">OFF (手動同期)</span>
+            <span id="autoSyncStateLabel" class="auto-sync-state-pill">OFF (手動同期)</span>
           </div>
           
-          <div style="font-size: 11px; line-height: 1.5; color: #b91c1c;">
+          <div class="auto-sync-warning">
             <strong>⚠️ 重要：</strong> デフォルト（OFF）の場合、アプリ内でスコアや曲追加を保存してもスプレッドシート側には反映されません。必ず下の<strong>「☁️ スプシへ保存 (同期)」</strong>ボタンを押して明示的に同期を行ってください。
           </div>
-          <div style="font-size: 10.5px; line-height: 1.4; color: #e11d48; margin-top: 5px;">
+          <div class="auto-sync-note">
             ※自動同期を【ON】にすると、アプリ下部の「💾 保存する」を押した瞬間に裏でスプシへの送信が自動実行されます。通信環境によっては<strong>動作が重くなったり、通信量を消費する可能性があるためご注意ください</strong>。
           </div>
         </div>
@@ -4548,7 +4682,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!map.has(songId)) {
           map.set(songId, {
             songId: t[7],
-            title: t[1],
+            title: safeSongTitle(t[1]),
             pack: t[6],
             version: t[11],
             endOfSale: t[8] || 0,
@@ -4593,13 +4727,22 @@ const htmlContent = `<!DOCTYPE html>
       return oA - oB;
     }
 
+    function safeSongTitle(val) {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'boolean') return val ? 'True' : 'False';
+      const str = String(val).trim();
+      if (str.toLowerCase() === 'true') return 'True';
+      if (str.toLowerCase() === 'false') return 'False';
+      return str;
+    }
+
     function normalizeMasterSongOrders(tuples) {
       if (!Array.isArray(tuples) || tuples.length === 0) return tuples;
       const songGroups = getSongGroups(tuples);
       const songOrderMap = new Map();
       songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
       tuples.forEach(t => {
-        t[1] = String(t[1] || '').trim();
+        t[1] = safeSongTitle(t[1]);
         if (songOrderMap.has(t[7])) {
           t[12] = songOrderMap.get(t[7]);
         }
@@ -7307,7 +7450,7 @@ const htmlContent = `<!DOCTYPE html>
       const localByTitle = new Map();
       const localById = new Map();
       masterSongs.forEach(t => {
-        const titleKey = String(t[1] || '').trim().toLowerCase();
+        const titleKey = safeSongTitle(t[1]).toLowerCase();
         const idKey = String(t[7] || '').trim().toLowerCase();
         if (titleKey) {
           if (!localByTitle.has(titleKey)) localByTitle.set(titleKey, []);
@@ -7323,7 +7466,7 @@ const htmlContent = `<!DOCTYPE html>
       const detectedMod = [];
 
       officialSongs.forEach(song => {
-        const titleKey = String(song.title || '').trim().toLowerCase();
+        const titleKey = safeSongTitle(song.title).toLowerCase();
         const idKey = String(song.songId || '').trim().toLowerCase();
 
         // Match existing tuples: prefer idKey, then titleKey
@@ -7337,10 +7480,13 @@ const htmlContent = `<!DOCTYPE html>
           const firstTuple = existingTuples[0];
           const curPack = String(firstTuple[6] || '基本曲').trim();
           const curVer = String(firstTuple[11] || 'v5.6.0').trim();
-          const curTitle = String(firstTuple[1] || '').trim();
+          const curTitle = safeSongTitle(firstTuple[1]);
+          if (firstTuple[1] !== curTitle) {
+            existingTuples.forEach(t => { t[1] = curTitle; });
+          }
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
-          let offTitle = String(song.title || '').trim();
+          let offTitle = safeSongTitle(song.title);
 
           const changes = [];
 
@@ -7658,7 +7804,7 @@ const htmlContent = `<!DOCTYPE html>
             if (!dObj || isNaN(dObj.constant)) return;
             masterSongs.push([
               song.songId + '_' + diff,
-              song.title,
+              safeSongTitle(song.title),
               diff,
               dObj.level || calcLevelFromConstant(dObj.constant),
               dObj.constant,
@@ -7692,7 +7838,7 @@ const htmlContent = `<!DOCTYPE html>
 
           // Update common metadata
           existingTuples.forEach(s => {
-            s[1] = officialSong.title;
+            s[1] = safeSongTitle(officialSong.title);
             s[6] = officialSong.pack || s[6];
             s[11] = officialSong.version || s[11];
             if (officialSong.endOfSale !== undefined) {
@@ -8305,7 +8451,7 @@ const htmlContent = `<!DOCTYPE html>
                 if (!diffObj || isNaN(diffObj.constant) || Number(diffObj.constant) <= 0) return;
                 restoredMaster.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  String(song.title || ''),
+                  safeSongTitle(song.title),
                   diff,
                   diffObj.level || calcLevelFromConstant(diffObj.constant),
                   Number(diffObj.constant),
@@ -8546,7 +8692,7 @@ const htmlContent = `<!DOCTYPE html>
                 if (!d || isNaN(d.constant) || Number(d.constant) <= 0) return;
                 builtTuples.push([
                   (song.songId || ('song_' + songInitId)) + '_' + diff,
-                  String(song.title || ''),
+                  safeSongTitle(song.title),
                   diff,
                   d.level || calcLevelFromConstant(d.constant),
                   Number(d.constant),
