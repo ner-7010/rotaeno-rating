@@ -3874,7 +3874,7 @@ const htmlContent = `<!DOCTYPE html>
   </div>
 
   <!-- Modal: Official Song Updates Preview & Merge -->
-  <div class="modal-overlay" id="officialUpdateModal" style="display: none;">
+  <div class="modal-overlay" id="officialUpdateModal">
     <div class="modal-box update-modal-box">
       <div class="update-modal-header">
         <div class="update-modal-title">
@@ -3932,7 +3932,7 @@ const htmlContent = `<!DOCTYPE html>
       </div>
 
       <div class="update-modal-footer">
-        <button type="button" class="btn-cancel" id="btnOfficialUpdateCancel">キャンセル</button>
+        <button type="button" class="btn-cancel" id="btnOfficialUpdateCancel">閉じる</button>
         <button type="button" class="btn-save" id="btnOfficialUpdateApply" disabled>✓ 反映する (計 0曲)</button>
       </div>
     </div>
@@ -6780,6 +6780,7 @@ const htmlContent = `<!DOCTYPE html>
     function openOfficialUpdateModal() {
       const modal = document.getElementById('officialUpdateModal');
       if (!modal) return;
+      modal.style.display = 'flex';
       modal.classList.add('open');
 
       const elLoading = document.getElementById('officialUpdateLoading');
@@ -6795,6 +6796,7 @@ const htmlContent = `<!DOCTYPE html>
       if (elEmpty) elEmpty.style.display = 'none';
       if (elContent) elContent.style.display = 'none';
       if (btnApply) {
+        btnApply.style.display = 'inline-block';
         btnApply.disabled = true;
         btnApply.textContent = '✓ 反映する (計 0曲)';
       }
@@ -6804,7 +6806,10 @@ const htmlContent = `<!DOCTYPE html>
 
     function closeOfficialUpdateModal() {
       const modal = document.getElementById('officialUpdateModal');
-      if (modal) modal.classList.remove('open');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
     }
 
     async function fetchOfficialSongUpdates() {
@@ -7026,12 +7031,16 @@ const htmlContent = `<!DOCTYPE html>
         if (elEmpty) elEmpty.style.display = 'block';
         if (elContent) elContent.style.display = 'none';
         if (elSummary) elSummary.style.display = 'none';
+        const btnApply = document.getElementById('btnOfficialUpdateApply');
+        if (btnApply) btnApply.style.display = 'none';
         return;
       }
 
       if (elEmpty) elEmpty.style.display = 'none';
       if (elContent) elContent.style.display = 'block';
       if (elSummary) elSummary.style.display = 'flex';
+      const btnApply = document.getElementById('btnOfficialUpdateApply');
+      if (btnApply) btnApply.style.display = 'inline-block';
 
       // Detect newly introduced packs
       const existingPacks = new Set(packOrder);
@@ -8060,6 +8069,12 @@ const htmlContent = `<!DOCTYPE html>
     if (btnOfficialCancel) btnOfficialCancel.addEventListener('click', closeOfficialUpdateModal);
     const btnOfficialApply = document.getElementById('btnOfficialUpdateApply');
     if (btnOfficialApply) btnOfficialApply.addEventListener('click', applyOfficialUpdates);
+    const officialModalOverlay = document.getElementById('officialUpdateModal');
+    if (officialModalOverlay) {
+      officialModalOverlay.addEventListener('click', (e) => {
+        if (e.target.id === 'officialUpdateModal') closeOfficialUpdateModal();
+      });
+    }
 
     window.addEventListener('beforeunload', (e) => {
       const allIds = new Set([...Object.keys(userScores), ...Object.keys(savedScores)]);
