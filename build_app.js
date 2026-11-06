@@ -1053,6 +1053,18 @@ const htmlContent = `<!DOCTYPE html>
       font-size: 24px;
       cursor: pointer;
       line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.15s, background-color 0.15s;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--color-text-main);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .modal-close-btn:active {
+      transform: scale(0.95);
     }
 
     .input-display {
@@ -3933,7 +3945,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="update-modal-title">
           <span>✨</span> 最新アプデ・新譜面情報の確認
         </div>
-        <button type="button" class="btn-modal-close" id="btnOfficialUpdateModalClose">&times;</button>
+        <button type="button" class="modal-close-btn" id="btnOfficialUpdateModalClose">&times;</button>
       </div>
 
       <div class="update-modal-body">
