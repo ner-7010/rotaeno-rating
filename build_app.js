@@ -30,6 +30,15 @@ const htmlContent = `<!DOCTYPE html>
   ${appleTouchBase64 ? `<link rel="apple-touch-icon" href="data:image/png;base64,${appleTouchBase64}">` : `<link rel="apple-touch-icon" href="./apple-touch-icon.png">`}
   <link rel="manifest" href="./manifest.json">
   <title>Rotaeno Rating Tracker</title>
+  <script>
+    (function() {
+      try {
+        var p = localStorage.getItem('rotaeno_theme_preference_v1') || 'auto';
+        var isDark = (p === 'dark') || (p === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+      } catch(e) {}
+    })();
+  </script>
   <style>
     :root {
       --header-height: 120px;
@@ -63,6 +72,40 @@ const htmlContent = `<!DOCTYPE html>
       --lamp-ap: #ff9900;
       --lamp-fc: #0099ff;
       --lamp-clear: #6b7c96;
+    }
+
+    [data-theme="dark"] {
+      --header-height: 120px;
+      --bg-body: #0a111a;
+      --bg-surface: #101c2b;
+      --bg-surface-soft: #162438;
+      --bg-card: #132034;
+      --bg-input: #0c1524;
+      
+      --color-text-main: #f1f5f9;
+      --color-text-sub: #94a3b8;
+      --color-text-muted: #64748b;
+      
+      --color-primary: #38bdf8;
+      --color-primary-dark: #7dd3fc;
+      --color-gold: #fbbf24;
+
+      --border-color: #24364e;
+      --border-beige: #22354c;
+
+      /* Difficulty Colors */
+      --diff-i: #4ade80;
+      --diff-ii: #38bdf8;
+      --diff-iii: #fb923c;
+      --diff-iv: #c084fc;
+      --diff-iv-alpha: #f472b6;
+      --diff-iv-alpha-border: #f472b6;
+
+      /* Lamps */
+      --lamp-applus: linear-gradient(135deg, #f472b6 0%, #fb7185 30%, #38bdf8 70%, #34d399 100%);
+      --lamp-ap: #fbbf24;
+      --lamp-fc: #38bdf8;
+      --lamp-clear: #94a3b8;
     }
 
     * {
@@ -143,7 +186,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .completion-badge {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-beige);
       padding: 4px 10px;
       border-radius: 8px;
@@ -178,7 +221,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .breakdown-item {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-beige);
       border-radius: 8px;
       padding: 8px 10px;
@@ -229,7 +272,7 @@ const htmlContent = `<!DOCTYPE html>
     .search-input {
       width: 100%;
       padding: 11px 14px 11px 36px;
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       color: var(--color-text-main);
@@ -257,7 +300,7 @@ const htmlContent = `<!DOCTYPE html>
       align-items: center;
       gap: 6px 12px;
       flex-wrap: wrap;
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 6px 10px;
@@ -320,7 +363,7 @@ const htmlContent = `<!DOCTYPE html>
 
     .filter-btn {
       padding: 6px 12px;
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 12px;
@@ -362,7 +405,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .btn-group-toggle {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 5px 10px;
@@ -717,7 +760,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .b40-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 8px 10px;
@@ -740,7 +783,7 @@ const htmlContent = `<!DOCTYPE html>
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(26, 42, 58, 0.6);
+      background: rgba(10, 17, 26, 0.7);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -753,7 +796,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .modal-box {
-      background: #ffffff;
+      background: var(--bg-card);
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       border: 1px solid var(--border-color);
@@ -780,7 +823,7 @@ const htmlContent = `<!DOCTYPE html>
 
     .action-fab {
       pointer-events: auto;
-      background: #ffffff;
+      background: var(--bg-card);
       color: var(--color-primary-dark);
       border: 1.5px solid var(--border-color);
       border-radius: 24px;
@@ -894,7 +937,7 @@ const htmlContent = `<!DOCTYPE html>
       border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 13px;
-      background: #ffffff;
+      background: var(--bg-input);
       color: var(--color-text-main);
       box-sizing: border-box;
       outline: none;
@@ -1080,7 +1123,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .input-display:focus-within {
-      background: #ffffff;
+      background: var(--bg-card);
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.15);
     }
@@ -1355,7 +1398,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .mypage-jump-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 14px 16px;
@@ -1412,7 +1455,7 @@ const htmlContent = `<!DOCTYPE html>
 
     /* Stats Scope Selector Card */
     .stats-scope-selector-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 12px 16px;
@@ -1508,7 +1551,7 @@ const htmlContent = `<!DOCTYPE html>
 
     /* Overall Stats Card & Lamps Grid */
     .stats-panel-box {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 16px;
@@ -1811,7 +1854,7 @@ const htmlContent = `<!DOCTYPE html>
       border-radius: 6px;
       font-size: 12px;
       outline: none;
-      background: #ffffff;
+      background: var(--bg-card);
       color: var(--color-text-main);
     }
     .ap-plus-search-input:focus {
@@ -1831,7 +1874,7 @@ const htmlContent = `<!DOCTYPE html>
       font-weight: 700;
       color: var(--color-text-sub);
       outline: none;
-      background: #ffffff;
+      background: var(--bg-card);
     }
 
     .ap-plus-toolbar-actions {
@@ -1910,7 +1953,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .ap-plus-table-wrap {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       overflow-x: auto;
@@ -2132,7 +2175,7 @@ const htmlContent = `<!DOCTYPE html>
 
     /* Settings View */
     .settings-panel {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 14px;
@@ -2291,7 +2334,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .diff-input-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1.5px solid var(--border-color);
       border-radius: 6px;
       padding: 6px;
@@ -2416,7 +2459,7 @@ const htmlContent = `<!DOCTYPE html>
 
     .staged-song-card,
     .saved-custom-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 10px;
@@ -2515,7 +2558,7 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     .pack-order-item {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 6px;
       padding: 6px 10px;
@@ -2785,7 +2828,7 @@ const htmlContent = `<!DOCTYPE html>
       gap: 8px;
     }
     .update-card {
-      background: #ffffff;
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 10px 12px;
@@ -2903,6 +2946,280 @@ const htmlContent = `<!DOCTYPE html>
       gap: 10px;
       background: #f8fafc;
     }
+
+    /* Theme Toggle Button */
+    .btn-theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-beige);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      user-select: none;
+      flex-shrink: 0;
+      color: var(--color-text-main);
+    }
+    .btn-theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--color-primary);
+    }
+    .btn-theme-toggle:active {
+      transform: scale(0.95);
+    }
+
+    .theme-choice-btn.active {
+      background: var(--color-primary-dark) !important;
+      color: #ffffff !important;
+      border-color: var(--color-primary-dark) !important;
+    }
+
+    /* Dark Mode Specific Overrides */
+    [data-theme="dark"] header {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .bottom-bar {
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .sort-select {
+      background: var(--bg-input);
+      color: var(--color-text-main);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .song-group-header {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .song-group-header:hover {
+      background: var(--bg-surface-soft);
+    }
+
+    [data-theme="dark"] .song-group-count {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .score-number-input {
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .key-cell {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-text-main);
+    }
+    [data-theme="dark"] .key-cell:active {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    [data-theme="dark"] .lamp-choice {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-text-sub);
+    }
+    [data-theme="dark"] .lamp-choice.selected {
+      background: var(--color-primary);
+      color: #0b111a;
+      border-color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .filter-btn {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--color-text-sub);
+    }
+    [data-theme="dark"] .filter-btn.active {
+      background: var(--color-primary);
+      color: #0b111a;
+      border-color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-group-toggle {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+    [data-theme="dark"] .btn-group-toggle:hover {
+      background: var(--bg-surface-soft);
+    }
+
+    [data-theme="dark"] .badge-tier-applus {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.25), rgba(251, 113, 133, 0.25));
+      color: #f472b6;
+      border: 1px solid rgba(244, 114, 182, 0.5);
+    }
+    [data-theme="dark"] .badge-tier-ex-rainbow {
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(56, 189, 248, 0.25));
+      color: #c084fc;
+      border: 1px solid rgba(167, 139, 250, 0.5);
+    }
+    [data-theme="dark"] .badge-tier-ex-orange {
+      background: rgba(251, 146, 60, 0.2);
+      color: #fb923c;
+      border: 1px solid rgba(251, 146, 60, 0.5);
+    }
+    [data-theme="dark"] .badge-tier-s-plus {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.5);
+    }
+    [data-theme="dark"] .badge-tier-s {
+      background: rgba(250, 204, 21, 0.18);
+      color: #facc15;
+      border: 1px solid rgba(250, 204, 21, 0.4);
+    }
+    [data-theme="dark"] .badge-tier-a-plus {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+    }
+    [data-theme="dark"] .badge-tier-a {
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    [data-theme="dark"] .badge-tier-b {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+    }
+    [data-theme="dark"] .badge-tier-c,
+    [data-theme="dark"] .badge-tier-d,
+    [data-theme="dark"] .badge-tier-e,
+    [data-theme="dark"] .badge-tier-f {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    [data-theme="dark"] .stats-scope-pills {
+      background: var(--bg-input);
+    }
+    [data-theme="dark"] .stats-scope-icon {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--color-primary);
+    }
+    [data-theme="dark"] .stats-scope-btn.active {
+      background: var(--color-primary);
+      color: #0b111a;
+      box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3);
+    }
+
+    [data-theme="dark"] .mypage-subnav {
+      background: var(--bg-surface);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .mypage-nav-btn.active {
+      background: var(--bg-card);
+      color: var(--color-primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    [data-theme="dark"] .mypage-nav-badge {
+      background: var(--bg-input);
+      color: var(--color-text-sub);
+    }
+    [data-theme="dark"] .mypage-nav-btn.active .mypage-nav-badge {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--color-primary);
+    }
+
+    [data-theme="dark"] .btn-subview-back {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--color-text-main);
+    }
+    [data-theme="dark"] .btn-subview-back:hover {
+      background: var(--bg-surface-soft);
+    }
+
+    [data-theme="dark"] .ap-plus-table th {
+      background: var(--bg-surface);
+      color: var(--color-text-sub);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .ap-plus-table td {
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .ap-plus-table tr:hover td {
+      background: var(--bg-surface-soft);
+    }
+
+    [data-theme="dark"] .gas-sync-panel {
+      border-color: #059669;
+      background: #0d281a;
+    }
+    [data-theme="dark"] .gas-guide-details {
+      background: #11291d;
+      border-color: #047857;
+      color: #a7f3d0;
+    }
+    [data-theme="dark"] .gas-guide-details summary {
+      color: #34d399;
+    }
+    [data-theme="dark"] .official-update-panel {
+      background: linear-gradient(135deg, #0e2920 0%, #112d46 100%);
+      border-color: #0284c7;
+    }
+    [data-theme="dark"] .update-summary-banner {
+      background: #10243a;
+      border-color: #0369a1;
+    }
+    [data-theme="dark"] .update-modal-header {
+      background: #101c2b;
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .update-modal-footer {
+      background: #101c2b;
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .update-changes-list {
+      background: #0e1927;
+    }
+    [data-theme="dark"] .update-diff-pill {
+      background: var(--bg-surface-soft);
+      border-color: var(--border-color);
+      color: var(--color-text-sub);
+    }
+    [data-theme="dark"] .update-badge-new {
+      background: rgba(22, 163, 74, 0.25);
+      color: #4ade80;
+    }
+    [data-theme="dark"] .update-badge-mod {
+      background: rgba(2, 132, 199, 0.25);
+      color: #38bdf8;
+    }
+
+    [data-theme="dark"] .pack-order-list {
+      background: var(--bg-input);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .pack-order-item {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .filter-checkbox-grid {
+      background: var(--bg-input);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .filter-modal-header {
+      background: var(--bg-surface);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .filter-modal-footer {
+      background: var(--bg-surface);
+      border-color: var(--border-color);
+    }
   </style>
 </head>
 <body>
@@ -2943,11 +3260,16 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </div>
       <div class="rating-right-box">
-        <div class="completion-badge">
-          <div class="completion-title">完成度</div>
-          <div class="completion-value">
-            <span id="completionSum">0.000</span> / <span id="completionMax">460</span>
-            <span class="completion-rate" id="completionRate">(0.00%)</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="btnThemeToggle" class="btn-theme-toggle" title="テーマ切り替え (ライト / ダーク)">
+            <span id="themeToggleIcon">🌙</span>
+          </button>
+          <div class="completion-badge">
+            <div class="completion-title">完成度</div>
+            <div class="completion-value">
+              <span id="completionSum">0.000</span> / <span id="completionMax">460</span>
+              <span class="completion-rate" id="completionRate">(0.00%)</span>
+            </div>
           </div>
         </div>
         <div style="font-size: 11px; color: var(--color-text-sub); font-weight:700;" id="scoreCount">0 / 0 登録</div>
@@ -3230,6 +3552,17 @@ const htmlContent = `<!DOCTYPE html>
           <button type="button" class="btn-check-updates" id="btnCheckOfficialUpdates">
             <span>⚡</span> アプデ情報を確認
           </button>
+        </div>
+      </div>
+
+      <!-- Section: Theme Settings -->
+      <div class="settings-panel">
+        <h3>🎨 外観・テーマ設定</h3>
+        <p>画面の配色テーマを選択できます。「端末設定に連動」にすると、OSのダークモード設定に合わせて自動で切り替わります（ヘッダー右上の 🌙/☀️ ボタンでもワンタップで切り替え可能です）。</p>
+        <div class="action-btn-group" id="themeChoiceGroup">
+          <button type="button" class="panel-btn theme-choice-btn" data-theme="auto" id="themeBtnAuto">📱 端末設定に連動</button>
+          <button type="button" class="panel-btn theme-choice-btn" data-theme="light" id="themeBtnLight">☀️ ライトモード</button>
+          <button type="button" class="panel-btn theme-choice-btn" data-theme="dark" id="themeBtnDark">🌙 ダークモード</button>
         </div>
       </div>
 
@@ -4016,11 +4349,13 @@ const htmlContent = `<!DOCTYPE html>
     const GAS_URL_KEY = 'rotaeno_gas_url_v1';
     const GAS_LAST_SYNC_KEY = 'rotaeno_gas_last_sync_v1';
     const AUTO_SYNC_KEY = 'rotaeno_auto_sync_v1';
+    const THEME_PREF_KEY = 'rotaeno_theme_preference_v1';
     const DEFAULT_GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw2W83eJjx1A2HbUH1XnKpBpjPuA66vEo9xoqQJFm2s2rMdqwyfepBCXuUpRMdmJbLV/exec';
     const GAS_SCRIPT_CODE = ${JSON.stringify(gasScriptContent)};
     let userSheetUrl = localStorage.getItem(USER_SHEET_URL_KEY) || '';
     let gasAppUrl = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_ENDPOINT;
     let autoSyncEnabled = localStorage.getItem(AUTO_SYNC_KEY) === 'true';
+    let currentThemePref = localStorage.getItem(THEME_PREF_KEY) || 'auto';
     let masterSongs = [];
     let savedMasterSongs = [];
     let userScores = {};
@@ -8265,6 +8600,73 @@ const htmlContent = `<!DOCTYPE html>
     const btnFirstBootRetry = document.getElementById('btnFirstBootRetry');
     if (btnFirstBootRetry) btnFirstBootRetry.addEventListener('click', startFirstBootFetch);
 
+    function applyTheme(pref) {
+      currentThemePref = pref;
+      localStorage.setItem(THEME_PREF_KEY, pref);
+
+      const isDark = (pref === 'dark') || (pref === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#101c2b');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#144973');
+      }
+
+      // Update Header Toggle Icon
+      const toggleIcon = document.getElementById('themeToggleIcon');
+      if (toggleIcon) {
+        toggleIcon.textContent = isDark ? '☀️' : '🌙';
+      }
+      const toggleBtn = document.getElementById('btnThemeToggle');
+      if (toggleBtn) {
+        toggleBtn.title = isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え';
+      }
+
+      // Update Settings Choice Buttons
+      document.querySelectorAll('.theme-choice-btn').forEach(btn => {
+        const choice = btn.getAttribute('data-theme');
+        if (choice === pref) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    function initTheme() {
+      applyTheme(currentThemePref);
+
+      // Listen for OS color scheme change when set to auto
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (currentThemePref === 'auto') {
+            applyTheme('auto');
+          }
+        });
+      }
+
+      // Header button toggles between light and dark
+      const btnToggle = document.getElementById('btnThemeToggle');
+      if (btnToggle) {
+        btnToggle.addEventListener('click', () => {
+          const isCurrentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          applyTheme(isCurrentlyDark ? 'light' : 'dark');
+        });
+      }
+
+      // Settings panel choice buttons
+      document.querySelectorAll('.theme-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const choice = btn.getAttribute('data-theme') || 'auto';
+          applyTheme(choice);
+        });
+      });
+    }
+
+    initTheme();
     loadPackOrder();
     const hasCachedMaster = loadMasterSongs();
     loadInitialScores();
