@@ -2623,6 +2623,245 @@ const htmlContent = `<!DOCTYPE html>
       padding-top: 8px;
       border-top: 1px dashed #d1fae5;
     }
+
+    /* Official Update Panel & Modal */
+    .official-update-panel {
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      border: 1.5px solid #38bdf8;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.12);
+    }
+    .official-update-banner-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .official-update-text {
+      flex: 1;
+      min-width: 220px;
+    }
+    .official-update-text h3 {
+      margin-bottom: 4px;
+      color: #0369a1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .official-update-text p {
+      margin: 0;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .btn-check-updates {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-check-updates:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+      transform: translateY(-1px);
+    }
+    .btn-check-updates:active {
+      transform: translateY(0);
+    }
+
+    /* Update Modal Layout */
+    .update-modal-box {
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 0 !important;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+    .update-modal-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+    .update-modal-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--color-primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .update-modal-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      flex: 1;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+    .update-summary-banner {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--color-text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .update-section-title {
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .update-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .update-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s ease;
+    }
+    .update-card-new {
+      border-left: 4px solid #10b981;
+    }
+    .update-card-mod {
+      border-left: 4px solid #0284c7;
+    }
+    .update-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .update-card-title-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--color-text-main);
+    }
+    .update-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .update-badge-new {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .update-badge-mod {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .update-card-meta {
+      font-size: 11px;
+      color: var(--color-text-sub);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .update-diffs-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .update-diff-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--color-text-sub);
+      border: 1px solid var(--border-color);
+    }
+    .update-changes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    .update-change-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .update-change-label {
+      font-weight: 800;
+      color: var(--color-text-sub);
+      min-width: 55px;
+    }
+    .update-change-val-old {
+      color: #dc2626;
+      text-decoration: line-through;
+      font-weight: 700;
+    }
+    .update-change-arrow {
+      color: var(--color-text-sub);
+      font-weight: 800;
+    }
+    .update-change-val-new {
+      color: #16a34a;
+      font-weight: 800;
+    }
+    .update-card-score-notice {
+      font-size: 10px;
+      font-weight: 700;
+      color: #059669;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .update-modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background: #f8fafc;
+    }
   </style>
 </head>
 <body>
@@ -2915,6 +3154,19 @@ const htmlContent = `<!DOCTYPE html>
 
     <!-- View: Backup / Settings -->
     <div id="viewSettings" style="display: none;">
+      <!-- Section: Official Songs & Update Sync -->
+      <div class="settings-panel official-update-panel">
+        <div class="official-update-banner-inner">
+          <div class="official-update-text">
+            <h3>✨ 新譜面・公式アプデ情報の確認</h3>
+            <p>管理者の親スプシ（RotaenoDB）から最新の追加楽曲や定数改定を自動検出し、プレビュー確認の上で一括反映できます（入力済みスコアは維持されます）。</p>
+          </div>
+          <button type="button" class="btn-check-updates" id="btnCheckOfficialUpdates">
+            <span>⚡</span> アプデ情報を確認
+          </button>
+        </div>
+      </div>
+
       <!-- Section: Add Song Card -->
       <div class="settings-panel">
         <h3>➕ 新曲の追加登録</h3>
@@ -3593,6 +3845,71 @@ const htmlContent = `<!DOCTYPE html>
         <button class="btn-cancel" id="btnEditSongModalCancel" type="button">キャンセル</button>
         <button class="btn-danger" id="btnEditSongModalDelete" type="button">🗑️ 削除</button>
         <button class="btn-save" id="btnEditSongModalSave" type="button">変更を適用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Official Song Updates Preview & Merge -->
+  <div class="modal-overlay" id="officialUpdateModal" style="display: none;">
+    <div class="modal-box update-modal-box">
+      <div class="update-modal-header">
+        <div class="update-modal-title">
+          <span>✨</span> 最新アプデ・新譜面情報の確認
+        </div>
+        <button type="button" class="btn-modal-close" id="btnOfficialUpdateModalClose">&times;</button>
+      </div>
+
+      <div class="update-modal-body">
+        <!-- Summary Banner -->
+        <div class="update-summary-banner" id="officialUpdateSummary" style="display: none;">
+          <span id="officialUpdateSummaryText" style="font-weight: 900; color: #0369a1;">最新アプデ情報: （新規 0曲 / 更新 0曲）</span>
+          <span style="font-size: 11px; color: var(--color-text-sub);">※チェックした項目のみ反映されます</span>
+        </div>
+
+        <!-- Loading State -->
+        <div id="officialUpdateLoading" style="text-align: center; padding: 36px 16px;">
+          <div style="font-size: 28px; margin-bottom: 8px;">⏳</div>
+          <div style="font-size: 13px; font-weight: 800; color: var(--color-primary-dark);">親スプレッドシート（RotaenoDB）に接続中...</div>
+          <div style="font-size: 11px; color: var(--color-text-sub); margin-top: 4px;">最新の楽曲マスターを取得しています</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="officialUpdateError" style="display: none; text-align: center; padding: 24px 16px;">
+          <div style="font-size: 24px; margin-bottom: 6px;">⚠️</div>
+          <div style="font-size: 13px; font-weight: 800; color: #dc2626;" id="officialUpdateErrorMsg">通信エラーが発生しました</div>
+          <div style="font-size: 11px; color: var(--color-text-sub); margin-top: 6px;">接続先APIまたは親スプシの共有設定を確認してください。</div>
+        </div>
+
+        <!-- Empty State (All Up to Date) -->
+        <div id="officialUpdateEmpty" style="display: none; text-align: center; padding: 36px 16px;">
+          <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+          <div style="font-size: 14px; font-weight: 900; color: #16a34a;">すべての楽曲データが最新です！</div>
+          <div style="font-size: 12px; color: var(--color-text-sub); margin-top: 4px;">未登録の新譜面や定数改定はありません。</div>
+        </div>
+
+        <!-- Diff Content List -->
+        <div id="officialUpdateDiffContent" style="display: none;">
+          <!-- Section 1: New Songs -->
+          <div id="officialUpdateNewSection" style="margin-bottom: 18px;">
+            <div class="update-section-title" style="color: #10b981;">
+              <span>🆕 新規登録 (<span id="officialUpdateNewCount">0</span>曲)</span>
+            </div>
+            <div class="update-cards-list" id="officialUpdateNewList"></div>
+          </div>
+
+          <!-- Section 2: Updated Songs -->
+          <div id="officialUpdateModSection">
+            <div class="update-section-title" style="color: #0284c7;">
+              <span>🔄 情報更新 (<span id="officialUpdateModCount">0</span>曲)</span>
+            </div>
+            <div class="update-cards-list" id="officialUpdateModList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="update-modal-footer">
+        <button type="button" class="btn-cancel" id="btnOfficialUpdateCancel">キャンセル</button>
+        <button type="button" class="btn-save" id="btnOfficialUpdateApply" disabled>✓ 反映する (計 0曲)</button>
       </div>
     </div>
   </div>
@@ -6407,6 +6724,408 @@ const htmlContent = `<!DOCTYPE html>
       if (modal) modal.classList.remove('open');
     }
 
+    // ==========================================================
+    // Official Song Updates & Staging Diff Engine
+    // ==========================================================
+    let officialUpdatesState = {
+      detectedNew: [],
+      detectedMod: []
+    };
+
+    function openOfficialUpdateModal() {
+      const modal = document.getElementById('officialUpdateModal');
+      if (!modal) return;
+      modal.classList.add('open');
+
+      const elLoading = document.getElementById('officialUpdateLoading');
+      const elSummary = document.getElementById('officialUpdateSummary');
+      const elError = document.getElementById('officialUpdateError');
+      const elEmpty = document.getElementById('officialUpdateEmpty');
+      const elContent = document.getElementById('officialUpdateDiffContent');
+      const btnApply = document.getElementById('btnOfficialUpdateApply');
+
+      if (elLoading) elLoading.style.display = 'block';
+      if (elSummary) elSummary.style.display = 'none';
+      if (elError) elError.style.display = 'none';
+      if (elEmpty) elEmpty.style.display = 'none';
+      if (elContent) elContent.style.display = 'none';
+      if (btnApply) {
+        btnApply.disabled = true;
+        btnApply.textContent = '✓ 反映する (計 0曲)';
+      }
+
+      fetchOfficialSongUpdates();
+    }
+
+    function closeOfficialUpdateModal() {
+      const modal = document.getElementById('officialUpdateModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    async function fetchOfficialSongUpdates() {
+      const endpoint = getActiveGasEndpoint();
+      const elLoading = document.getElementById('officialUpdateLoading');
+      const elSummary = document.getElementById('officialUpdateSummary');
+      const elError = document.getElementById('officialUpdateError');
+      const elEmpty = document.getElementById('officialUpdateEmpty');
+
+      try {
+        let officialSongs = [];
+
+        // 1. Try fetching from Central Official DB (no url parameter)
+        const centralRes = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
+        const centralJson = await centralRes.json();
+        if (centralJson.status === 'success' && centralJson.data && Array.isArray(centralJson.data.songs) && centralJson.data.songs.length > 0) {
+          officialSongs = centralJson.data.songs;
+        } else if (userSheetUrl) {
+          // Fallback to userSheetUrl if central sheet Songs is empty
+          const userRes = await fetch(endpoint + '?url=' + encodeURIComponent(userSheetUrl) + '&t=' + Date.now(), { method: 'GET' });
+          const userJson = await userRes.json();
+          if (userJson.status === 'success' && userJson.data && Array.isArray(userJson.data.songs) && userJson.data.songs.length > 0) {
+            officialSongs = userJson.data.songs;
+          }
+        }
+
+        if (elLoading) elLoading.style.display = 'none';
+
+        if (!Array.isArray(officialSongs) || officialSongs.length === 0) {
+          if (elError) {
+            elError.style.display = 'block';
+            document.getElementById('officialUpdateErrorMsg').textContent = '親スプレッドシート（または設定済みスプシ）の楽曲データが0件です。\\n管理者は設定画面から「スプシへ全データを保存」を行って楽曲データを初期登録してください。';
+          }
+          return;
+        }
+
+        // 2. Run Diff Engine
+        diffOfficialSongs(officialSongs);
+
+      } catch (err) {
+        console.error('fetchOfficialSongUpdates error:', err);
+        if (elLoading) elLoading.style.display = 'none';
+        if (elError) {
+          elError.style.display = 'block';
+          document.getElementById('officialUpdateErrorMsg').textContent = '通信エラーが発生しました: ' + (err.message || '');
+        }
+      }
+    }
+
+    function diffOfficialSongs(officialSongs) {
+      const elSummary = document.getElementById('officialUpdateSummary');
+      const elEmpty = document.getElementById('officialUpdateEmpty');
+      const elContent = document.getElementById('officialUpdateDiffContent');
+      const newListEl = document.getElementById('officialUpdateNewList');
+      const modListEl = document.getElementById('officialUpdateModList');
+      const newSec = document.getElementById('officialUpdateNewSection');
+      const modSec = document.getElementById('officialUpdateModSection');
+      const summaryText = document.getElementById('officialUpdateSummaryText');
+
+      // Map local songs by normalized title
+      const localByTitle = new Map();
+      masterSongs.forEach(t => {
+        const k = String(t[1] || '').trim().toLowerCase();
+        if (!localByTitle.has(k)) localByTitle.set(k, []);
+        localByTitle.get(k).push(t);
+      });
+
+      const detectedNew = [];
+      const detectedMod = [];
+
+      officialSongs.forEach(song => {
+        const titleKey = String(song.title || '').trim().toLowerCase();
+        const existingTuples = localByTitle.get(titleKey);
+
+        if (!existingTuples || existingTuples.length === 0) {
+          // New Song
+          detectedNew.push(song);
+        } else {
+          // Existing Song: Check for differences
+          const firstTuple = existingTuples[0];
+          const curPack = String(firstTuple[6] || '基本曲').trim();
+          const curVer = String(firstTuple[11] || 'v5.6.0').trim();
+          const offPack = String(song.pack || '基本曲').trim();
+          const offVer = String(song.version || 'v5.6.0').trim();
+
+          const changes = [];
+
+          if (curPack !== offPack) {
+            changes.push({
+              field: 'pack',
+              label: 'パック',
+              oldVal: curPack,
+              newVal: offPack
+            });
+          }
+
+          if (curVer !== offVer) {
+            changes.push({
+              field: 'version',
+              label: 'Ver',
+              oldVal: curVer,
+              newVal: offVer
+            });
+          }
+
+          // Check Difficulties & Constants
+          const existingDiffMap = new Map();
+          existingTuples.forEach(t => existingDiffMap.set(t[2], t));
+
+          const offDiffs = song.diffs || {};
+          ['I', 'II', 'III', 'IV', 'IV-α'].forEach(diff => {
+            const offD = offDiffs[diff];
+            const exT = existingDiffMap.get(diff);
+
+            if (offD && !isNaN(offD.constant) && Number(offD.constant) > 0) {
+              const offConst = Number(offD.constant);
+              const offLv = String(offD.level || calcLevelFromConstant(offConst)).trim();
+
+              if (!exT) {
+                changes.push({
+                  field: 'diff_add',
+                  diff: diff,
+                  label: diff + ' 追加',
+                  oldVal: '未収録',
+                  newVal: 'Lv.' + offLv + ' (' + offConst + ')',
+                  newConst: offConst,
+                  newLevel: offLv
+                });
+              } else {
+                const exConst = Number(exT[4]) || 0;
+                const exLv = String(exT[3] || '').trim();
+
+                const constDiff = Math.abs(exConst - offConst) > 0.001;
+                const lvDiff = offD.level && exLv !== offLv;
+
+                if (constDiff || lvDiff) {
+                  changes.push({
+                    field: 'const_revision',
+                    diff: diff,
+                    label: diff + ' 定数',
+                    oldVal: exConst + (exLv ? ' (Lv.' + exLv + ')' : ''),
+                    newVal: offConst + (offLv ? ' (Lv.' + offLv + ')' : ''),
+                    newConst: offConst,
+                    newLevel: offLv
+                  });
+                }
+              }
+            }
+          });
+
+          if (changes.length > 0) {
+            detectedMod.push({
+              song: song,
+              existingTuples: existingTuples,
+              changes: changes
+            });
+          }
+        }
+      });
+
+      officialUpdatesState = { detectedNew, detectedMod };
+
+      if (detectedNew.length === 0 && detectedMod.length === 0) {
+        if (elEmpty) elEmpty.style.display = 'block';
+        if (elContent) elContent.style.display = 'none';
+        if (elSummary) elSummary.style.display = 'none';
+        return;
+      }
+
+      if (elEmpty) elEmpty.style.display = 'none';
+      if (elContent) elContent.style.display = 'block';
+      if (elSummary) elSummary.style.display = 'flex';
+
+      // Summary text
+      if (summaryText) {
+        summaryText.textContent = '最新アプデ情報: （新規 ' + detectedNew.length + '曲 / 更新 ' + detectedMod.length + '曲）';
+      }
+
+      // 1. Render New Songs
+      if (newSec) newSec.style.display = detectedNew.length > 0 ? 'block' : 'none';
+      const newCountEl = document.getElementById('officialUpdateNewCount');
+      if (newCountEl) newCountEl.textContent = detectedNew.length;
+
+      if (newListEl) {
+        newListEl.innerHTML = '';
+        detectedNew.forEach((s, idx) => {
+          const card = document.createElement('div');
+          card.className = 'update-card update-card-new';
+
+          const d = s.diffs || {};
+          let diffPillsHtml = '';
+          ['I', 'II', 'III', 'IV', 'IV-α'].forEach(k => {
+            if (d[k] && !isNaN(d[k].constant)) {
+              diffPillsHtml += '<span class="update-diff-pill">' + k + ': Lv.' + (d[k].level || calcLevelFromConstant(d[k].constant)) + ' (' + d[k].constant + ')</span>';
+            }
+          });
+
+          card.innerHTML = 
+            '<div class="update-card-header">' +
+              '<label class="update-card-title-wrap">' +
+                '<input type="checkbox" class="chk-official-update-item" data-type="new" data-index="' + idx + '" checked>' +
+                '<span>' + escapeHtml(s.title) + '</span>' +
+              '</label>' +
+              '<span class="update-badge update-badge-new">新規</span>' +
+            '</div>' +
+            '<div class="update-card-meta">' +
+              '<span>パック: <b>' + escapeHtml(s.pack || '基本曲') + '</b></span>' +
+              '<span>Ver: <b>' + escapeHtml(s.version || 'v5.6.0') + '</b></span>' +
+            '</div>' +
+            '<div class="update-diffs-pills">' + diffPillsHtml + '</div>';
+          newListEl.appendChild(card);
+        });
+      }
+
+      // 2. Render Modified Songs
+      if (modSec) modSec.style.display = detectedMod.length > 0 ? 'block' : 'none';
+      const modCountEl = document.getElementById('officialUpdateModCount');
+      if (modCountEl) modCountEl.textContent = detectedMod.length;
+
+      if (modListEl) {
+        modListEl.innerHTML = '';
+        detectedMod.forEach((m, idx) => {
+          const card = document.createElement('div');
+          card.className = 'update-card update-card-mod';
+
+          let changesHtml = '';
+          m.changes.forEach(c => {
+            changesHtml += 
+              '<div class="update-change-row">' +
+                '<span class="update-change-label">' + escapeHtml(c.label) + '</span>' +
+                '<span class="update-change-val-old">' + escapeHtml(String(c.oldVal)) + '</span>' +
+                '<span class="update-change-arrow">→</span>' +
+                '<span class="update-change-val-new">' + escapeHtml(String(c.newVal)) + '</span>' +
+              '</div>';
+          });
+
+          card.innerHTML = 
+            '<div class="update-card-header">' +
+              '<label class="update-card-title-wrap">' +
+                '<input type="checkbox" class="chk-official-update-item" data-type="mod" data-index="' + idx + '" checked>' +
+                '<span>' + escapeHtml(m.song.title) + '</span>' +
+              '</label>' +
+              '<span class="update-badge update-badge-mod">更新</span>' +
+            '</div>' +
+            '<div class="update-changes-list">' +
+              changesHtml +
+            '</div>' +
+            '<div class="update-card-score-notice">' +
+              '<span>✓ 入力済みのスコア・クリアランプ・理論値記録はそのまま維持されます</span>' +
+            '</div>';
+          modListEl.appendChild(card);
+        });
+      }
+
+      // Attach checkbox listeners to recalculate total
+      document.querySelectorAll('.chk-official-update-item').forEach(chk => {
+        chk.addEventListener('change', updateOfficialUpdateApplyButton);
+      });
+
+      updateOfficialUpdateApplyButton();
+    }
+
+    function updateOfficialUpdateApplyButton() {
+      const chks = document.querySelectorAll('.chk-official-update-item:checked');
+      const count = chks.length;
+      const btn = document.getElementById('btnOfficialUpdateApply');
+      if (btn) {
+        btn.textContent = '✓ 反映する (計 ' + count + '曲)';
+        btn.disabled = count === 0;
+      }
+    }
+
+    function applyOfficialUpdates() {
+      const chks = document.querySelectorAll('.chk-official-update-item:checked');
+      if (chks.length === 0) return;
+
+      const { detectedNew, detectedMod } = officialUpdatesState;
+      let appliedCount = 0;
+
+      // 1. Process Checked New Songs
+      let maxInitId = masterSongs.length;
+      chks.forEach(chk => {
+        const type = chk.getAttribute('data-type');
+        const idx = parseInt(chk.getAttribute('data-index'), 10);
+
+        if (type === 'new' && detectedNew[idx]) {
+          const song = detectedNew[idx];
+          const tuples = songObjToTuples(song, maxInitId + 1);
+          maxInitId += tuples.length;
+          masterSongs.push(...tuples);
+
+          if (song.pack && !packOrder.includes(song.pack)) {
+            packOrder.push(song.pack);
+          }
+          appliedCount++;
+        }
+      });
+
+      // 2. Process Checked Modified Songs
+      chks.forEach(chk => {
+        const type = chk.getAttribute('data-type');
+        const idx = parseInt(chk.getAttribute('data-index'), 10);
+
+        if (type === 'mod' && detectedMod[idx]) {
+          const m = detectedMod[idx];
+          const officialSong = m.song;
+          const existingTuples = m.existingTuples;
+
+          // Update common metadata
+          existingTuples.forEach(s => {
+            s[1] = officialSong.title;
+            s[6] = officialSong.pack || s[6];
+            s[11] = officialSong.version || s[11];
+
+            // Update constants / levels if revised
+            if (officialSong.diffs && officialSong.diffs[s[2]]) {
+              const d = officialSong.diffs[s[2]];
+              if (!isNaN(d.constant) && Number(d.constant) > 0) {
+                s[4] = Number(d.constant);
+                s[3] = d.level || calcLevelFromConstant(s[4]);
+              }
+            }
+          });
+
+          // Check for newly added difficulty (e.g. IV-alpha added)
+          ['I', 'II', 'III', 'IV', 'IV-α'].forEach(diff => {
+            const d = officialSong.diffs && officialSong.diffs[diff];
+            const exists = existingTuples.some(t => t[2] === diff);
+            if (d && !isNaN(d.constant) && Number(d.constant) > 0 && !exists) {
+              const baseTuple = existingTuples[0];
+              const newTuple = [
+                baseTuple[7] + '_' + diff,
+                officialSong.title,
+                diff,
+                d.level || calcLevelFromConstant(d.constant),
+                Number(d.constant),
+                0,
+                officialSong.pack || baseTuple[6],
+                baseTuple[7],
+                baseTuple[8] || 0,
+                0,
+                '',
+                officialSong.version || baseTuple[11],
+                (baseTuple[12] || 0) + 1
+              ];
+              masterSongs.push(newTuple);
+            }
+          });
+
+          if (officialSong.pack && !packOrder.includes(officialSong.pack)) {
+            packOrder.push(officialSong.pack);
+          }
+          appliedCount++;
+        }
+      });
+
+      closeOfficialUpdateModal();
+      initFormDatalists();
+      renderPackOrderList();
+      renderEditSongSearchResult();
+      checkUnsavedChanges();
+      refresh();
+
+      alert('✨ 計 ' + appliedCount + '曲 のアプデ情報を一時反映しました！\\n画面下部の「💾 保存する」を押して確定してください。');
+    }
+
     const btnEditClose = document.getElementById('btnEditSongModalClose');
     if (btnEditClose) btnEditClose.addEventListener('click', closeEditSongModal);
     const btnEditCancel = document.getElementById('btnEditSongModalCancel');
@@ -7079,6 +7798,15 @@ const htmlContent = `<!DOCTYPE html>
     if (btnGasDownload) btnGasDownload.addEventListener('click', downloadFromGas);
     const btnCopyGasCode = document.getElementById('btnCopyGasCode');
     if (btnCopyGasCode) btnCopyGasCode.addEventListener('click', copyGasScriptCode);
+
+    const btnCheckUpdates = document.getElementById('btnCheckOfficialUpdates');
+    if (btnCheckUpdates) btnCheckUpdates.addEventListener('click', openOfficialUpdateModal);
+    const btnOfficialClose = document.getElementById('btnOfficialUpdateModalClose');
+    if (btnOfficialClose) btnOfficialClose.addEventListener('click', closeOfficialUpdateModal);
+    const btnOfficialCancel = document.getElementById('btnOfficialUpdateCancel');
+    if (btnOfficialCancel) btnOfficialCancel.addEventListener('click', closeOfficialUpdateModal);
+    const btnOfficialApply = document.getElementById('btnOfficialUpdateApply');
+    if (btnOfficialApply) btnOfficialApply.addEventListener('click', applyOfficialUpdates);
 
     window.addEventListener('beforeunload', (e) => {
       const allIds = new Set([...Object.keys(userScores), ...Object.keys(savedScores)]);
