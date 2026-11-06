@@ -106,14 +106,6 @@ function doPost(e) {
  * Sheet I/O Helpers
  * ========================================================== */
 
-function cleanTitle(val) {
-  if (val === null || val === undefined) return '';
-  const str = String(val).trim();
-  if (str.toLowerCase() === 'true') return 'True';
-  if (str.toLowerCase() === 'false') return 'False';
-  return str;
-}
-
 // 1. Songs Sheet (楽曲マスター: 1曲1行)
 function writeSongsSheet(ss, songs) {
   const sheet = getOrCreateSheet(ss, SHEET_NAMES.SONGS);
@@ -129,8 +121,9 @@ function writeSongsSheet(ss, songs) {
   songs.forEach((s, idx) => {
     const d = s.diffs || {};
     const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
-    const titleStr = cleanTitle(s.title);
-    const cellTitle = (titleStr.toLowerCase() === 'true' || titleStr.toLowerCase() === 'false') ? ("'" + titleStr) : titleStr;
+    const titleStr = String(s.title || '');
+    // If title is 'true' or 'false' (any casing), prefix with apostrophe to store as text in Google Sheets
+    const cellTitle = (/^(true|false)$/i.test(titleStr)) ? ("'" + titleStr) : titleStr;
     rows.push([
       orderNo,
       cellTitle,
@@ -151,7 +144,7 @@ function writeSongsSheet(ss, songs) {
   });
 
   if (rows.length > 1) {
-    sheet.getRange(2, 2, rows.length - 1, 1).setNumberFormat('@');
+    sheet.getRange(2, 2, rows.length - 1, 4).setNumberFormat('@');
     sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
     sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');
   } else {
@@ -164,49 +157,55 @@ function writeSongsSheet(ss, songs) {
 function readSongsSheet(ss) {
   const sheet = ss.getSheetByName(SHEET_NAMES.SONGS);
   if (!sheet) return [];
-  const values = sheet.getDataRange().getValues();
+  const range = sheet.getDataRange();
+  const values = range.getValues();
+  const displayValues = range.getDisplayValues();
   if (values.length <= 1) return [];
 
   // Check if header row contains 'デフォルト順' (backward compatible)
-  const headerCol0 = String(values[0][0] || '').trim();
+  const headerCol0 = String((displayValues[0] && displayValues[0][0]) || values[0][0] || '').trim();
   const hasOrderCol = (headerCol0 === 'デフォルト順' || headerCol0 === 'No' || headerCol0 === '順序' || headerCol0 === 'ID');
 
   const songs = [];
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
+    const disp = displayValues[i];
     if (hasOrderCol) {
-      if (row[1] === null || row[1] === undefined || row[1] === '') continue;
+      // Use displayValues for string fields so boolean cells like TRUE/FALSE preserve their exact cell text!
+      const title = (disp && disp[1] !== '') ? disp[1] : String(row[1] || '');
+      if (!title) continue;
       const initId = (row[0] !== '' && !isNaN(row[0])) ? Number(row[0]) : i;
       const diffs = {};
-      if (row[5] !== '') diffs['I'] = { constant: Number(row[5]), level: String(row[6] || '') };
-      if (row[7] !== '') diffs['II'] = { constant: Number(row[7]), level: String(row[8] || '') };
-      if (row[9] !== '') diffs['III'] = { constant: Number(row[9]), level: String(row[10] || '') };
-      if (row[11] !== '') diffs['IV'] = { constant: Number(row[11]), level: String(row[12] || '') };
-      if (row[13] !== '') diffs['IV-α'] = { constant: Number(row[13]), level: String(row[14] || '') };
+      if (row[5] !== '') diffs['I'] = { constant: Number(row[5]), level: String((disp && disp[6]) || row[6] || '') };
+      if (row[7] !== '') diffs['II'] = { constant: Number(row[7]), level: String((disp && disp[8]) || row[8] || '') };
+      if (row[9] !== '') diffs['III'] = { constant: Number(row[9]), level: String((disp && disp[10]) || row[10] || '') };
+      if (row[11] !== '') diffs['IV'] = { constant: Number(row[11]), level: String((disp && disp[12]) || row[12] || '') };
+      if (row[13] !== '') diffs['IV-α'] = { constant: Number(row[13]), level: String((disp && disp[14]) || row[14] || '') };
 
       songs.push({
         initId: initId,
-        title: cleanTitle(row[1]),
-        pack: String(row[2] || '基本曲'),
-        version: String(row[3] || 'v5.6.0'),
-        songId: String(row[4] || ('song_' + i)),
+        title: title,
+        pack: String((disp && disp[2]) || row[2] || '基本曲'),
+        version: String((disp && disp[3]) || row[3] || 'v5.6.0'),
+        songId: String((disp && disp[4]) || row[4] || ('song_' + i)),
         diffs: diffs
       });
     } else {
-      if (row[0] === null || row[0] === undefined || row[0] === '') continue;
+      const title = (disp && disp[0] !== '') ? disp[0] : String(row[0] || '');
+      if (!title) continue;
       const diffs = {};
-      if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String(row[5] || '') };
-      if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String(row[7] || '') };
-      if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String(row[9] || '') };
-      if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String(row[11] || '') };
-      if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String(row[13] || '') };
+      if (row[4] !== '') diffs['I'] = { constant: Number(row[4]), level: String((disp && disp[5]) || row[5] || '') };
+      if (row[6] !== '') diffs['II'] = { constant: Number(row[6]), level: String((disp && disp[7]) || row[7] || '') };
+      if (row[8] !== '') diffs['III'] = { constant: Number(row[8]), level: String((disp && disp[9]) || row[9] || '') };
+      if (row[10] !== '') diffs['IV'] = { constant: Number(row[10]), level: String((disp && disp[11]) || row[11] || '') };
+      if (row[12] !== '') diffs['IV-α'] = { constant: Number(row[12]), level: String((disp && disp[13]) || row[13] || '') };
 
       songs.push({
         initId: i,
-        title: cleanTitle(row[0]),
-        pack: String(row[1] || '基本曲'),
-        version: String(row[2] || 'v5.6.0'),
-        songId: String(row[3] || ('song_' + i)),
+        title: title,
+        pack: String((disp && disp[1]) || row[1] || '基本曲'),
+        version: String((disp && disp[2]) || row[2] || 'v5.6.0'),
+        songId: String((disp && disp[3]) || row[3] || ('song_' + i)),
         diffs: diffs
       });
     }
