@@ -33,8 +33,11 @@ const htmlContent = `<!DOCTYPE html>
   <script>
     (function() {
       try {
-        var p = localStorage.getItem('rotaeno_theme_preference_v1') || 'auto';
-        var isDark = (p === 'dark') || (p === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var p = localStorage.getItem('rotaeno_theme_preference_v1');
+        var isDark = (p === 'dark');
+        if (p === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          isDark = true;
+        }
         if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
       } catch(e) {}
     })();
@@ -3747,9 +3750,9 @@ const htmlContent = `<!DOCTYPE html>
         <h3>🎨 外観・テーマ設定</h3>
         <p>画面の配色テーマを選択できます。「端末設定に連動」にすると、OSのダークモード設定に合わせて自動で切り替わります（ヘッダー右上の 🌙/☀️ ボタンでもワンタップで切り替え可能です）。</p>
         <div class="action-btn-group" id="themeChoiceGroup">
-          <button type="button" class="panel-btn theme-choice-btn" data-theme="auto" id="themeBtnAuto">📱 端末設定に連動</button>
-          <button type="button" class="panel-btn theme-choice-btn" data-theme="light" id="themeBtnLight">☀️ ライトモード</button>
+          <button type="button" class="panel-btn theme-choice-btn" data-theme="light" id="themeBtnLight">☀️ ライトモード (標準)</button>
           <button type="button" class="panel-btn theme-choice-btn" data-theme="dark" id="themeBtnDark">🌙 ダークモード</button>
+          <button type="button" class="panel-btn theme-choice-btn" data-theme="auto" id="themeBtnAuto">📱 端末設定に連動</button>
         </div>
       </div>
 
@@ -4542,7 +4545,10 @@ const htmlContent = `<!DOCTYPE html>
     let userSheetUrl = localStorage.getItem(USER_SHEET_URL_KEY) || '';
     let gasAppUrl = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_ENDPOINT;
     let autoSyncEnabled = localStorage.getItem(AUTO_SYNC_KEY) === 'true';
-    let currentThemePref = localStorage.getItem(THEME_PREF_KEY) || 'auto';
+    let currentThemePref = localStorage.getItem(THEME_PREF_KEY) || 'light';
+    if (currentThemePref === 'auto') {
+      currentThemePref = 'light';
+    }
     let masterSongs = [];
     let savedMasterSongs = [];
     let userScores = {};
