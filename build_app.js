@@ -4157,13 +4157,42 @@ const htmlContent = `<!DOCTYPE html>
       return masterSongs;
     }
 
+    const DIFF_SORT_ORDER = { 'IV-α': 0, 'IV': 1, 'III': 2, 'II': 3, 'I': 4 };
+
+    function compareDefaultOrder(a, b) {
+      const oA = Number(a.initId !== undefined ? a.initId : (a[12] || 0));
+      const oB = Number(b.initId !== undefined ? b.initId : (b[12] || 0));
+      if (oA !== oB) return oA - oB;
+      const diffA = a.diff !== undefined ? a.diff : a[2];
+      const diffB = b.diff !== undefined ? b.diff : b[2];
+      const dA = DIFF_SORT_ORDER[diffA] !== undefined ? DIFF_SORT_ORDER[diffA] : 99;
+      const dB = DIFF_SORT_ORDER[diffB] !== undefined ? DIFF_SORT_ORDER[diffB] : 99;
+      return dA - dB;
+    }
+
+    function normalizeMasterSongOrders(tuples) {
+      if (!Array.isArray(tuples) || tuples.length === 0) return tuples;
+      const songGroups = getSongGroups(tuples);
+      const songOrderMap = new Map();
+      songGroups.forEach(s => songOrderMap.set(s.songId, s.initId));
+      tuples.forEach(t => {
+        if (songOrderMap.has(t[7])) {
+          t[12] = songOrderMap.get(t[7]);
+        }
+      });
+      tuples.sort((a, b) => compareDefaultOrder(a, b));
+      return tuples;
+    }
+
     function loadMasterSongs() {
       const saved = localStorage.getItem(MASTER_SONGS_KEY);
       if (saved) {
         try {
           masterSongs = JSON.parse(saved);
           if (Array.isArray(masterSongs) && masterSongs.length > 0) {
+            masterSongs = normalizeMasterSongOrders(masterSongs);
             savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
+            saveMasterSongs();
             return;
           }
         } catch (e) {
@@ -4192,6 +4221,7 @@ const htmlContent = `<!DOCTYPE html>
         }
       }
 
+      masterSongs = normalizeMasterSongOrders(masterSongs);
       saveMasterSongs();
     }
 
@@ -4920,9 +4950,9 @@ const htmlContent = `<!DOCTYPE html>
             const rateB = b.effectiveRating || 0;
             if (rateB !== rateA) return rateB - rateA;
             if (b.score !== a.score) return b.score - a.score;
-            return a.initId - b.initId;
+            return compareDefaultOrder(a, b);
           }
-          return a.initId - b.initId;
+          return compareDefaultOrder(a, b);
         });
 
         songListContainer.innerHTML = list.length > 0
@@ -4940,7 +4970,7 @@ const htmlContent = `<!DOCTYPE html>
           if (!packMap.has(c.pack)) packMap.set(c.pack, []);
           packMap.get(c.pack).push(c);
         });
-        packMap.forEach(items => items.sort((a, b) => a.initId - b.initId));
+        packMap.forEach(items => items.sort((a, b) => compareDefaultOrder(a, b)));
         const orderedPacks = [];
         packOrder.forEach(p => {
           if (packMap.has(p)) orderedPacks.push(p);
@@ -4964,7 +4994,7 @@ const htmlContent = `<!DOCTYPE html>
         titleCatMap.forEach(items => items.sort((a, b) => {
           const tComp = a.title.localeCompare(b.title, 'ja', { numeric: true, sensitivity: 'base' });
           if (tComp !== 0) return tComp;
-          return a.initId - b.initId;
+          return compareDefaultOrder(a, b);
         }));
         groups = TITLE_CATEGORY_ORDER
           .filter(cat => titleCatMap.has(cat) && titleCatMap.get(cat).length > 0)
@@ -4980,7 +5010,7 @@ const htmlContent = `<!DOCTYPE html>
           if (!verMap.has(c.version)) verMap.set(c.version, []);
           verMap.get(c.version).push(c);
         });
-        verMap.forEach(items => items.sort((a, b) => a.initId - b.initId));
+        verMap.forEach(items => items.sort((a, b) => compareDefaultOrder(a, b)));
         const sortedVers = Array.from(verMap.keys()).sort((a, b) => compareVersions(a, b));
         groups = sortedVers.map(v => ({
           id: 'ver_' + encodeURIComponent(v),
@@ -4998,7 +5028,7 @@ const htmlContent = `<!DOCTYPE html>
         lvlMap.forEach(items => items.sort((a, b) => {
           if (b.constant !== a.constant) return b.constant - a.constant;
           if (b.score !== a.score) return b.score - a.score;
-          return a.initId - b.initId;
+          return compareDefaultOrder(a, b);
         }));
         const sortedLvls = Array.from(lvlMap.keys()).sort((a, b) => levelToValue(b) - levelToValue(a));
         groups = sortedLvls.map(lvl => ({
@@ -5016,7 +5046,7 @@ const htmlContent = `<!DOCTYPE html>
         });
         tierMap.forEach(items => items.sort((a, b) => {
           if (b.score !== a.score) return b.score - a.score;
-          return a.initId - b.initId;
+          return compareDefaultOrder(a, b);
         }));
         groups = SCORE_GRADE_TIERS
           .filter(t => (tierMap.get(t.id) || []).length > 0)
@@ -7266,7 +7296,7 @@ const htmlContent = `<!DOCTYPE html>
         });
       }
 
-      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+      masterSongs.sort((a, b) => compareDefaultOrder(a, b));
       closeOfficialUpdateModal();
       initFormDatalists();
       renderPackOrderList();
@@ -7724,7 +7754,7 @@ const htmlContent = `<!DOCTYPE html>
           t[12] = songOrderMap.get(t[7]);
         }
       });
-      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+      masterSongs.sort((a, b) => compareDefaultOrder(a, b));
       saveMasterSongs();
 
       const payload = {
@@ -7848,7 +7878,7 @@ const htmlContent = `<!DOCTYPE html>
               }
             });
 
-            restoredMaster.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+            restoredMaster.sort((a, b) => compareDefaultOrder(a, b));
             masterSongs = restoredMaster;
             saveMasterSongs();
           }
@@ -7927,7 +7957,7 @@ const htmlContent = `<!DOCTYPE html>
           t[12] = songOrderMap.get(t[7]);
         }
       });
-      masterSongs.sort((a, b) => (a[12] || 0) - (b[12] || 0));
+      masterSongs.sort((a, b) => compareDefaultOrder(a, b));
       saveMasterSongs();
 
       const payload = {
