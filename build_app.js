@@ -4160,14 +4160,15 @@ const htmlContent = `<!DOCTYPE html>
     const DIFF_SORT_ORDER = { 'IV-α': 0, 'IV': 1, 'III': 2, 'II': 3, 'I': 4 };
 
     function compareDefaultOrder(a, b) {
-      const oA = Number(a.initId !== undefined ? a.initId : (a[12] || 0));
-      const oB = Number(b.initId !== undefined ? b.initId : (b[12] || 0));
-      if (oA !== oB) return oA - oB;
       const diffA = a.diff !== undefined ? a.diff : a[2];
       const diffB = b.diff !== undefined ? b.diff : b[2];
       const dA = DIFF_SORT_ORDER[diffA] !== undefined ? DIFF_SORT_ORDER[diffA] : 99;
       const dB = DIFF_SORT_ORDER[diffB] !== undefined ? DIFF_SORT_ORDER[diffB] : 99;
-      return dA - dB;
+      if (dA !== dB) return dA - dB;
+
+      const oA = Number(a.initId !== undefined ? a.initId : (a[12] || 0));
+      const oB = Number(b.initId !== undefined ? b.initId : (b[12] || 0));
+      return oA - oB;
     }
 
     function normalizeMasterSongOrders(tuples) {
