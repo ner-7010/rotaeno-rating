@@ -4185,6 +4185,8 @@ const htmlContent = `<!DOCTYPE html>
       return tuples;
     }
 
+    let isFirstBoot = false;
+
     function loadMasterSongs() {
       const saved = localStorage.getItem(MASTER_SONGS_KEY);
       if (saved) {
@@ -4201,7 +4203,9 @@ const htmlContent = `<!DOCTYPE html>
         }
       }
 
-      // Initial Seed Load from DEFAULT_SONGS
+      isFirstBoot = true;
+
+      // Initial Seed Load from DEFAULT_SONGS (Zero-latency offline baseline)
       masterSongs = JSON.parse(JSON.stringify(DEFAULT_SONGS));
 
       // Auto-migrate any previously added songs from legacy key
@@ -6815,30 +6819,44 @@ const htmlContent = `<!DOCTYPE html>
       try {
         let officialSongs = [];
         let officialPackOrder = [];
+        let fetchErrorDetail = null;
 
         // 1. Try fetching from Central Official DB (no url parameter)
-        const centralRes = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
-        const centralJson = await centralRes.json();
-        if (centralJson.status === 'success' && centralJson.data) {
-          if (Array.isArray(centralJson.data.songs) && centralJson.data.songs.length > 0) {
-            officialSongs = centralJson.data.songs;
+        try {
+          const centralRes = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
+          const centralJson = await centralRes.json();
+          if (centralJson.status === 'success' && centralJson.data) {
+            if (Array.isArray(centralJson.data.songs) && centralJson.data.songs.length > 0) {
+              officialSongs = centralJson.data.songs;
+            }
+            if (centralJson.data.config && Array.isArray(centralJson.data.config.packOrder) && centralJson.data.config.packOrder.length > 0) {
+              officialPackOrder = centralJson.data.config.packOrder;
+            }
+          } else if (centralJson.status === 'error') {
+            fetchErrorDetail = centralJson.message;
           }
-          if (centralJson.data.config && Array.isArray(centralJson.data.config.packOrder) && centralJson.data.config.packOrder.length > 0) {
-            officialPackOrder = centralJson.data.config.packOrder;
-          }
+        } catch (e) {
+          fetchErrorDetail = e.message;
         }
 
+        // 2. Fallback to userSheetUrl if central sheet Songs is empty or errored
         if (officialSongs.length === 0 && userSheetUrl) {
-          // Fallback to userSheetUrl if central sheet Songs is empty
-          const userRes = await fetch(endpoint + '?url=' + encodeURIComponent(userSheetUrl) + '&t=' + Date.now(), { method: 'GET' });
-          const userJson = await userRes.json();
-          if (userJson.status === 'success' && userJson.data) {
-            if (Array.isArray(userJson.data.songs) && userJson.data.songs.length > 0) {
-              officialSongs = userJson.data.songs;
+          try {
+            const userRes = await fetch(endpoint + '?url=' + encodeURIComponent(userSheetUrl) + '&t=' + Date.now(), { method: 'GET' });
+            const userJson = await userRes.json();
+            if (userJson.status === 'success' && userJson.data) {
+              if (Array.isArray(userJson.data.songs) && userJson.data.songs.length > 0) {
+                officialSongs = userJson.data.songs;
+              }
+              if (officialPackOrder.length === 0 && userJson.data.config && Array.isArray(userJson.data.config.packOrder)) {
+                officialPackOrder = userJson.data.config.packOrder;
+              }
+              fetchErrorDetail = null;
+            } else if (userJson.status === 'error') {
+              fetchErrorDetail = userJson.message;
             }
-            if (officialPackOrder.length === 0 && userJson.data.config && Array.isArray(userJson.data.config.packOrder)) {
-              officialPackOrder = userJson.data.config.packOrder;
-            }
+          } catch (e) {
+            fetchErrorDetail = e.message;
           }
         }
 
@@ -6847,7 +6865,13 @@ const htmlContent = `<!DOCTYPE html>
         if (!Array.isArray(officialSongs) || officialSongs.length === 0) {
           if (elError) {
             elError.style.display = 'block';
-            document.getElementById('officialUpdateErrorMsg').textContent = '親スプレッドシート（または設定済みスプシ）の楽曲データが0件です。\\n管理者は設定画面から「スプシへ全データを保存」を行って楽曲データを初期登録してください。';
+            let errMsg = '親スプレッドシート（または設定済みスプシ）から楽曲データを取得できませんでした。';
+            if (fetchErrorDetail) {
+              errMsg += '\\n\\n【詳細】: ' + fetchErrorDetail;
+            } else {
+              errMsg += '\\n\\n楽曲データが0件です。管理者は設定画面から「☁️ スプシへ保存 (同期)」を行って管理スプシへ楽曲データを初期保存してください。';
+            }
+            document.getElementById('officialUpdateErrorMsg').textContent = errMsg;
           }
           return;
         }
@@ -6875,12 +6899,20 @@ const htmlContent = `<!DOCTYPE html>
       const modSec = document.getElementById('officialUpdateModSection');
       const summaryText = document.getElementById('officialUpdateSummaryText');
 
-      // Map local songs by normalized title
+      // Map local songs by normalized title and songId
       const localByTitle = new Map();
+      const localById = new Map();
       masterSongs.forEach(t => {
-        const k = String(t[1] || '').trim().toLowerCase();
-        if (!localByTitle.has(k)) localByTitle.set(k, []);
-        localByTitle.get(k).push(t);
+        const titleKey = String(t[1] || '').trim().toLowerCase();
+        const idKey = String(t[7] || '').trim().toLowerCase();
+        if (titleKey) {
+          if (!localByTitle.has(titleKey)) localByTitle.set(titleKey, []);
+          localByTitle.get(titleKey).push(t);
+        }
+        if (idKey) {
+          if (!localById.has(idKey)) localById.set(idKey, []);
+          localById.get(idKey).push(t);
+        }
       });
 
       const detectedNew = [];
@@ -6888,7 +6920,10 @@ const htmlContent = `<!DOCTYPE html>
 
       officialSongs.forEach(song => {
         const titleKey = String(song.title || '').trim().toLowerCase();
-        const existingTuples = localByTitle.get(titleKey);
+        const idKey = String(song.songId || '').trim().toLowerCase();
+
+        // Match existing tuples: prefer idKey, then titleKey
+        let existingTuples = (idKey && localById.get(idKey)) || (titleKey && localByTitle.get(titleKey));
 
         if (!existingTuples || existingTuples.length === 0) {
           // New Song
@@ -6898,10 +6933,21 @@ const htmlContent = `<!DOCTYPE html>
           const firstTuple = existingTuples[0];
           const curPack = String(firstTuple[6] || '基本曲').trim();
           const curVer = String(firstTuple[11] || 'v5.6.0').trim();
+          const curTitle = String(firstTuple[1] || '').trim();
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
+          const offTitle = String(song.title || '').trim();
 
           const changes = [];
+
+          if (offTitle && curTitle !== offTitle) {
+            changes.push({
+              field: 'title',
+              label: '曲名',
+              oldVal: curTitle,
+              newVal: offTitle
+            });
+          }
 
           if (curPack !== offPack) {
             changes.push({
@@ -7186,8 +7232,7 @@ const htmlContent = `<!DOCTYPE html>
             ? Number(song.initId)
             : (++maxInitId);
 
-          const diffKeys = ['I', 'II', 'III', 'IV'];
-          if (song.diffs && song.diffs['IV-α']) diffKeys.push('IV-α');
+          const diffKeys = ['IV-α', 'IV', 'III', 'II', 'I'];
 
           diffKeys.forEach(diff => {
             const dObj = song.diffs && song.diffs[diff];
@@ -7261,7 +7306,7 @@ const htmlContent = `<!DOCTYPE html>
                 0,
                 '',
                 officialSong.version || baseTuple[11],
-                (baseTuple[12] || 0) + 1
+                (baseTuple[12] || 0)
               ];
               masterSongs.push(newTuple);
             }
@@ -7285,27 +7330,39 @@ const htmlContent = `<!DOCTYPE html>
         const officialInitIdMap = new Map();
         officialSongs.forEach((song, idx) => {
           const normTitle = String(song.title || '').trim().toLowerCase();
+          const normId = String(song.songId || '').trim().toLowerCase();
           const initId = (song.initId !== undefined && !isNaN(song.initId)) ? Number(song.initId) : (idx + 1);
-          officialInitIdMap.set(normTitle, initId);
+          if (normId) officialInitIdMap.set(normId, initId);
+          if (normTitle) officialInitIdMap.set(normTitle, initId);
         });
 
         masterSongs.forEach(s => {
+          const normId = String(s[7] || '').trim().toLowerCase();
           const normTitle = String(s[1] || '').trim().toLowerCase();
-          if (officialInitIdMap.has(normTitle)) {
+          if (officialInitIdMap.has(normId)) {
+            s[12] = officialInitIdMap.get(normId);
+          } else if (officialInitIdMap.has(normTitle)) {
             s[12] = officialInitIdMap.get(normTitle);
           }
         });
       }
 
       masterSongs.sort((a, b) => compareDefaultOrder(a, b));
+      saveMasterSongs();
+      savePackOrder();
+
       closeOfficialUpdateModal();
       initFormDatalists();
       renderPackOrderList();
       renderEditSongSearchResult();
-      checkUnsavedChanges();
       refresh();
 
-      alert('✨ 計 ' + appliedCount + '曲 のアプデ情報を一時反映しました！\\n画面下部の「💾 保存する」を押して確定してください。');
+      if (autoSyncEnabled && userSheetUrl) {
+        triggerAutoSync();
+      }
+
+      showSaveToast('✨ 計 ' + appliedCount + '曲 のアプデ情報を反映・保存しました！');
+      alert('✨ 計 ' + appliedCount + '曲 のアプデ情報を反映・保存しました！');
     }
 
     const btnEditClose = document.getElementById('btnEditSongModalClose');
@@ -7828,60 +7885,37 @@ const htmlContent = `<!DOCTYPE html>
 
           // 1. Restore Songs
           if (Array.isArray(d.songs) && d.songs.length > 0) {
-            const restoredMaster = JSON.parse(JSON.stringify(DEFAULT_SONGS));
-            const defaultSongIds = new Set(DEFAULT_SONGS.map(s => s[7]));
-            const songMap = new Map();
-            d.songs.forEach(s => songMap.set(s.songId, s));
-
-            // Sync constants & initId if edited in sheet
-            restoredMaster.forEach(t => {
-              const song = songMap.get(t[7]);
-              if (song) {
-                if (song.initId !== undefined && !isNaN(song.initId)) t[12] = Number(song.initId);
-                if (song.diffs && song.diffs[t[2]]) {
-                  const diffObj = song.diffs[t[2]];
-                  if (!isNaN(diffObj.constant)) t[4] = diffObj.constant;
-                  if (diffObj.level) t[3] = diffObj.level;
-                }
-              }
+            const restoredMaster = [];
+            d.songs.forEach((song, idx) => {
+              const songInitId = (song.initId !== undefined && !isNaN(song.initId)) ? Number(song.initId) : (idx + 1);
+              const diffKeys = ['IV-α', 'IV', 'III', 'II', 'I'];
+              diffKeys.forEach(diff => {
+                const diffObj = song.diffs && song.diffs[diff];
+                if (!diffObj || isNaN(diffObj.constant) || Number(diffObj.constant) <= 0) return;
+                restoredMaster.push([
+                  (song.songId || ('song_' + songInitId)) + '_' + diff,
+                  song.title || '',
+                  diff,
+                  diffObj.level || calcLevelFromConstant(diffObj.constant),
+                  Number(diffObj.constant),
+                  0,
+                  song.pack || '基本曲',
+                  song.songId || ('song_' + songInitId),
+                  0,
+                  0,
+                  '',
+                  song.version || 'v5.6.0',
+                  songInitId
+                ]);
+              });
             });
 
-            // Add any user added songs from sheet with their exact initId
-            let fallbackId = restoredMaster.length;
-            d.songs.forEach(song => {
-              if (!defaultSongIds.has(song.songId)) {
-                const songInitId = (song.initId !== undefined && !isNaN(song.initId)) 
-                  ? Number(song.initId) 
-                  : (++fallbackId);
-
-                const diffKeys = ['I', 'II', 'III', 'IV'];
-                if (song.diffs && song.diffs['IV-α']) diffKeys.push('IV-α');
-
-                diffKeys.forEach(diff => {
-                  const dObj = song.diffs && song.diffs[diff];
-                  if (!dObj || isNaN(dObj.constant)) return;
-                  restoredMaster.push([
-                    song.songId + '_' + diff,
-                    song.title,
-                    diff,
-                    dObj.level || calcLevelFromConstant(dObj.constant),
-                    dObj.constant,
-                    0,
-                    song.pack || '基本曲',
-                    song.songId,
-                    0,
-                    0,
-                    '',
-                    song.version || 'v5.6.0',
-                    songInitId
-                  ]);
-                });
-              }
-            });
-
-            restoredMaster.sort((a, b) => compareDefaultOrder(a, b));
-            masterSongs = restoredMaster;
-            saveMasterSongs();
+            if (restoredMaster.length > 0) {
+              restoredMaster.sort((a, b) => compareDefaultOrder(a, b));
+              masterSongs = restoredMaster;
+              savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
+              saveMasterSongs();
+            }
           }
 
           // 2. Restore Scores
@@ -8060,6 +8094,70 @@ const htmlContent = `<!DOCTYPE html>
       }
     });
 
+    async function initFetchFromManagementSheet() {
+      const endpoint = getActiveGasEndpoint();
+      if (!endpoint) return;
+
+      try {
+        const res = await fetch(endpoint + '?t=' + Date.now(), { method: 'GET' });
+        const json = await res.json();
+        if (json.status === 'success' && json.data) {
+          const liveSongs = json.data.songs;
+          const liveConfig = json.data.config;
+
+          if (Array.isArray(liveSongs) && liveSongs.length > 0) {
+            const builtTuples = [];
+            liveSongs.forEach((song, idx) => {
+              const songInitId = (song.initId !== undefined && !isNaN(song.initId)) ? Number(song.initId) : (idx + 1);
+              const diffKeys = ['IV-α', 'IV', 'III', 'II', 'I'];
+              diffKeys.forEach(diff => {
+                const d = song.diffs && song.diffs[diff];
+                if (!d || isNaN(d.constant) || Number(d.constant) <= 0) return;
+                builtTuples.push([
+                  (song.songId || ('song_' + songInitId)) + '_' + diff,
+                  song.title || '',
+                  diff,
+                  d.level || calcLevelFromConstant(d.constant),
+                  Number(d.constant),
+                  0,
+                  song.pack || '基本曲',
+                  song.songId || ('song_' + songInitId),
+                  0,
+                  0,
+                  '',
+                  song.version || 'v5.6.0',
+                  songInitId
+                ]);
+              });
+            });
+
+            if (builtTuples.length > 0) {
+              builtTuples.sort((a, b) => compareDefaultOrder(a, b));
+              masterSongs = builtTuples;
+              savedMasterSongs = JSON.parse(JSON.stringify(masterSongs));
+              saveMasterSongs();
+
+              if (liveConfig && Array.isArray(liveConfig.packOrder) && liveConfig.packOrder.length > 0) {
+                packOrder = [...liveConfig.packOrder];
+                savedPackOrder = [...packOrder];
+                GAME_PACK_ORDER = [...liveConfig.packOrder];
+                savePackOrder();
+              }
+
+              initFormDatalists();
+              renderPackOrderList();
+              renderEditSongSearchResult();
+              refresh();
+
+              showSaveToast('✨ 管理スプシから最新楽曲データ（計 ' + liveSongs.length + '曲）を初期ロードしました！');
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Initial management sheet fetch fallback to embedded seed:', err);
+      }
+    }
+
     loadPackOrder();
     loadMasterSongs();
     loadInitialScores();
@@ -8071,6 +8169,10 @@ const htmlContent = `<!DOCTYPE html>
     refresh();
     checkUnsavedChanges();
     updateGasSyncUI();
+
+    if (isFirstBoot) {
+      initFetchFromManagementSheet();
+    }
   </script>
 </body>
 </html>`;
