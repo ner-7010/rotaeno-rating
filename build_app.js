@@ -4581,11 +4581,6 @@ const htmlContent = `<!DOCTYPE html>
         </div>
         <div class="calc-info">
           <div class="calc-rating-text" id="modalPreviewRating">Rating 0.000</div>
-          <div id="modalRateUpSection" class="modal-rate-up-section" style="display: none;">
-            <span class="modal-rate-up-label">🎯 レート+0.001目標:</span>
-            <span class="modal-rate-up-score" id="modalRateUpScore">-</span>
-            <span class="modal-rate-up-pts" id="modalRateUpPts">-</span>
-          </div>
         </div>
       </div>
 
@@ -6936,17 +6931,6 @@ const htmlContent = `<!DOCTYPE html>
       } else if (selectedChart) {
         const rate = calcSingleRating(currentInputScore, selectedChart.constant, selectedChart.endOfSale);
         document.getElementById('modalPreviewRating').textContent = \`Rating \${rate.toFixed(4)}\`;
-      }
-
-      const rateUpSec = document.getElementById('modalRateUpSection');
-      if (rateUpSec) {
-        if (selectedChart && selectedChart.rateUp) {
-          rateUpSec.style.display = 'inline-flex';
-          document.getElementById('modalRateUpScore').textContent = '目標 ' + selectedChart.rateUp.targetScore.toLocaleString();
-          document.getElementById('modalRateUpPts').textContent = '(あと +' + selectedChart.rateUp.ptsNeeded.toLocaleString() + ' 点)';
-        } else {
-          rateUpSec.style.display = 'none';
-        }
       }
     }
 
