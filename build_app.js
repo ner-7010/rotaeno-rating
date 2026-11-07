@@ -3289,6 +3289,151 @@ const htmlContent = `<!DOCTYPE html>
       background: #f8fafc;
     }
 
+    /* Notice Popup Modal */
+    .notice-popup-box {
+      max-width: 500px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 0 !important;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+    .notice-popup-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+    .notice-popup-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--color-primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .notice-popup-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+    }
+    .notice-item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .notice-item-card.has-update {
+      border-left-color: #f59e0b;
+    }
+    .notice-item-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-weight: 700;
+    }
+    .notice-item-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .notice-item-badge.badge-update {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .notice-item-text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--color-text-main);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-weight: 600;
+    }
+    .notice-popup-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .notice-popup-btn-primary {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13.5px;
+      font-weight: 900;
+      cursor: pointer;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+      transition: all 0.15s ease;
+    }
+    .notice-popup-btn-primary:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+    }
+    .notice-popup-sub-actions {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    .notice-popup-btn-later {
+      flex: 1;
+      padding: 9px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--color-text-main);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .notice-popup-btn-later:hover {
+      background: var(--bg-surface-soft);
+      border-color: var(--color-primary);
+    }
+    .notice-popup-btn-read {
+      flex: 1;
+      padding: 9px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--color-text-sub);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .notice-popup-btn-read:hover {
+      background: var(--bg-surface-soft);
+      color: var(--color-text-main);
+    }
+
     /* Theme Toggle Button */
     .btn-theme-toggle {
       background: var(--bg-card);
@@ -3522,6 +3667,19 @@ const htmlContent = `<!DOCTYPE html>
     [data-theme="dark"] .update-modal-footer {
       background: #101c2b;
       border-color: var(--border-color);
+    }
+    [data-theme="dark"] .notice-popup-header,
+    [data-theme="dark"] .notice-popup-footer {
+      background: #101c2b;
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .notice-item-badge {
+      background: rgba(2, 132, 199, 0.25);
+      color: #38bdf8;
+    }
+    [data-theme="dark"] .notice-item-badge.badge-update {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fbbf24;
     }
     [data-theme="dark"] .update-changes-list {
       background: #0e1927;
@@ -4866,6 +5024,33 @@ const htmlContent = `<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- Modal: Notice / Update Announcement Popup (No backdrop click close) -->
+  <div class="modal-overlay" id="noticePopupModal">
+    <div class="modal-box notice-popup-box">
+      <div class="notice-popup-header">
+        <div class="notice-popup-title">
+          <span>📢</span> お知らせ・アップデート情報
+        </div>
+        <button type="button" class="modal-close-btn" id="btnNoticePopupClose" title="後で確認する">&times;</button>
+      </div>
+      <div class="notice-popup-body" id="noticePopupList">
+        <!-- Populated dynamically -->
+      </div>
+      <div class="notice-popup-footer">
+        <button type="button" class="notice-popup-btn-primary" id="btnNoticePopupGoUpdate" style="display: none;">
+          <span>⚡</span> アプデ情報を確認する
+        </button>
+        <button type="button" class="notice-popup-btn-primary" id="btnNoticePopupConfirm" style="display: none;">
+          <span>✓</span> 確認しました（再表示しない）
+        </button>
+        <div class="notice-popup-sub-actions">
+          <button type="button" class="notice-popup-btn-later" id="btnNoticePopupLater">🕒 後で確認する</button>
+          <button type="button" class="notice-popup-btn-read" id="btnNoticePopupMarkRead" style="display: none;">✓ 確認済み（再表示しない）</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const DEFAULT_AP_PLUS_RECORDS = ${defaultApPlusData};
     const STORAGE_KEY = 'rotaeno_user_scores_v1';
@@ -4880,6 +5065,13 @@ const htmlContent = `<!DOCTYPE html>
     const GAS_LAST_SYNC_KEY = 'rotaeno_gas_last_sync_v1';
     const AUTO_SYNC_KEY = 'rotaeno_auto_sync_v1';
     const THEME_PREF_KEY = 'rotaeno_theme_preference_v1';
+    const POPUP_LAST_SEEN_ID_KEY = 'rotaeno_popup_last_seen_id_v1';
+    const POPUP_LAST_FETCH_AT_KEY = 'rotaeno_popup_last_fetch_at_v1';
+    const POPUP_SNOOZE_AT_KEY = 'rotaeno_popup_snooze_at_v1';
+    const POPUP_CACHE_DATA_KEY = 'rotaeno_popup_cached_items_v1';
+    const POPUP_RELOAD_COOLDOWN_MS = 15 * 60 * 1000;      // リロード時GAS通信クールダウン: 15分
+    const POPUP_TAB_SWITCH_COOLDOWN_MS = 12 * 60 * 60 * 1000; // タブ切替時GAS通信クールダウン: 12時間(半日)
+    const POPUP_SNOOZE_COOLDOWN_MS = 60 * 60 * 1000;      // 「後で確認する」再表示クールダウン: 1時間
     const DEFAULT_GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw2W83eJjx1A2HbUH1XnKpBpjPuA66vEo9xoqQJFm2s2rMdqwyfepBCXuUpRMdmJbLV/exec';
     const GAS_SCRIPT_CODE = ${JSON.stringify(gasScriptContent)};
     let userSheetUrl = localStorage.getItem(USER_SHEET_URL_KEY) || '';
@@ -8004,6 +8196,9 @@ const htmlContent = `<!DOCTYPE html>
             if (centralJson.data.config && Array.isArray(centralJson.data.config.packOrder) && centralJson.data.config.packOrder.length > 0) {
               officialPackOrder = centralJson.data.config.packOrder;
             }
+            if (Array.isArray(centralJson.data.popups)) {
+              saveCachedPopupItems(centralJson.data.popups);
+            }
           } else if (centralJson.status === 'error') {
             fetchErrorDetail = centralJson.message;
           }
@@ -8225,6 +8420,7 @@ const htmlContent = `<!DOCTYPE html>
       officialUpdatesState = { detectedNew, detectedMod, officialSongs, officialPackOrder };
 
       if (detectedNew.length === 0 && detectedMod.length === 0) {
+        markNoticePopupAsRead();
         if (elEmpty) elEmpty.style.display = 'block';
         if (elContent) elContent.style.display = 'none';
         if (elSummary) elSummary.style.display = 'none';
@@ -8564,6 +8760,7 @@ const htmlContent = `<!DOCTYPE html>
         saveApPlusRecords();
       }
 
+      markNoticePopupAsRead();
       closeOfficialUpdateModal();
       initFormDatalists();
       initApPlusForm();
@@ -9789,6 +9986,15 @@ const htmlContent = `<!DOCTYPE html>
                 savePackOrder();
               }
 
+              if (Array.isArray(json.data.popups)) {
+                saveCachedPopupItems(json.data.popups);
+                localStorage.setItem(POPUP_LAST_FETCH_AT_KEY, String(Date.now()));
+                const maxInitPopupNo = json.data.popups.reduce((max, item) => Math.max(max, Number(item.no) || 0), 0);
+                if (maxInitPopupNo > 0) {
+                  setLastSeenPopupId(maxInitPopupNo);
+                }
+              }
+
               initFormDatalists();
               initApPlusForm();
               renderPackOrderList();
@@ -9814,6 +10020,193 @@ const htmlContent = `<!DOCTYPE html>
 
     const btnFirstBootRetry = document.getElementById('btnFirstBootRetry');
     if (btnFirstBootRetry) btnFirstBootRetry.addEventListener('click', startFirstBootFetch);
+
+    // ==========================================================
+    // Notice / Update Popup Engine (popup sheet)
+    // ==========================================================
+    let currentUnreadPopups = [];
+    let isCheckingPopup = false;
+
+    function getLastSeenPopupId() {
+      const val = parseInt(localStorage.getItem(POPUP_LAST_SEEN_ID_KEY) || '0', 10);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function setLastSeenPopupId(no) {
+      const cur = getLastSeenPopupId();
+      if (no > cur) {
+        localStorage.setItem(POPUP_LAST_SEEN_ID_KEY, String(no));
+      }
+      localStorage.removeItem(POPUP_SNOOZE_AT_KEY);
+    }
+
+    function getCachedPopupItems() {
+      try {
+        const raw = localStorage.getItem(POPUP_CACHE_DATA_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCachedPopupItems(items) {
+      if (!Array.isArray(items)) return;
+      try {
+        localStorage.setItem(POPUP_CACHE_DATA_KEY, JSON.stringify(items));
+      } catch (e) {}
+    }
+
+    function isAnyBlockingModalOpen() {
+      const noticeModal = document.getElementById('noticePopupModal');
+      const officialModal = document.getElementById('officialUpdateModal');
+      const firstBoot = document.getElementById('firstBootLoadingOverlay');
+      if (noticeModal && noticeModal.classList.contains('open')) return true;
+      if (officialModal && officialModal.classList.contains('open')) return true;
+      if (firstBoot && firstBoot.style.display === 'flex') return true;
+      return false;
+    }
+
+    function renderAndOpenNoticePopup(unreadList) {
+      if (!Array.isArray(unreadList) || unreadList.length === 0) return;
+      if (isAnyBlockingModalOpen()) return;
+
+      currentUnreadPopups = unreadList;
+      const modal = document.getElementById('noticePopupModal');
+      const listEl = document.getElementById('noticePopupList');
+      const btnGoUpdate = document.getElementById('btnNoticePopupGoUpdate');
+      const btnConfirm = document.getElementById('btnNoticePopupConfirm');
+      const btnMarkRead = document.getElementById('btnNoticePopupMarkRead');
+      if (!modal || !listEl) return;
+
+      const sorted = [...unreadList].sort((a, b) => (Number(b.no) || 0) - (Number(a.no) || 0));
+      const hasUpdateGuide = sorted.some(item => Number(item.guideUpdate) === 1);
+
+      let html = '';
+      sorted.forEach(item => {
+        const isUpd = Number(item.guideUpdate) === 1;
+        const cardClass = isUpd ? 'notice-item-card has-update' : 'notice-item-card';
+        const badgeClass = isUpd ? 'notice-item-badge badge-update' : 'notice-item-badge';
+        const badgeLabel = isUpd ? '⚡ 楽曲・データ更新' : '📢 お知らせ';
+        const dateStr = item.date ? escapeHtml(String(item.date)) : '';
+
+        html +=
+          '<div class="' + cardClass + '">' +
+            '<div class="notice-item-meta">' +
+              '<span class="' + badgeClass + '">' + badgeLabel + ' (No.' + escapeHtml(String(item.no)) + ')</span>' +
+              '<span>' + dateStr + '</span>' +
+            '</div>' +
+            '<div class="notice-item-text">' + escapeHtml(String(item.message || '')) + '</div>' +
+          '</div>';
+      });
+      listEl.innerHTML = html;
+
+      if (hasUpdateGuide) {
+        if (btnGoUpdate) btnGoUpdate.style.display = 'inline-flex';
+        if (btnConfirm) btnConfirm.style.display = 'none';
+        if (btnMarkRead) btnMarkRead.style.display = 'inline-block';
+      } else {
+        if (btnGoUpdate) btnGoUpdate.style.display = 'none';
+        if (btnConfirm) btnConfirm.style.display = 'inline-flex';
+        if (btnMarkRead) btnMarkRead.style.display = 'none';
+      }
+
+      modal.style.display = 'flex';
+      modal.classList.add('open');
+    }
+
+    function closeNoticePopupElement() {
+      const modal = document.getElementById('noticePopupModal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function markNoticePopupAsRead() {
+      const cached = getCachedPopupItems();
+      const allItems = [...cached, ...currentUnreadPopups];
+      const maxNo = allItems.reduce((max, item) => Math.max(max, Number(item.no) || 0), getLastSeenPopupId());
+      if (maxNo > 0) {
+        setLastSeenPopupId(maxNo);
+      }
+      currentUnreadPopups = [];
+      closeNoticePopupElement();
+    }
+
+    function deferNoticePopup() {
+      localStorage.setItem(POPUP_SNOOZE_AT_KEY, String(Date.now()));
+      closeNoticePopupElement();
+    }
+
+    async function checkPopupNotifications(triggerType = 'load') {
+      if (isCheckingPopup) return;
+      if (isAnyBlockingModalOpen()) return;
+
+      const now = Date.now();
+      const lastFetchAt = parseInt(localStorage.getItem(POPUP_LAST_FETCH_AT_KEY) || '0', 10) || 0;
+      const snoozeAt = parseInt(localStorage.getItem(POPUP_SNOOZE_AT_KEY) || '0', 10) || 0;
+      const lastSeenId = getLastSeenPopupId();
+
+      const shouldFetchGas = (triggerType === 'load')
+        ? (now - lastFetchAt >= POPUP_RELOAD_COOLDOWN_MS)
+        : (now - lastFetchAt >= POPUP_TAB_SWITCH_COOLDOWN_MS);
+
+      if (shouldFetchGas) {
+        const endpoint = getActiveGasEndpoint();
+        if (endpoint) {
+          isCheckingPopup = true;
+          try {
+            localStorage.setItem(POPUP_LAST_FETCH_AT_KEY, String(now));
+            const res = await fetch(endpoint + '?mode=popup&t=' + now, { method: 'GET' });
+            const json = await res.json();
+            if (json && json.status === 'success' && json.data && Array.isArray(json.data.popups)) {
+              saveCachedPopupItems(json.data.popups);
+            }
+          } catch (err) {
+            console.warn('Popup check skipped:', err);
+          } finally {
+            isCheckingPopup = false;
+          }
+        }
+      }
+
+      const cachedItems = getCachedPopupItems();
+      const unread = cachedItems.filter(item => (Number(item.no) || 0) > getLastSeenPopupId());
+      if (unread.length === 0) return;
+
+      if (triggerType !== 'load' && snoozeAt > 0 && (now - snoozeAt < POPUP_SNOOZE_COOLDOWN_MS)) {
+        return;
+      }
+
+      renderAndOpenNoticePopup(unread);
+    }
+
+    const btnNoticeClose = document.getElementById('btnNoticePopupClose');
+    if (btnNoticeClose) btnNoticeClose.addEventListener('click', deferNoticePopup);
+    const btnNoticeLater = document.getElementById('btnNoticePopupLater');
+    if (btnNoticeLater) btnNoticeLater.addEventListener('click', deferNoticePopup);
+    const btnNoticeConfirm = document.getElementById('btnNoticePopupConfirm');
+    if (btnNoticeConfirm) btnNoticeConfirm.addEventListener('click', markNoticePopupAsRead);
+    const btnNoticeMarkRead = document.getElementById('btnNoticePopupMarkRead');
+    if (btnNoticeMarkRead) btnNoticeMarkRead.addEventListener('click', markNoticePopupAsRead);
+    const btnNoticeGoUpdate = document.getElementById('btnNoticePopupGoUpdate');
+    if (btnNoticeGoUpdate) {
+      btnNoticeGoUpdate.addEventListener('click', () => {
+        markNoticePopupAsRead();
+        openOfficialUpdateModal();
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkPopupNotifications('visibility');
+      }
+    });
+    window.addEventListener('focus', () => {
+      checkPopupNotifications('visibility');
+    });
 
     function applyTheme(pref) {
       currentThemePref = pref;
@@ -9896,6 +10289,8 @@ const htmlContent = `<!DOCTYPE html>
 
     if (!hasCachedMaster) {
       startFirstBootFetch();
+    } else {
+      checkPopupNotifications('load');
     }
   </script>
 </body>

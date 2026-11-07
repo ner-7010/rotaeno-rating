@@ -11,7 +11,8 @@ const SHEET_NAMES = {
   SONGS: 'Songs',
   SCORES: 'Scores',
   THEORY: 'TheoryRecords',
-  CONFIG: 'Config'
+  CONFIG: 'Config',
+  POPUP: 'popup'
 };
 
 function getOrCreateSheet(ss, name) {
@@ -40,14 +41,50 @@ function resolveSpreadsheet(target) {
 
 function doGet(e) {
   try {
+    const mode = (e && e.parameter && e.parameter.mode) ? String(e.parameter.mode).trim().toLowerCase() : '';
     const target = (e && e.parameter) ? (e.parameter.url || e.parameter.id) : null;
+
+    // 軽量モード: お知らせポップアップ情報のみ取得 (5分間メモリキャッシュ対応)
+    if (mode === 'popup') {
+      const noCache = (e && e.parameter && e.parameter.nocache === '1');
+      let popups = null;
+      try {
+        if (!target && !noCache) {
+          const cache = CacheService.getScriptCache();
+          const cachedJson = cache.get('ROTAENO_POPUP_CACHE_V1');
+          if (cachedJson) {
+            popups = JSON.parse(cachedJson);
+          }
+        }
+      } catch (cacheErr) {}
+
+      if (!popups) {
+        const ss = resolveSpreadsheet(target);
+        popups = readPopupSheet(ss);
+        try {
+          if (!target) {
+            const cache = CacheService.getScriptCache();
+            cache.put('ROTAENO_POPUP_CACHE_V1', JSON.stringify(popups), 300);
+          }
+        } catch (cacheErr) {}
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        data: {
+          popups: popups
+        }
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     const ss = resolveSpreadsheet(target);
 
     const data = {
       songs: readSongsSheet(ss),
       scores: readScoresSheet(ss),
       apPlusRecords: readTheorySheet(ss),
-      config: readConfigSheet(ss)
+      config: readConfigSheet(ss),
+      popups: (!target) ? readPopupSheet(ss) : []
     };
 
     return ContentService.createTextOutput(JSON.stringify({
@@ -426,4 +463,75 @@ function readConfigSheet(ss) {
     }
   }
   return config;
+}
+
+// 5. popup Sheet (お知らせポップアップ: 管理DBスプシ専用)
+function readPopupSheet(ss) {
+  const sheet = ss.getSheetByName(SHEET_NAMES.POPUP) || ss.getSheetByName('Popup') || ss.getSheetByName('POPUP');
+  if (!sheet) return [];
+  const range = sheet.getDataRange();
+  const values = range.getValues();
+  const displayValues = range.getDisplayValues();
+  if (values.length <= 1) return [];
+
+  const headers = displayValues[0].map(h => String(h || '').trim());
+  const colNo = headers.findIndex(h => /^(番号|No|ID)$/i.test(h));
+  const colPub = headers.findIndex(h => /^(公開|表示|有効|public|active)$/i.test(h));
+  const colDate = headers.findIndex(h => /^(対応日|日付|公開日|日時|date)$/i.test(h));
+  const colMsg = headers.findIndex(h => /^(お知らせ|内容|本文|メッセージ|message|text)$/i.test(h));
+  const colUpdate = headers.findIndex(h => /^(アプデ誘導|アプデ|アプデ確認|update)$/i.test(h));
+
+  const idxNo = colNo !== -1 ? colNo : 0;
+  const idxDate = colDate !== -1 ? colDate : (colPub !== -1 ? 2 : 1);
+  const idxMsg = colMsg !== -1 ? colMsg : (colPub !== -1 ? 3 : 2);
+  const idxUpdate = colUpdate !== -1 ? colUpdate : (colPub !== -1 ? 4 : 3);
+
+  const popups = [];
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const disp = displayValues[i];
+
+    const rawNo = row[idxNo];
+    if (rawNo === '' || rawNo === null || rawNo === undefined || isNaN(rawNo)) continue;
+    const no = Number(rawNo);
+    if (no <= 0) continue;
+
+    // 「公開」列が存在する場合は、1 または TRUE の行のみ公開対象とする
+    if (colPub !== -1) {
+      const pubVal = String(row[colPub] !== undefined && row[colPub] !== null ? row[colPub] : '').trim();
+      const isPublished = (row[colPub] === 1 || row[colPub] === true || pubVal === '1' || pubVal.toUpperCase() === 'TRUE' || pubVal === '○' || pubVal === '公開');
+      if (!isPublished) continue;
+    }
+
+    const msg = String((disp && disp[idxMsg] !== undefined ? disp[idxMsg] : row[idxMsg]) || '').trim();
+    if (!msg) continue;
+
+    let dateStr = '';
+    const dateVal = row[idxDate];
+    if (dateVal instanceof Date) {
+      dateStr = Utilities.formatDate(dateVal, 'Asia/Tokyo', 'yyyy/MM/dd');
+    } else if (disp && disp[idxDate]) {
+      dateStr = String(disp[idxDate]).trim();
+    } else if (dateVal) {
+      dateStr = String(dateVal).trim();
+    }
+
+    let guideUpdate = 0;
+    if (idxUpdate !== -1 && row.length > idxUpdate) {
+      const upVal = String(row[idxUpdate] !== undefined && row[idxUpdate] !== null ? row[idxUpdate] : '').trim();
+      if (row[idxUpdate] === 1 || row[idxUpdate] === true || upVal === '1' || upVal.toUpperCase() === 'TRUE' || upVal === '○') {
+        guideUpdate = 1;
+      }
+    }
+
+    popups.push({
+      no: no,
+      date: dateStr,
+      message: msg,
+      guideUpdate: guideUpdate
+    });
+  }
+
+  popups.sort((a, b) => a.no - b.no);
+  return popups;
 }
