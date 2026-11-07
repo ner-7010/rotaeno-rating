@@ -122,7 +122,7 @@ function writeSongsSheet(ss, songs) {
     'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId', '販売終了',
     'I_定数', 'I_Lv', 'II_定数', 'II_Lv',
     'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',
-    'IV-α_定数', 'IV-α_Lv'
+    'IV-α_定数', 'IV-α_Lv', 'IV-α_曲名'
   ];
   const rows = [headers];
 
@@ -130,6 +130,8 @@ function writeSongsSheet(ss, songs) {
     const d = s.diffs || {};
     const orderNo = (s.initId !== undefined && !isNaN(s.initId)) ? Number(s.initId) : (idx + 1);
     const titleStr = safeFormatTitleForSheet(s.title);
+    const rawTitleAlpha = s.titleAlpha || (d['IV-α'] && d['IV-α'].title) || '';
+    const titleAlphaStr = (rawTitleAlpha && rawTitleAlpha !== s.title) ? safeFormatTitleForSheet(rawTitleAlpha) : '';
     const isEndOfSale = (s.endOfSale === 1 || s.endOfSale === true || String(s.endOfSale) === '1') ? 1 : 0;
     rows.push([
       orderNo,
@@ -147,12 +149,14 @@ function writeSongsSheet(ss, songs) {
       d['IV'] ? d['IV'].constant : '',
       d['IV'] ? d['IV'].level : '',
       d['IV-α'] ? d['IV-α'].constant : '',
-      d['IV-α'] ? d['IV-α'].level : ''
+      d['IV-α'] ? d['IV-α'].level : '',
+      titleAlphaStr
     ]);
   });
 
   if (rows.length > 1) {
     sheet.getRange(2, 2, rows.length - 1, 4).setNumberFormat('@');
+    sheet.getRange(2, 17, rows.length - 1, 1).setNumberFormat('@');
     sheet.getRange(1, 1, rows.length, headers.length).setValues(rows);
     sheet.getRange(1, 1, rows.length, 1).setHorizontalAlignment('center');
     sheet.getRange(1, 6, rows.length, 1).setHorizontalAlignment('center');
@@ -189,6 +193,7 @@ function readSongsSheet(ss) {
   const colLvIV = headers.indexOf('IV_Lv');
   const colConstIVAlpha = headers.findIndex(h => /^(IV-α_定数|IV-a_定数)$/i.test(h));
   const colLvIVAlpha = headers.findIndex(h => /^(IV-α_Lv|IV-a_Lv)$/i.test(h));
+  const colTitleIVAlpha = headers.findIndex(h => /^(IV-α_曲名|IV-a_曲名|IV-α曲名|titleAlpha)$/i.test(h));
 
   const hasOrderCol = colOrder !== -1;
   const idxTitle = colTitle !== -1 ? colTitle : (hasOrderCol ? 1 : 0);
@@ -211,6 +216,18 @@ function readSongsSheet(ss) {
       if (title.toLowerCase() === 'false') title = 'False';
     }
     if (!title) continue;
+
+    let titleAlpha = '';
+    if (colTitleIVAlpha !== -1) {
+      let rawAlpha = (disp && disp[colTitleIVAlpha] !== '') ? disp[colTitleIVAlpha] : row[colTitleIVAlpha];
+      if (typeof rawAlpha === 'boolean') {
+        titleAlpha = rawAlpha ? 'True' : 'False';
+      } else {
+        titleAlpha = String(rawAlpha || '').trim();
+        if (titleAlpha.toLowerCase() === 'true') titleAlpha = 'True';
+        if (titleAlpha.toLowerCase() === 'false') titleAlpha = 'False';
+      }
+    }
 
     const initId = (hasOrderCol && row[colOrder] !== '' && !isNaN(row[colOrder])) ? Number(row[colOrder]) : i;
 
@@ -248,9 +265,14 @@ function readSongsSheet(ss) {
       parseDiff(baseDiffIdx + 8, baseDiffIdx + 9, 'IV-α');
     }
 
+    if (diffs['IV-α'] && titleAlpha) {
+      diffs['IV-α'].title = titleAlpha;
+    }
+
     songs.push({
       initId: initId,
       title: title,
+      titleAlpha: titleAlpha || '',
       pack: String((disp && disp[idxPack]) || row[idxPack] || '基本曲'),
       version: String((disp && disp[idxVer]) || row[idxVer] || 'v5.6.0'),
       songId: String((disp && disp[idxSongId]) || row[idxSongId] || ('song_' + i)),
