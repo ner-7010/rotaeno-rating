@@ -5684,7 +5684,7 @@ const htmlContent = `<!DOCTYPE html>
       if (subApPlus) subApPlus.style.display = subview === 'applus' ? 'block' : 'none';
 
       if (options.scroll !== false) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'instant' });
       }
       if (options.save !== false) {
         saveFilterState();
@@ -6138,6 +6138,7 @@ const htmlContent = `<!DOCTYPE html>
     const FILTER_AUTOSAVE_KEY = 'rotaeno_filter_autosave_enabled';
     const FILTER_STATE_KEY = 'rotaeno_saved_filter_state_v1';
     let currentMainTab = 'songs';
+    let songsScrollY = 0;
 
     let currentSort = 'DEFAULT';
     let filterDiffs = new Set();
@@ -6212,6 +6213,13 @@ const htmlContent = `<!DOCTYPE html>
     }
 
     function switchMainTab(tab, options = {}) {
+      const prevTab = currentMainTab;
+
+      // 楽曲一覧から離れる場合、現在のスクロール位置を記憶
+      if (prevTab === 'songs') {
+        songsScrollY = window.scrollY || window.pageYOffset || 0;
+      }
+
       currentMainTab = tab;
       document.querySelectorAll('.tab-item').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-tab') === tab);
@@ -6226,6 +6234,15 @@ const htmlContent = `<!DOCTYPE html>
 
       const fabGroup = document.getElementById('floatingBtnGroup');
       if (fabGroup) fabGroup.style.display = tab === 'songs' ? 'flex' : 'none';
+
+      // スクロール制御: 楽曲一覧は元の位置を復元、他タブは即座に最上部へリセット
+      if (options.scroll !== false) {
+        if (tab === 'songs') {
+          window.scrollTo({ top: songsScrollY, behavior: 'instant' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }
 
       if (options.save !== false) {
         saveFilterState();
@@ -6361,7 +6378,7 @@ const htmlContent = `<!DOCTYPE html>
 
         // Restore Main Tab
         if (['songs', 'mypage', 'settings'].includes(state.activeTab)) {
-          switchMainTab(state.activeTab, { save: false });
+          switchMainTab(state.activeTab, { scroll: false, save: false });
         }
       } catch (e) {
         console.warn('Failed to restore filter state:', e);
