@@ -3043,6 +3043,112 @@
       background: #fecaca;
     }
 
+    /* Collapsible Settings Panels */
+    .collapsible-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      padding: 2px 0;
+    }
+    .collapsible-header:hover .collapsible-title h3 {
+      color: var(--color-primary);
+    }
+    .collapsible-toggle-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 9999px;
+      padding: 3px 10px;
+      transition: all 0.2s;
+    }
+    [data-theme="dark"] .collapsible-toggle-badge {
+      background: rgba(99, 102, 241, 0.16);
+      border-color: rgba(129, 140, 248, 0.3);
+      color: #c7d2fe;
+    }
+    .btn-toggle-panel {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.04);
+      transition: background 0.15s;
+    }
+    .btn-toggle-panel:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    [data-theme="dark"] .btn-toggle-panel {
+      color: #c7d2fe;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="dark"] .btn-toggle-panel:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Gas Sync Panel Quick Layout */
+    .gas-sync-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .gas-sync-quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .gas-btn-upload {
+      background: #10b981 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border-color: #059669 !important;
+      padding: 9px 12px !important;
+      font-size: 13px !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2) !important;
+      transition: transform 0.1s, background 0.15s !important;
+    }
+    .gas-btn-upload:active {
+      transform: translateY(1px);
+    }
+    .gas-btn-download {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border-color: #0369a1 !important;
+      padding: 9px 12px !important;
+      font-size: 13px !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2) !important;
+      transition: transform 0.1s, background 0.15s !important;
+    }
+    .gas-btn-download:active {
+      transform: translateY(1px);
+    }
+    .gas-sync-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
     /* Google Spreadsheet Sync */
     .gas-sync-panel {
       border: 1.5px solid #a7f3d0;
@@ -4293,93 +4399,195 @@
         </label>
       </div>
 
-      <!-- Section: Add Song Card -->
-      <div class="settings-panel">
-        <h3>➕ 新曲の追加登録</h3>
-        <p>公式アップデート等で登場した新曲の譜面データを追加できます。定数を入力するとレベルが自動算出されます。登録した楽曲はマスター楽曲データベースに直接統合され、曲一覧やスコア入力・統計に即時反映されます。</p>
-        
-        <div class="new-song-form">
-          <div class="form-row-2col">
-            <div class="form-group">
-              <label class="form-label" for="newSongTitle">曲名 (I〜IV) <span class="required-star">*</span></label>
-              <input type="text" id="newSongTitle" class="form-input" placeholder="曲名を入力 (例: Future Strike)">
+            <!-- Section: Google Spreadsheet Sync (Moved upfront with persistent quick-action buttons) -->
+      <div class="settings-panel gas-sync-panel">
+        <div class="gas-sync-title-row">
+          <h3 style="margin: 0; font-size: 15px;">☁️ Google スプレッドシート連携 (個人クラウド同期)</h3>
+          <span class="gas-sync-badge" id="gasSyncBadge">未接続</span>
+        </div>
+
+        <!-- Persistent Quick-action buttons: always visible even when folded -->
+        <div class="gas-sync-quick-actions">
+          <button class="panel-btn gas-btn-upload" id="btnGasUpload" type="button">
+            ☁️ スプシへ保存 (同期)
+          </button>
+          <button class="panel-btn gas-btn-download" id="btnGasDownload" type="button">
+            🔄 スプシから復元
+          </button>
+        </div>
+
+        <div class="gas-sync-meta-row">
+          <span>最終同期: <strong id="gasLastSyncText" style="color: var(--color-text-main);">未同期</strong></span>
+          <button type="button" class="btn-toggle-panel" id="btnToggleGasDetails" aria-expanded="false">
+            <span id="gasToggleText">⚙️ 設定・詳細を展開</span>
+            <span class="toggle-arrow" id="gasToggleArrow">▼</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Body for Gas Sync Details -->
+        <div class="collapsible-body" id="gasSyncDetailsBody" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+          <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">
+            ご自身のGoogleスプレッドシートを個人データベースとして、スマホやPCからワンタップで双方向同期できます。デプロイやコード編集は一切不要です！
+          </p>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 800; color: var(--color-text-sub); margin-bottom: 4px;">
+              あなたのGoogleスプレッドシートのURL
+            </label>
+            <div style="display: flex; gap: 6px;">
+              <input type="url" id="userSheetUrlInput" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/.../edit" style="flex: 1; font-size: 12px;">
+              <button type="button" class="panel-btn" id="btnSaveSheetUrl" style="background: var(--color-primary-dark); color: #fff; font-weight: 700; white-space: nowrap;">保存</button>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="newSongTitleAlpha">IV-α 専用曲名 <span class="form-note">※IV-αで曲名が変わる場合のみ</span></label>
-              <input type="text" id="newSongTitleAlpha" class="form-input" placeholder="未入力なら通常曲名を使用">
-            </div>
-          </div>
-
-          <div class="form-row-2col">
-            <div class="form-group">
-              <label class="form-label" for="newSongPack">ソングパック</label>
-              <input type="text" id="newSongPack" class="form-input" placeholder="パック名 (例: 基本曲)" list="packDatalist">
-              <datalist id="packDatalist"></datalist>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="newSongVersion">バージョン</label>
-              <input type="text" id="newSongVersion" class="form-input" placeholder="バージョン (例: v5.6.0)" list="versionDatalist">
-              <datalist id="versionDatalist"></datalist>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 10px;">
-            <label class="form-label" for="insertAfterSong">直前の楽曲 (デフォルト順序) <span class="form-note">※パック選択で自動補完</span></label>
-            <input type="text" id="insertAfterSong" class="form-input" placeholder="基準となる直前の曲名を選択" list="songDatalist">
-            <datalist id="songDatalist"></datalist>
-          </div>
-
-          <div class="form-diff-section">
-            <div class="form-label">難易度定数 <span class="form-note">※定数からレベルを自動算出 (IV-α は任意/空欄可)</span></div>
-            <div class="diff-input-grid">
-              <!-- Diff I -->
-              <div class="diff-input-card diff-I-box">
-                <div class="diff-input-header">
-                  <span class="diff-tag-pill diff-I">I</span>
-                  <span class="calc-level-tag" id="previewLevelI">Lv.-</span>
-                </div>
-                <input type="number" step="0.1" min="1.0" max="16.0" id="newConstI" class="diff-num-input" placeholder="例: 3.0">
-              </div>
-
-              <!-- Diff II -->
-              <div class="diff-input-card diff-II-box">
-                <div class="diff-input-header">
-                  <span class="diff-tag-pill diff-II">II</span>
-                  <span class="calc-level-tag" id="previewLevelII">Lv.-</span>
-                </div>
-                <input type="number" step="0.1" min="1.0" max="16.0" id="newConstII" class="diff-num-input" placeholder="例: 7.2">
-              </div>
-
-              <!-- Diff III -->
-              <div class="diff-input-card diff-III-box">
-                <div class="diff-input-header">
-                  <span class="diff-tag-pill diff-III">III</span>
-                  <span class="calc-level-tag" id="previewLevelIII">Lv.-</span>
-                </div>
-                <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIII" class="diff-num-input" placeholder="例: 10.8">
-              </div>
-
-              <!-- Diff IV -->
-              <div class="diff-input-card diff-IV-box">
-                <div class="diff-input-header">
-                  <span class="diff-tag-pill diff-IV">IV</span>
-                  <span class="calc-level-tag" id="previewLevelIV">Lv.-</span>
-                </div>
-                <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIV" class="diff-num-input" placeholder="例: 13.6">
-              </div>
-
-              <!-- Diff IV-α (Optional) -->
-              <div class="diff-input-card diff-IV-alpha-box">
-                <div class="diff-input-header">
-                  <span class="diff-tag-pill diff-IV-alpha">IV-α</span>
-                  <span class="calc-level-tag" id="previewLevelIVAlpha">任意</span>
-                </div>
-                <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIVAlpha" class="diff-num-input" placeholder="任意">
-              </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
+              <button type="button" id="btnGasTest" style="background: none; border: none; font-size: 11px; color: var(--color-primary); cursor: pointer; text-decoration: underline;">🔗 接続テスト</button>
             </div>
           </div>
 
-          <button type="button" class="btn-add-song" id="btnAddSongCard">＋ 楽曲を追加してマスターに登録</button>
+          <!-- Sync Mode & Important Warning Box -->
+          <div class="auto-sync-banner">
+            <div class="auto-sync-header">
+              <label for="autoSyncToggle" class="auto-sync-label">
+                <input type="checkbox" id="autoSyncToggle" class="auto-sync-checkbox">
+                <span>💾 変更保存時にスプシへ自動同期する</span>
+              </label>
+              <span id="autoSyncStateLabel" class="auto-sync-state-pill">OFF (手動同期)</span>
+            </div>
+            
+            <div class="auto-sync-warning">
+              <strong>⚠️ 重要：</strong> デフォルト（OFF）の場合、アプリ内でスコアや曲追加を保存してもスプレッドシート側には反映されません。必ず上の<strong>「☁️ スプシへ保存 (同期)」</strong>ボタンを押して明示的に同期を行ってください。
+            </div>
+            <div class="auto-sync-note">
+              ※自動同期を【ON】にすると、アプリ下部の「💾 保存する」を押した瞬間に裏でスプシへの送信が自動実行されます。通信環境によっては動作が重くなったり、通信量を消費する可能性があるためご注意ください。
+            </div>
+          </div>
+
+          <!-- Setup Guide Accordion -->
+          <details class="gas-guide-details">
+            <summary>📖 初期設定手順（スマホでも1分・デプロイ不要！）</summary>
+            <div class="gas-guide-content">
+              <ol style="margin: 0; padding-left: 20px; font-size: 12px; line-height: 1.6; color: var(--color-text-main);">
+                <li>Googleドライブで<strong>スプレッドシートを新規作成</strong>します（中身は空っぽでOK！<a href="https://sheets.new" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary); font-weight:700;">sheets.new</a> を開くとワンタップで新規作成できます）。</li>
+                <li>スプシ右上の「<strong>共有</strong>」ボタンを押し、一般的なアクセスを「<strong>リンクを知っている全員</strong>」、役割を「<strong>編集者</strong>」に変更します。</li>
+                <li>「<strong>リンクをコピー</strong>」をタップします。</li>
+                <li>このアプリに戻り、上の入力欄に貼り付けて「<strong>保存</strong>」を押せば完了です！</li>
+              </ol>
+              <p style="font-size: 11px; color: var(--color-text-muted); margin: 8px 0 0 0;">
+                ※保存後、「☁️ スプシへ保存」を押すと全4シート（Songs, Scores, TheoryRecords, Config）が自動生成されます。
+              </p>
+
+              <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e1;">
+                <details style="font-size: 11px; color: var(--color-text-muted);">
+                  <summary style="cursor: pointer; font-weight: 700;">⚙️ 詳細設定（中央APIエンドポイントの変更など）</summary>
+                  <div style="margin-top: 8px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px;">中央連携API (GAS Web App URL)</label>
+                    <input type="url" id="gasAppUrlInput" class="form-input" style="width: 100%; font-size: 11px; box-sizing: border-box;" placeholder="https://script.google.com/macros/s/.../exec">
+                    <div style="display: flex; gap: 6px; margin-top: 6px;">
+                      <button type="button" class="panel-btn" id="btnSaveGasUrl" style="font-size: 11px;">API URL保存</button>
+                      <button type="button" class="panel-btn" id="btnCopyGasCode" style="font-size: 11px;">📋 GASコードをコピー</button>
+                    </div>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+            <!-- Section: Add Song Card (Collapsible) -->
+      <div class="settings-panel" id="panelAddSong">
+        <div class="collapsible-header" id="headerAddSong" role="button" tabindex="0">
+          <div class="collapsible-title">
+            <h3 style="margin: 0; font-size: 15px;">➕ 新曲の追加登録</h3>
+          </div>
+          <span class="collapsible-toggle-badge" id="badgeAddSong">展開する ▼</span>
+        </div>
+
+        <div class="collapsible-content" id="contentAddSong" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+          <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">公式アップデート等で登場した新曲の譜面データを追加できます。定数を入力するとレベルが自動算出されます。登録した楽曲はマスター楽曲データベースに直接統合され、曲一覧やスコア入力・統計に即時反映されます。</p>
+          
+          <div class="new-song-form">
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" for="newSongTitle">曲名 (I〜IV) <span class="required-star">*</span></label>
+                <input type="text" id="newSongTitle" class="form-input" placeholder="曲名を入力 (例: Future Strike)">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newSongTitleAlpha">IV-α 専用曲名 <span class="form-note">※IV-αで曲名が変わる場合のみ</span></label>
+                <input type="text" id="newSongTitleAlpha" class="form-input" placeholder="未入力なら通常曲名を使用">
+              </div>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" for="newSongPack">ソングパック</label>
+                <input type="text" id="newSongPack" class="form-input" placeholder="パック名 (例: 基本曲)" list="packDatalist">
+                <datalist id="packDatalist"></datalist>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="newSongVersion">バージョン</label>
+                <input type="text" id="newSongVersion" class="form-input" placeholder="バージョン (例: v5.6.0)" list="versionDatalist">
+                <datalist id="versionDatalist"></datalist>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="insertAfterSong">直前の楽曲 (デフォルト順序) <span class="form-note">※パック選択で自動補完</span></label>
+              <input type="text" id="insertAfterSong" class="form-input" placeholder="基準となる直前の曲名を選択" list="songDatalist">
+              <datalist id="songDatalist"></datalist>
+            </div>
+
+            <div class="form-diff-section">
+              <div class="form-label">難易度定数 <span class="form-note">※定数からレベルを自動算出 (IV-α は任意/空欄可)</span></div>
+              <div class="diff-input-grid">
+                <!-- Diff I -->
+                <div class="diff-input-card diff-I-box">
+                  <div class="diff-input-header">
+                    <span class="diff-tag-pill diff-I">I</span>
+                    <span class="calc-level-tag" id="previewLevelI">Lv.-</span>
+                  </div>
+                  <input type="number" step="0.1" min="1.0" max="16.0" id="newConstI" class="diff-num-input" placeholder="例: 3.0">
+                </div>
+
+                <!-- Diff II -->
+                <div class="diff-input-card diff-II-box">
+                  <div class="diff-input-header">
+                    <span class="diff-tag-pill diff-II">II</span>
+                    <span class="calc-level-tag" id="previewLevelII">Lv.-</span>
+                  </div>
+                  <input type="number" step="0.1" min="1.0" max="16.0" id="newConstII" class="diff-num-input" placeholder="例: 7.2">
+                </div>
+
+                <!-- Diff III -->
+                <div class="diff-input-card diff-III-box">
+                  <div class="diff-input-header">
+                    <span class="diff-tag-pill diff-III">III</span>
+                    <span class="calc-level-tag" id="previewLevelIII">Lv.-</span>
+                  </div>
+                  <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIII" class="diff-num-input" placeholder="例: 10.8">
+                </div>
+
+                <!-- Diff IV -->
+                <div class="diff-input-card diff-IV-box">
+                  <div class="diff-input-header">
+                    <span class="diff-tag-pill diff-IV">IV</span>
+                    <span class="calc-level-tag" id="previewLevelIV">Lv.-</span>
+                  </div>
+                  <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIV" class="diff-num-input" placeholder="例: 13.6">
+                </div>
+
+                <!-- Diff IV-α (Optional) -->
+                <div class="diff-input-card diff-IV-alpha-box">
+                  <div class="diff-input-header">
+                    <span class="diff-tag-pill diff-IV-alpha">IV-α</span>
+                    <span class="calc-level-tag" id="previewLevelIVAlpha">任意</span>
+                  </div>
+                  <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIVAlpha" class="diff-num-input" placeholder="任意">
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-add-song" id="btnAddSongCard">＋ 楽曲を追加してマスターに登録</button>
+          </div>
         </div>
       </div>
 
@@ -4394,11 +4602,10 @@
         <div class="staged-cards-list" id="stagedCardsList"></div>
       </div>
 
-
       <!-- Section: Edit Song Master Data -->
       <div class="settings-panel">
-        <h3>✏️ 楽曲データの編集（定数・難易度改定）</h3>
-        <p>公式アップデートによる譜面定数の改定や、曲名・パック名・難易度の変更ができます。全楽曲（初期曲・追加曲問わず）を検索して即座に編集できます。</p>
+        <h3 style="margin-top: 0;">✏️ 楽曲データの編集（定数・難易度改定）</h3>
+        <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">公式アップデートによる譜面定数の改定や、曲名・パック名・難易度の変更ができます。全楽曲（初期曲・追加曲問わず）を検索して即座に編集できます。</p>
         
         <div style="margin-bottom: 10px;">
           <input type="text" id="editSongSearchInput" class="form-input" placeholder="🔍 編集したい曲名で検索 (例: -1, Future Strike, 翠杜)" style="width: 100%; box-sizing: border-box;">
@@ -4409,104 +4616,30 @@
         </div>
       </div>
 
-      <!-- Section: Song Pack Order Manager -->
-      <div class="settings-panel">
-        <h3>🎵 ソングパック管理・並び替え</h3>
-        <p>ソングパックの追加・削除や、ゲーム内の並び順に合わせた並び替えができます。ドラッグ＆ドロップまたは上下矢印ボタン（▲/▼）で順番を自由に移動できます。</p>
-        
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input type="text" id="newPackNameInput" class="form-input" placeholder="新しいソングパック名を入力" style="flex: 1;">
-          <button type="button" class="panel-btn" id="btnAddPackBtn" style="background: var(--color-primary-dark); color: #ffffff; font-weight: 800; white-space: nowrap;">追加</button>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-size: 11px; font-weight: 800; color: var(--color-text-sub);">並び替え (<span id="packListCount">60</span>パック)</span>
-          <button type="button" id="btnResetPackOrder" style="background: none; border: none; font-size: 11px; color: var(--color-primary); cursor: pointer; text-decoration: underline;">ゲーム初期順に戻す</button>
-        </div>
-
-        <div class="pack-order-list" id="packOrderList"></div>
-      </div>
-
-      <!-- Section: Google Spreadsheet Sync -->
-      <div class="settings-panel gas-sync-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
-          <h3 style="margin-bottom: 0;">☁️ Google スプレッドシート連携 (個人クラウド同期)</h3>
-          <span class="gas-sync-badge" id="gasSyncBadge">未接続</span>
-        </div>
-        <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">
-          ご自身のGoogleスプレッドシートを個人データベースとして、スマホやPCからワンタップで双方向同期できます。デプロイやコード編集は一切不要です！
-        </p>
-
-        <div style="margin-bottom: 12px;">
-          <label style="display: block; font-size: 11px; font-weight: 800; color: var(--color-text-sub); margin-bottom: 4px;">
-            あなたのGoogleスプレッドシートのURL
-          </label>
-          <div style="display: flex; gap: 6px;">
-            <input type="url" id="userSheetUrlInput" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/.../edit" style="flex: 1; font-size: 12px;">
-            <button type="button" class="panel-btn" id="btnSaveSheetUrl" style="background: var(--color-primary-dark); color: #fff; font-weight: 700; white-space: nowrap;">保存</button>
+      <!-- Section: Song Pack Order Manager (Collapsible) -->
+      <div class="settings-panel" id="panelPackOrder">
+        <div class="collapsible-header" id="headerPackOrder" role="button" tabindex="0">
+          <div class="collapsible-title">
+            <h3 style="margin: 0; font-size: 15px;">🎵 ソングパック管理・並び替え</h3>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 11px; color: var(--color-text-muted);">
-            <span>最終同期: <strong id="gasLastSyncText" style="color: var(--color-text-main);">未同期</strong></span>
-            <button type="button" id="btnGasTest" style="background: none; border: none; font-size: 11px; color: var(--color-primary); cursor: pointer; text-decoration: underline;">🔗 接続テスト</button>
-          </div>
+          <span class="collapsible-toggle-badge" id="badgePackOrder">展開する ▼</span>
         </div>
 
-        <!-- Sync Mode & Important Warning Box -->
-        <div class="auto-sync-banner">
-          <div class="auto-sync-header">
-            <label for="autoSyncToggle" class="auto-sync-label">
-              <input type="checkbox" id="autoSyncToggle" class="auto-sync-checkbox">
-              <span>💾 変更保存時にスプシへ自動同期する</span>
-            </label>
-            <span id="autoSyncStateLabel" class="auto-sync-state-pill">OFF (手動同期)</span>
-          </div>
+        <div class="collapsible-content" id="contentPackOrder" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+          <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">ソングパックの追加・削除や、ゲーム内の並び順に合わせた並び替えができます。ドラッグ＆ドロップまたは上下矢印ボタン（▲/▼）で順番を自由に移動できます。</p>
           
-          <div class="auto-sync-warning">
-            <strong>⚠️ 重要：</strong> デフォルト（OFF）の場合、アプリ内でスコアや曲追加を保存してもスプレッドシート側には反映されません。必ず下の<strong>「☁️ スプシへ保存 (同期)」</strong>ボタンを押して明示的に同期を行ってください。
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="newPackNameInput" class="form-input" placeholder="新しいソングパック名を入力" style="flex: 1;">
+            <button type="button" class="panel-btn" id="btnAddPackBtn" style="background: var(--color-primary-dark); color: #ffffff; font-weight: 800; white-space: nowrap;">追加</button>
           </div>
-          <div class="auto-sync-note">
-            ※自動同期を【ON】にすると、アプリ下部の「💾 保存する」を押した瞬間に裏でスプシへの送信が自動実行されます。通信環境によっては<strong>動作が重くなったり、通信量を消費する可能性があるためご注意ください</strong>。
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 11px; font-weight: 800; color: var(--color-text-sub);">並び替え (<span id="packListCount">60</span>パック)</span>
+            <button type="button" id="btnResetPackOrder" style="background: none; border: none; font-size: 11px; color: var(--color-primary); cursor: pointer; text-decoration: underline;">ゲーム初期順に戻す</button>
           </div>
+
+          <div class="pack-order-list" id="packOrderList"></div>
         </div>
-
-        <div class="action-btn-group" style="margin-bottom: 12px;">
-          <button class="panel-btn" id="btnGasUpload" style="background: #10b981; color: #ffffff; font-weight: 800; border-color: #059669;">
-            ☁️ スプシへ保存 (同期)
-          </button>
-          <button class="panel-btn" id="btnGasDownload" style="background: #0284c7; color: #ffffff; font-weight: 800; border-color: #0369a1;">
-            🔄 スプシから復元
-          </button>
-        </div>
-
-        <!-- Setup Guide Accordion -->
-        <details class="gas-guide-details" open>
-          <summary>📖 初期設定手順（スマホでも1分・デプロイ不要！）</summary>
-          <div class="gas-guide-content">
-            <ol style="margin: 0; padding-left: 20px; font-size: 12px; line-height: 1.6; color: var(--color-text-main);">
-              <li>Googleドライブで<strong>スプレッドシートを新規作成</strong>します（中身は空っぽでOK！<a href="https://sheets.new" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary); font-weight:700;">sheets.new</a> を開くとワンタップで新規作成できます）。</li>
-              <li>スプシ右上の「<strong>共有</strong>」ボタンを押し、一般的なアクセスを「<strong>リンクを知っている全員</strong>」、役割を「<strong>編集者</strong>」に変更します。</li>
-              <li>「<strong>リンクをコピー</strong>」をタップします。</li>
-              <li>このアプリに戻り、上の入力欄に貼り付けて「<strong>保存</strong>」を押せば完了です！</li>
-            </ol>
-            <p style="font-size: 11px; color: var(--color-text-muted); margin: 8px 0 0 0;">
-              ※保存後、「☁️ スプシへ保存」を押すと全4シート（Songs, Scores, TheoryRecords, Config）が自動生成されます。
-            </p>
-
-            <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e1;">
-              <details style="font-size: 11px; color: var(--color-text-muted);">
-                <summary style="cursor: pointer; font-weight: 700;">⚙️ 詳細設定（中央APIエンドポイントの変更など）</summary>
-                <div style="margin-top: 8px;">
-                  <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px;">中央連携API (GAS Web App URL)</label>
-                  <input type="url" id="gasAppUrlInput" class="form-input" style="width: 100%; font-size: 11px; box-sizing: border-box;" placeholder="https://script.google.com/macros/s/.../exec">
-                  <div style="display: flex; gap: 6px; margin-top: 6px;">
-                    <button type="button" class="panel-btn" id="btnSaveGasUrl" style="font-size: 11px;">API URL保存</button>
-                    <button type="button" class="panel-btn" id="btnCopyGasCode" style="font-size: 11px;">📋 GASコードをコピー</button>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </div>
-        </details>
       </div>
 
       <div class="settings-panel">
@@ -9547,6 +9680,48 @@
       refresh();
     });
 
+    // Collapsible Settings Panels Logic
+    function initCollapsiblePanels() {
+      // 1. Google Spreadsheet Sync details toggle
+      const btnGasToggle = document.getElementById('btnToggleGasDetails');
+      const gasBody = document.getElementById('gasSyncDetailsBody');
+      const gasText = document.getElementById('gasToggleText');
+      const gasArrow = document.getElementById('gasToggleArrow');
+      if (btnGasToggle && gasBody) {
+        btnGasToggle.addEventListener('click', () => {
+          const isOpen = gasBody.style.display !== 'none';
+          gasBody.style.display = isOpen ? 'none' : 'block';
+          btnGasToggle.setAttribute('aria-expanded', String(!isOpen));
+          if (gasText) gasText.textContent = isOpen ? '⚙️ 設定・詳細を展開' : '▲ 設定・詳細を閉じる';
+          if (gasArrow) gasArrow.textContent = isOpen ? '▼' : '▲';
+        });
+      }
+
+      // 2. Add song card toggle
+      const headerAddSong = document.getElementById('headerAddSong');
+      const contentAddSong = document.getElementById('contentAddSong');
+      const badgeAddSong = document.getElementById('badgeAddSong');
+      if (headerAddSong && contentAddSong) {
+        headerAddSong.addEventListener('click', () => {
+          const isOpen = contentAddSong.style.display !== 'none';
+          contentAddSong.style.display = isOpen ? 'none' : 'block';
+          if (badgeAddSong) badgeAddSong.textContent = isOpen ? '展開する ▼' : '閉じる ▲';
+        });
+      }
+
+      // 3. Pack order card toggle
+      const headerPackOrder = document.getElementById('headerPackOrder');
+      const contentPackOrder = document.getElementById('contentPackOrder');
+      const badgePackOrder = document.getElementById('badgePackOrder');
+      if (headerPackOrder && contentPackOrder) {
+        headerPackOrder.addEventListener('click', () => {
+          const isOpen = contentPackOrder.style.display !== 'none';
+          contentPackOrder.style.display = isOpen ? 'none' : 'block';
+          if (badgePackOrder) badgePackOrder.textContent = isOpen ? '展開する ▼' : '閉じる ▲';
+        });
+      }
+    }
+
     // Google Spreadsheet Sync Functions
     function updateGasSyncUI() {
       const sheetInput = document.getElementById('userSheetUrlInput');
@@ -10748,6 +10923,7 @@
     loadApPlusRecords();
     initFormDatalists();
     initApPlusForm();
+    initCollapsiblePanels();
     renderPackOrderList();
     renderEditSongSearchResult();
     restoreFilterState();
