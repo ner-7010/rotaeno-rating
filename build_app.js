@@ -4196,27 +4196,32 @@ const htmlContent = `<!DOCTYPE html>
         <div class="new-song-form">
           <div class="form-row-2col">
             <div class="form-group">
-              <label class="form-label" for="newSongTitle">曲名 <span class="required-star">*</span></label>
+              <label class="form-label" for="newSongTitle">曲名 (I〜IV) <span class="required-star">*</span></label>
               <input type="text" id="newSongTitle" class="form-input" placeholder="曲名を入力 (例: Future Strike)">
             </div>
+            <div class="form-group">
+              <label class="form-label" for="newSongTitleAlpha">IV-α 専用曲名 <span class="form-note">※IV-αで曲名が変わる場合のみ</span></label>
+              <input type="text" id="newSongTitleAlpha" class="form-input" placeholder="未入力なら通常曲名を使用">
+            </div>
+          </div>
+
+          <div class="form-row-2col">
             <div class="form-group">
               <label class="form-label" for="newSongPack">ソングパック</label>
               <input type="text" id="newSongPack" class="form-input" placeholder="パック名 (例: 基本曲)" list="packDatalist">
               <datalist id="packDatalist"></datalist>
             </div>
-          </div>
-
-          <div class="form-row-2col" style="margin-bottom: 10px;">
             <div class="form-group">
               <label class="form-label" for="newSongVersion">バージョン</label>
               <input type="text" id="newSongVersion" class="form-input" placeholder="バージョン (例: v5.6.0)" list="versionDatalist">
               <datalist id="versionDatalist"></datalist>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="insertAfterSong">直前の楽曲 (デフォルト順序) <span class="form-note">※パック選択で自動補完</span></label>
-              <input type="text" id="insertAfterSong" class="form-input" placeholder="基準となる直前の曲名を選択" list="songDatalist">
-              <datalist id="songDatalist"></datalist>
-            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label" for="insertAfterSong">直前の楽曲 (デフォルト順序) <span class="form-note">※パック選択で自動補完</span></label>
+            <input type="text" id="insertAfterSong" class="form-input" placeholder="基準となる直前の曲名を選択" list="songDatalist">
+            <datalist id="songDatalist"></datalist>
           </div>
 
           <div class="form-diff-section">
@@ -4266,10 +4271,6 @@ const htmlContent = `<!DOCTYPE html>
                 </div>
                 <input type="number" step="0.1" min="1.0" max="16.0" id="newConstIVAlpha" class="diff-num-input" placeholder="任意">
               </div>
-            </div>
-            <div class="form-group" style="margin-top: 8px;">
-              <label class="form-label" for="newSongTitleAlpha">IV-α 専用曲名 <span class="form-note">※I〜IVと曲名が異なる場合のみ入力（空欄ならI〜IVと同じ曲名）</span></label>
-              <input type="text" id="newSongTitleAlpha" class="form-input" placeholder="例: βinαrΨ // Re:Coded">
             </div>
           </div>
 
@@ -4837,8 +4838,13 @@ const htmlContent = `<!DOCTYPE html>
         <input type="hidden" id="editTargetSongId" value="">
         
         <div class="form-group">
-          <label class="form-label" for="editSongTitleInput">曲名 <span class="required-star">*</span></label>
+          <label class="form-label" for="editSongTitleInput">曲名 (I〜IV) <span class="required-star">*</span></label>
           <input type="text" id="editSongTitleInput" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editSongTitleAlphaInput">IV-α 専用曲名 <span class="form-note">※IV-αで曲名が変わる場合のみ</span></label>
+          <input type="text" id="editSongTitleAlphaInput" class="form-input" placeholder="未入力なら通常曲名を使用">
         </div>
 
         <div class="form-row-2col">
@@ -4910,10 +4916,6 @@ const htmlContent = `<!DOCTYPE html>
               </div>
               <input type="number" step="0.1" min="1.0" max="16.0" id="editConstIVAlpha" class="diff-num-input" placeholder="任意">
             </div>
-          </div>
-          <div class="form-group" style="margin-top: 8px;">
-            <label class="form-label" for="editSongTitleAlphaInput">IV-α 専用曲名 <span class="form-note">※I〜IVと曲名が異なる場合のみ入力（空欄ならI〜IVと同じ曲名）</span></label>
-            <input type="text" id="editSongTitleAlphaInput" class="form-input" placeholder="空欄の場合はI〜IVと同じ曲名">
           </div>
         </div>
       </div>
@@ -5238,6 +5240,16 @@ const htmlContent = `<!DOCTYPE html>
       return anyPackSongs.length > 0 ? anyPackSongs[anyPackSongs.length - 1][1] : '';
     }
 
+    function getChartTitleFromSongObj(song, diff) {
+      const baseTitle = safeSongTitle(song.title);
+      if (diff === 'IV-α') {
+        const dObj = song.diffs && song.diffs['IV-α'];
+        const alphaTitle = safeSongTitle((dObj && dObj.title) ? dObj.title : (song.titleAlpha || ''));
+        if (alphaTitle) return alphaTitle;
+      }
+      return baseTitle;
+    }
+
     function songObjToTuples(song, insertAfterTitleOrBaseId) {
       const tuples = [];
       const diffKeys = ['I', 'II', 'III', 'IV'];
@@ -5277,12 +5289,12 @@ const htmlContent = `<!DOCTYPE html>
       const map = new Map();
       tuples.forEach(t => {
         const songId = t[7];
+        const chartTitle = safeSongTitle(t[1]);
         if (!map.has(songId)) {
           map.set(songId, {
             songId: t[7],
-            title: safeSongTitle(t[1]),
+            title: chartTitle,
             titleAlpha: '',
-            _alphaRawTitle: '',
             pack: t[6],
             version: t[11],
             endOfSale: t[8] || 0,
@@ -5290,29 +5302,32 @@ const htmlContent = `<!DOCTYPE html>
             diffs: {}
           });
         }
-        const g = map.get(songId);
-        if (t[2] === 'IV-α') {
-          g._alphaRawTitle = safeSongTitle(t[1]);
-        } else {
-          g.title = safeSongTitle(t[1]);
+        const group = map.get(songId);
+        if (t[2] !== 'IV-α') {
+          group.title = chartTitle;
         }
         if (t[2] === 'IV' && t[12] !== undefined && !isNaN(t[12])) {
-          g.initId = Number(t[12]);
+          group.initId = Number(t[12]);
         }
-        g.diffs[t[2]] = {
+        const diffEntry = {
           constant: t[4],
           level: t[3]
         };
+        if (t[2] === 'IV-α') {
+          diffEntry.title = chartTitle;
+        }
+        group.diffs[t[2]] = diffEntry;
       });
       const list = Array.from(map.values());
-      list.forEach(g => {
-        if (g._alphaRawTitle && g._alphaRawTitle !== g.title) {
-          g.titleAlpha = g._alphaRawTitle;
-          if (g.diffs['IV-α']) {
-            g.diffs['IV-α'].title = g._alphaRawTitle;
+      list.forEach(s => {
+        if (s.diffs['IV-α']) {
+          const alphaT = s.diffs['IV-α'].title || '';
+          if (alphaT && alphaT !== s.title) {
+            s.titleAlpha = alphaT;
+          } else {
+            delete s.diffs['IV-α'].title;
           }
         }
-        delete g._alphaRawTitle;
       });
       // Sort by initId so songs are in true game default order
       list.sort((a, b) => (a.initId || 0) - (b.initId || 0));
@@ -5349,19 +5364,6 @@ const htmlContent = `<!DOCTYPE html>
       if (str.toLowerCase() === 'true') return 'True';
       if (str.toLowerCase() === 'false') return 'False';
       return str;
-    }
-
-    function getChartTitleFromSongObj(song, diff) {
-      const baseTitle = safeSongTitle(song ? song.title : '');
-      if (diff === 'IV-α' && song) {
-        const alphaTitle = safeSongTitle(
-          song.titleAlpha ||
-          (song.diffs && song.diffs['IV-α'] && song.diffs['IV-α'].title) ||
-          ''
-        );
-        if (alphaTitle) return alphaTitle;
-      }
-      return baseTitle;
     }
 
     function normalizeMasterSongOrders(tuples) {
@@ -7608,13 +7610,14 @@ const htmlContent = `<!DOCTYPE html>
           }
         });
 
-        const stagedTitleDisplay = (song.titleAlpha && song.titleAlpha !== song.title)
-          ? (escapeHtml(song.title) + ' <span style="font-size:11px; color:var(--color-primary);">/ IV-α: ' + escapeHtml(song.titleAlpha) + '</span>')
+        const alphaTitle = getChartTitleFromSongObj(song, 'IV-α');
+        const titleHtml = (alphaTitle && alphaTitle !== song.title && song.diffs && song.diffs['IV-α'])
+          ? (escapeHtml(song.title) + ' <span style="font-size:11px; color:var(--color-primary);">/ IV-α: ' + escapeHtml(alphaTitle) + '</span>')
           : escapeHtml(song.title);
 
         html += '<div class="staged-song-card">' +
           '<div class="custom-card-main">' +
-            '<div class="custom-card-title">' + stagedTitleDisplay + '</div>' +
+            '<div class="custom-card-title">' + titleHtml + '</div>' +
             '<div class="custom-card-meta">' +
               '<span class="ver-tag">' + escapeHtml(song.version) + '</span>' +
               '<span>' + escapeHtml(song.pack) + '</span>' +
@@ -7941,17 +7944,18 @@ const htmlContent = `<!DOCTYPE html>
         'IV': { constant: constIV, level: calcLevelFromConstant(constIV) }
       };
       if (constIVAlpha !== null && !isNaN(constIVAlpha)) {
-        diffs['IV-α'] = { constant: constIVAlpha, level: calcLevelFromConstant(constIVAlpha) };
+        const ivAlphaObj = { constant: constIVAlpha, level: calcLevelFromConstant(constIVAlpha) };
         if (titleAlpha && titleAlpha !== title) {
-          diffs['IV-α'].title = titleAlpha;
+          ivAlphaObj.title = titleAlpha;
         }
+        diffs['IV-α'] = ivAlphaObj;
       }
 
       const songId = 'song_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
       const newSong = {
         songId,
         title,
-        titleAlpha: (constIVAlpha !== null && !isNaN(constIVAlpha) && titleAlpha && titleAlpha !== title) ? titleAlpha : '',
+        titleAlpha: (titleAlpha && titleAlpha !== title) ? titleAlpha : '',
         pack,
         version,
         diffs
@@ -7992,7 +7996,7 @@ const htmlContent = `<!DOCTYPE html>
 
       const groups = getSongGroups(masterSongs);
       const matched = groups.filter(g => {
-        const alphaTitle = g.titleAlpha || '';
+        const alphaTitle = getChartTitleFromSongObj(g, 'IV-α');
         return g.title.toLowerCase().includes(query) ||
           alphaTitle.toLowerCase().includes(query) ||
           (g.pack && g.pack.toLowerCase().includes(query));
@@ -8017,7 +8021,7 @@ const htmlContent = `<!DOCTYPE html>
         });
 
         const endOfSaleBadge = song.endOfSale === 1 ? ' <span style="color:#dc2626; font-size:11px; font-weight:800;">(販売終了)</span>' : '';
-        const alphaTitle = song.titleAlpha || '';
+        const alphaTitle = getChartTitleFromSongObj(song, 'IV-α');
         const titleDisplay = (alphaTitle && alphaTitle !== song.title && song.diffs && song.diffs['IV-α'])
           ? (escapeHtml(song.title) + ' <span style="font-size:11px; color:var(--color-primary);">/ IV-α: ' + escapeHtml(alphaTitle) + '</span>')
           : escapeHtml(song.title);
@@ -8076,17 +8080,19 @@ const htmlContent = `<!DOCTYPE html>
 
       const first = tuples[0];
       const baseTuple = tuples.find(s => s[2] !== 'IV-α') || first;
-      const ivAlphaTuple = tuples.find(s => s[2] === 'IV-α');
+      const alphaTuple = tuples.find(s => s[2] === 'IV-α');
+      const baseTitle = safeSongTitle(baseTuple[1]);
+      const alphaTitle = alphaTuple ? safeSongTitle(alphaTuple[1]) : '';
       const diffMap = {};
       tuples.forEach(t => {
         diffMap[t[2]] = t[4];
       });
 
       document.getElementById('editTargetSongId').value = songId;
-      document.getElementById('editSongTitleInput').value = baseTuple[1];
+      document.getElementById('editSongTitleInput').value = baseTitle;
       const editTitleAlphaEl = document.getElementById('editSongTitleAlphaInput');
       if (editTitleAlphaEl) {
-        editTitleAlphaEl.value = (ivAlphaTuple && ivAlphaTuple[1] !== baseTuple[1]) ? ivAlphaTuple[1] : '';
+        editTitleAlphaEl.value = (alphaTitle && alphaTitle !== baseTitle) ? alphaTitle : '';
       }
       document.getElementById('editSongPackInput').value = first[6] || '';
       document.getElementById('editSongVersionInput').value = first[11] || '';
@@ -8287,12 +8293,14 @@ const htmlContent = `<!DOCTYPE html>
       const detectedMod = [];
 
       officialSongs.forEach(song => {
-        const titleKey = safeSongTitle(song.title).toLowerCase();
+        const titleKey = getChartTitleFromSongObj(song, 'IV').toLowerCase();
         const alphaTitleKey = getChartTitleFromSongObj(song, 'IV-α').toLowerCase();
         const idKey = String(song.songId || '').trim().toLowerCase();
 
         // Match existing tuples: prefer idKey, then titleKey or alphaTitleKey
-        let existingTuples = (idKey && localById.get(idKey)) || (titleKey && localByTitle.get(titleKey)) || (alphaTitleKey && localByTitle.get(alphaTitleKey));
+        let existingTuples = (idKey && localById.get(idKey)) ||
+          (titleKey && localByTitle.get(titleKey)) ||
+          (alphaTitleKey && localByTitle.get(alphaTitleKey));
 
         if (!existingTuples || existingTuples.length === 0) {
           // New Song
@@ -8305,9 +8313,10 @@ const htmlContent = `<!DOCTYPE html>
           const curPack = String(firstTuple[6] || '基本曲').trim();
           const curVer = String(firstTuple[11] || 'v5.6.0').trim();
           const curTitle = safeSongTitle(baseTuple[1]);
+          const curAlphaTitle = alphaTuple ? safeSongTitle(alphaTuple[1]) : '';
           const offPack = String(song.pack || '基本曲').trim();
           const offVer = String(song.version || 'v5.6.0').trim();
-          const offTitle = safeSongTitle(song.title);
+          const offTitle = getChartTitleFromSongObj(song, 'IV');
           const offAlphaTitle = getChartTitleFromSongObj(song, 'IV-α');
 
           const changes = [];
@@ -8315,22 +8324,19 @@ const htmlContent = `<!DOCTYPE html>
           if (offTitle && curTitle !== offTitle) {
             changes.push({
               field: 'title',
-              label: '曲名',
+              label: '曲名 (I〜IV)',
               oldVal: curTitle,
               newVal: offTitle
             });
           }
 
-          if (alphaTuple) {
-            const curAlphaTitle = safeSongTitle(alphaTuple[1]);
-            if (offAlphaTitle && curAlphaTitle !== offAlphaTitle) {
-              changes.push({
-                field: 'titleAlpha',
-                label: 'IV-α 曲名',
-                oldVal: curAlphaTitle,
-                newVal: offAlphaTitle
-              });
-            }
+          if (alphaTuple && offAlphaTitle && curAlphaTitle !== offAlphaTitle) {
+            changes.push({
+              field: 'titleAlpha',
+              label: 'IV-α 曲名',
+              oldVal: curAlphaTitle,
+              newVal: offAlphaTitle
+            });
           }
 
           if (curPack !== offPack) {
@@ -8673,7 +8679,7 @@ const htmlContent = `<!DOCTYPE html>
 
           // Update common metadata
           existingTuples.forEach(s => {
-            s[1] = getChartTitleFromSongObj(officialSong, s[2]);
+            s[1] = getChartTitleFromSongObj(officialSong, s[2]) || s[1];
             s[6] = officialSong.pack || s[6];
             s[11] = officialSong.version || s[11];
             if (officialSong.endOfSale !== undefined) {
@@ -8698,7 +8704,7 @@ const htmlContent = `<!DOCTYPE html>
               const baseTuple = existingTuples[0];
               const newTuple = [
                 baseTuple[7] + '_' + diff,
-                getChartTitleFromSongObj(officialSong, diff),
+                getChartTitleFromSongObj(officialSong, diff) || baseTuple[1],
                 diff,
                 d.level || calcLevelFromConstant(d.constant),
                 Number(d.constant),
@@ -8732,7 +8738,7 @@ const htmlContent = `<!DOCTYPE html>
       if (Array.isArray(officialSongs) && officialSongs.length > 0) {
         const officialInitIdMap = new Map();
         officialSongs.forEach((song, idx) => {
-          const normTitle = safeSongTitle(song.title).toLowerCase();
+          const normTitle = getChartTitleFromSongObj(song, 'IV').toLowerCase();
           const normAlphaTitle = getChartTitleFromSongObj(song, 'IV-α').toLowerCase();
           const normId = String(song.songId || '').trim().toLowerCase();
           const initId = (song.initId !== undefined && !isNaN(song.initId)) ? Number(song.initId) : (idx + 1);
@@ -8859,13 +8865,16 @@ const htmlContent = `<!DOCTYPE html>
           newDiffs['IV-α'] = constIVAlpha;
         }
 
+        const resolvedBaseTitle = safeSongTitle(newTitle);
+        const resolvedAlphaTitle = safeSongTitle(newTitleAlpha || newTitle);
+
         // I〜IVの更新
         ['I', 'II', 'III', 'IV'].forEach(diff => {
           let t = currentTuples.find(s => s[2] === diff);
           const c = newDiffs[diff];
           const lvl = calcLevelFromConstant(c);
           if (t) {
-            t[1] = newTitle;
+            t[1] = resolvedBaseTitle;
             t[3] = lvl;
             t[4] = c;
             t[6] = newPack;
@@ -8875,10 +8884,10 @@ const htmlContent = `<!DOCTYPE html>
               t[12] = calculateInitIdForDiff(diff, newInsertAfterSong);
             }
           } else {
-            const newInitId = calculateInitIdForDiff(diff, newInsertAfterSong || newTitle);
+            const newInitId = calculateInitIdForDiff(diff, newInsertAfterSong || resolvedBaseTitle);
             masterSongs.push([
               songId + '_' + diff,
-              newTitle,
+              resolvedBaseTitle,
               diff,
               lvl,
               c,
@@ -8898,7 +8907,6 @@ const htmlContent = `<!DOCTYPE html>
         let ivAlphaTuple = currentTuples.find(s => s[2] === 'IV-α');
         if (constIVAlpha !== null) {
           const lvl = calcLevelFromConstant(constIVAlpha);
-          const resolvedAlphaTitle = newTitleAlpha || newTitle;
           if (ivAlphaTuple) {
             ivAlphaTuple[1] = resolvedAlphaTitle;
             ivAlphaTuple[3] = lvl;
@@ -8910,7 +8918,7 @@ const htmlContent = `<!DOCTYPE html>
               ivAlphaTuple[12] = calculateInitIdForDiff('IV-α', newInsertAfterSong);
             }
           } else {
-            const newInitId = calculateInitIdForDiff('IV-α', newInsertAfterSong || newTitle);
+            const newInitId = calculateInitIdForDiff('IV-α', newInsertAfterSong || resolvedBaseTitle);
             masterSongs.push([
               songId + '_IV-α',
               resolvedAlphaTitle,
@@ -8933,7 +8941,7 @@ const htmlContent = `<!DOCTYPE html>
 
         masterSongs.forEach(s => {
           if (s[7] === songId) {
-            s[1] = (s[2] === 'IV-α') ? (newTitleAlpha || newTitle) : newTitle;
+            s[1] = (s[2] === 'IV-α') ? resolvedAlphaTitle : resolvedBaseTitle;
             s[6] = newPack;
             s[8] = isEndOfSale;
             s[11] = newVersion;
