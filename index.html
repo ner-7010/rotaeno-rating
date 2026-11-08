@@ -873,6 +873,7 @@
     }
 
     .action-fab {
+      position: relative;
       pointer-events: auto;
       background: var(--bg-card);
       color: var(--color-primary-dark);
@@ -917,6 +918,98 @@
       background-color: var(--color-gold);
       border-radius: 50%;
       display: inline-block;
+      transition: all 0.2s;
+    }
+
+    .filter-badge-dot.has-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      background: #ef4444;
+      color: #ffffff;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 18px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color-bg-card, #ffffff);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme="dark"] .filter-badge-dot.has-count {
+      border-color: #1e1e2d;
+    }
+
+    /* Active Filter Notice Bar */
+    .active-filter-notice-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 14px;
+      margin-bottom: 10px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--color-primary-dark);
+      transition: all 0.2s;
+    }
+
+    .active-filter-notice-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .active-filter-notice-icon {
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .active-filter-notice-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-clear-active-filter {
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-clear-active-filter:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .btn-clear-active-filter:active {
+      transform: translateY(0);
+    }
+
+    [data-theme="dark"] .active-filter-notice-bar {
+      background: rgba(99, 102, 241, 0.16);
+      border-color: rgba(129, 140, 248, 0.35);
+      color: #c7d2fe;
     }
 
     /* Filter Modal Layout */
@@ -3914,6 +4007,15 @@
   <main class="container">
     <!-- View: Song List -->
     <div id="viewSongs">
+      <!-- Active Filter Notice Bar -->
+      <div id="activeFilterNoticeBar" class="active-filter-notice-bar" style="display: none;">
+        <div class="active-filter-notice-info">
+          <span class="active-filter-notice-icon">🔍</span>
+          <span class="active-filter-notice-text" id="activeFilterNoticeText">絞り込み適用中: 全 0曲中 0曲 表示</span>
+        </div>
+        <button type="button" class="btn-clear-active-filter" id="btnClearActiveFilter" title="すべての絞り込み・並び替えを解除して全件表示に戻します">✕ 条件をクリア</button>
+      </div>
+
       <div id="songGroupToolbar" class="song-group-toolbar" style="display: none;">
         <div class="song-group-toolbar-info">
           <span id="songGroupToolbarCount">0 グループ</span>
@@ -4173,6 +4275,16 @@
           <button type="button" class="panel-btn theme-choice-btn" data-theme="dark" id="themeBtnDark">🌙 ダークモード</button>
           <button type="button" class="panel-btn theme-choice-btn" data-theme="auto" id="themeBtnAuto">📱 端末設定に連動</button>
         </div>
+      </div>
+
+      <!-- Section: Filter Persistence Settings -->
+      <div class="settings-panel">
+        <h3>🔍 絞り込み・並び替え設定の保持</h3>
+        <p>ページを再読み込みした際にも、絞り込み条件（楽曲名・難易度・定数・スコア範囲等）や並び替え順、開いていたタブを自動的に復元します。</p>
+        <label class="setting-checkbox-label" style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; margin-top: 10px;">
+          <input type="checkbox" id="chkAutoSaveFilters" checked>
+          <span>絞り込み条件・並び替え・表示タブを自動保存する</span>
+        </label>
       </div>
 
       <!-- Section: Add Song Card -->
@@ -5522,7 +5634,7 @@
       }
     }
 
-    function switchMypageSubView(subview) {
+    function switchMypageSubView(subview, options = {}) {
       currentMypageSubView = subview;
       const navStats = document.getElementById('mypageNavStats');
       const navB40 = document.getElementById('mypageNavB40');
@@ -5538,7 +5650,12 @@
       if (subB40) subB40.style.display = subview === 'b40' ? 'block' : 'none';
       if (subApPlus) subApPlus.style.display = subview === 'applus' ? 'block' : 'none';
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (options.scroll !== false) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (options.save !== false) {
+        saveFilterState();
+      }
     }
 
     function loadInitialScores() {
@@ -5977,12 +6094,238 @@
     let currentInputScore = 0;
     let currentInputStatus = '';
 
+    const FILTER_AUTOSAVE_KEY = 'rotaeno_filter_autosave_enabled';
+    const FILTER_STATE_KEY = 'rotaeno_saved_filter_state_v1';
+    let currentMainTab = 'songs';
+
     let currentSort = 'DEFAULT';
     let filterDiffs = new Set();
     let filterConst = 'ALL';
     let filterStatus = 'ALL';
     let searchQuery = '';
     let showDeleted = true;
+
+    function isFilterAutoSaveEnabled() {
+      const saved = localStorage.getItem(FILTER_AUTOSAVE_KEY);
+      return saved === null || saved === 'true';
+    }
+
+    function setFilterAutoSaveEnabled(enabled) {
+      localStorage.setItem(FILTER_AUTOSAVE_KEY, String(enabled));
+      if (!enabled) {
+        localStorage.removeItem(FILTER_STATE_KEY);
+      } else {
+        saveFilterState();
+      }
+    }
+
+    function getActiveFilterCount() {
+      let count = 0;
+      if (searchQuery && searchQuery.trim().length > 0) count++;
+      if (currentSort && currentSort !== 'DEFAULT') count++;
+      if (!showDeleted) count++;
+      if (filterDiffs && filterDiffs.size > 0) count++;
+      if (filterConst && filterConst !== 'ALL') count++;
+      if (filterStatus && filterStatus !== 'ALL') count++;
+      if (filterScoreMin !== null || filterScoreMax !== null) count++;
+      if (excludeApPlus) count++;
+      if (excludeAp) count++;
+      if (excludeFc) count++;
+      if (excludeEx) count++;
+      if (excludePlayed) count++;
+      if (filterConstMin !== null || filterConstMax !== null || filterConstExact !== null) count++;
+      if (filterLevelMin || filterLevelMax || filterLevelExact) count++;
+      return count;
+    }
+
+    function saveFilterState(overrideTab = null) {
+      if (!isFilterAutoSaveEnabled()) return;
+      try {
+        const state = {
+          activeTab: overrideTab || currentMainTab || 'songs',
+          currentMypageSubView: typeof currentMypageSubView !== 'undefined' ? currentMypageSubView : 'stats',
+          currentSort: currentSort || 'DEFAULT',
+          searchQuery: searchQuery || '',
+          showDeleted: !!showDeleted,
+          filterDiffs: Array.from(filterDiffs || []),
+          filterConst: filterConst || 'ALL',
+          filterStatus: filterStatus || 'ALL',
+          filterScoreMin: filterScoreMin,
+          filterScoreMax: filterScoreMax,
+          excludeApPlus: !!excludeApPlus,
+          excludeAp: !!excludeAp,
+          excludeFc: !!excludeFc,
+          excludeEx: !!excludeEx,
+          excludePlayed: !!excludePlayed,
+          filterConstMin: filterConstMin,
+          filterConstMax: filterConstMax,
+          filterConstExact: filterConstExact,
+          filterLevelMin: filterLevelMin || '',
+          filterLevelMax: filterLevelMax || '',
+          filterLevelExact: filterLevelExact || ''
+        };
+        localStorage.setItem(FILTER_STATE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Failed to save filter state:', e);
+      }
+    }
+
+    function switchMainTab(tab, options = {}) {
+      currentMainTab = tab;
+      document.querySelectorAll('.tab-item').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-tab') === tab);
+      });
+
+      const viewSongs = document.getElementById('viewSongs');
+      const viewMypage = document.getElementById('viewMypage');
+      const viewSettings = document.getElementById('viewSettings');
+      if (viewSongs) viewSongs.style.display = tab === 'songs' ? 'block' : 'none';
+      if (viewMypage) viewMypage.style.display = tab === 'mypage' ? 'block' : 'none';
+      if (viewSettings) viewSettings.style.display = tab === 'settings' ? 'block' : 'none';
+
+      const fabGroup = document.getElementById('floatingBtnGroup');
+      if (fabGroup) fabGroup.style.display = tab === 'songs' ? 'flex' : 'none';
+
+      if (options.save !== false) {
+        saveFilterState();
+      }
+    }
+
+    function restoreFilterState() {
+      const chkAutoSave = document.getElementById('chkAutoSaveFilters');
+      const autoSaveEnabled = isFilterAutoSaveEnabled();
+      if (chkAutoSave) chkAutoSave.checked = autoSaveEnabled;
+
+      if (!autoSaveEnabled) return;
+
+      const raw = localStorage.getItem(FILTER_STATE_KEY);
+      if (!raw) return;
+
+      try {
+        const state = JSON.parse(raw);
+        if (!state || typeof state !== 'object') return;
+
+        // Restore Search Query
+        if (typeof state.searchQuery === 'string') {
+          searchQuery = state.searchQuery;
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) searchInput.value = searchQuery;
+        }
+
+        // Restore Sort
+        if (typeof state.currentSort === 'string') {
+          currentSort = state.currentSort;
+          const sortSelect = document.getElementById('sortSelect');
+          if (sortSelect) sortSelect.value = currentSort;
+        }
+
+        // Restore Show Deleted
+        if (typeof state.showDeleted === 'boolean') {
+          showDeleted = state.showDeleted;
+          const chkDeleted = document.getElementById('chkShowDeleted');
+          if (chkDeleted) chkDeleted.checked = showDeleted;
+        }
+
+        // Restore Filter Diffs
+        if (Array.isArray(state.filterDiffs)) {
+          filterDiffs = new Set(state.filterDiffs);
+          document.querySelectorAll('#diffFilters .filter-btn').forEach(btn => {
+            const val = btn.getAttribute('data-val');
+            if (val === 'ALL') {
+              btn.classList.toggle('active', filterDiffs.size === 0);
+            } else {
+              btn.classList.toggle('active', filterDiffs.has(val));
+            }
+          });
+        }
+
+        // Restore Filter Const
+        if (typeof state.filterConst === 'string') {
+          filterConst = state.filterConst;
+          document.querySelectorAll('#constFilters .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-val') === filterConst);
+          });
+        }
+
+        // Restore Filter Status
+        if (typeof state.filterStatus === 'string') {
+          filterStatus = state.filterStatus;
+          document.querySelectorAll('#statusFilters .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-val') === filterStatus);
+          });
+        }
+
+        // Restore Score Min/Max
+        filterScoreMin = (typeof state.filterScoreMin === 'number' && !isNaN(state.filterScoreMin)) ? state.filterScoreMin : null;
+        const scoreMinInput = document.getElementById('filterScoreMin');
+        if (scoreMinInput) scoreMinInput.value = filterScoreMin !== null ? String(filterScoreMin) : '';
+
+        filterScoreMax = (typeof state.filterScoreMax === 'number' && !isNaN(state.filterScoreMax)) ? state.filterScoreMax : null;
+        const scoreMaxInput = document.getElementById('filterScoreMax');
+        if (scoreMaxInput) scoreMaxInput.value = filterScoreMax !== null ? String(filterScoreMax) : '';
+
+        // Restore Exclude Checkboxes
+        excludeApPlus = !!state.excludeApPlus;
+        const chkApPlus = document.getElementById('chkExcludeApPlus');
+        if (chkApPlus) chkApPlus.checked = excludeApPlus;
+
+        excludeAp = !!state.excludeAp;
+        const chkAp = document.getElementById('chkExcludeAp');
+        if (chkAp) chkAp.checked = excludeAp;
+
+        excludeFc = !!state.excludeFc;
+        const chkFc = document.getElementById('chkExcludeFc');
+        if (chkFc) chkFc.checked = excludeFc;
+
+        excludeEx = !!state.excludeEx;
+        const chkEx = document.getElementById('chkExcludeEx');
+        if (chkEx) chkEx.checked = excludeEx;
+
+        excludePlayed = !!state.excludePlayed;
+        const chkPlayed = document.getElementById('chkExcludePlayed');
+        if (chkPlayed) chkPlayed.checked = excludePlayed;
+
+        // Restore Const Range / Exact
+        filterConstMin = (typeof state.filterConstMin === 'number' && !isNaN(state.filterConstMin)) ? state.filterConstMin : null;
+        const constMinInput = document.getElementById('filterConstMin');
+        if (constMinInput) constMinInput.value = filterConstMin !== null ? String(filterConstMin) : '';
+
+        filterConstMax = (typeof state.filterConstMax === 'number' && !isNaN(state.filterConstMax)) ? state.filterConstMax : null;
+        const constMaxInput = document.getElementById('filterConstMax');
+        if (constMaxInput) constMaxInput.value = filterConstMax !== null ? String(filterConstMax) : '';
+
+        filterConstExact = (typeof state.filterConstExact === 'number' && !isNaN(state.filterConstExact)) ? state.filterConstExact : null;
+        const constExactInput = document.getElementById('filterConstExact');
+        if (constExactInput) constExactInput.value = filterConstExact !== null ? String(filterConstExact) : '';
+
+        // Restore Level Range / Exact
+        filterLevelMin = typeof state.filterLevelMin === 'string' ? state.filterLevelMin : '';
+        const levelMinInput = document.getElementById('filterLevelMin');
+        if (levelMinInput) levelMinInput.value = filterLevelMin;
+
+        filterLevelMax = typeof state.filterLevelMax === 'string' ? state.filterLevelMax : '';
+        const levelMaxInput = document.getElementById('filterLevelMax');
+        if (levelMaxInput) levelMaxInput.value = filterLevelMax;
+
+        filterLevelExact = typeof state.filterLevelExact === 'string' ? state.filterLevelExact : '';
+        const levelExactInput = document.getElementById('filterLevelExact');
+        if (levelExactInput) levelExactInput.value = filterLevelExact;
+
+        // Restore Mypage Subview
+        if (['stats', 'b40', 'applus'].includes(state.currentMypageSubView)) {
+          if (typeof switchMypageSubView === 'function') {
+            switchMypageSubView(state.currentMypageSubView, { scroll: false, save: false });
+          }
+        }
+
+        // Restore Main Tab
+        if (['songs', 'mypage', 'settings'].includes(state.activeTab)) {
+          switchMainTab(state.activeTab, { save: false });
+        }
+      } catch (e) {
+        console.warn('Failed to restore filter state:', e);
+      }
+    }
 
     let filterScoreMin = null;
     let filterScoreMax = null;
@@ -6423,29 +6766,38 @@
       const modalCountEl = document.getElementById('modalFilteredCount');
       if (modalCountEl) modalCountEl.textContent = `(${count.toLocaleString()}件)`;
 
+      const activeCount = getActiveFilterCount();
+      const isFiltered = activeCount > 0;
+
+      // Update Floating FAB badge
       const dotEl = document.getElementById('filterBadgeDot');
-      const isFiltered = (
-        currentSort !== 'DEFAULT' ||
-        filterDiffs.size > 0 ||
-        filterConst !== 'ALL' ||
-        filterStatus !== 'ALL' ||
-        !showDeleted ||
-        searchQuery.trim().length > 0 ||
-        filterScoreMin !== null ||
-        filterScoreMax !== null ||
-        excludeApPlus ||
-        excludeAp ||
-        excludeFc ||
-        excludeEx ||
-        excludePlayed ||
-        filterConstMin !== null ||
-        filterConstMax !== null ||
-        filterConstExact !== null ||
-        filterLevelMin !== '' ||
-        filterLevelMax !== '' ||
-        filterLevelExact !== ''
-      );
-      if (dotEl) dotEl.style.display = isFiltered ? 'inline-block' : 'none';
+      if (dotEl) {
+        if (isFiltered) {
+          dotEl.textContent = activeCount > 99 ? '99+' : String(activeCount);
+          dotEl.classList.add('has-count');
+          dotEl.style.display = 'inline-flex';
+        } else {
+          dotEl.textContent = '';
+          dotEl.classList.remove('has-count');
+          dotEl.style.display = 'none';
+        }
+      }
+
+      // Update Notice Bar in Songs View
+      const noticeBar = document.getElementById('activeFilterNoticeBar');
+      const noticeText = document.getElementById('activeFilterNoticeText');
+      if (noticeBar && noticeText) {
+        if (isFiltered) {
+          const totalCharts = (typeof chartTuples !== 'undefined' && chartTuples) ? chartTuples.length : count;
+          noticeText.textContent = `絞り込み適用中 (${activeCount}件の条件): 全 ${totalCharts.toLocaleString()}曲中 ${count.toLocaleString()}曲 表示`;
+          noticeBar.style.display = 'flex';
+        } else {
+          noticeBar.style.display = 'none';
+        }
+      }
+
+      // Auto save filter state on update
+      saveFilterState();
     }
 
     function openFilterModal() {
@@ -7436,17 +7788,18 @@
 
     document.querySelectorAll('.tab-item').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
         const tab = btn.getAttribute('data-tab');
-
-        document.getElementById('viewSongs').style.display = tab === 'songs' ? 'block' : 'none';
-        document.getElementById('viewMypage').style.display = tab === 'mypage' ? 'block' : 'none';
-        document.getElementById('viewSettings').style.display = tab === 'settings' ? 'block' : 'none';
-
-        const fabGroup = document.getElementById('floatingBtnGroup');
-        if (fabGroup) fabGroup.style.display = tab === 'songs' ? 'flex' : 'none';
+        switchMainTab(tab);
       });
+    });
+
+    document.getElementById('btnClearActiveFilter')?.addEventListener('click', () => {
+      const resetBtn = document.getElementById('btnFilterReset');
+      if (resetBtn) resetBtn.click();
+    });
+
+    document.getElementById('chkAutoSaveFilters')?.addEventListener('change', (e) => {
+      setFilterAutoSaveEnabled(e.target.checked);
     });
 
     // MyPage Sub-Navigation & Event Listeners
@@ -10279,6 +10632,7 @@
     initApPlusForm();
     renderPackOrderList();
     renderEditSongSearchResult();
+    restoreFilterState();
     refresh();
     checkUnsavedChanges();
     updateGasSyncUI();
