@@ -4220,10 +4220,16 @@ const htmlContent = `<!DOCTYPE html>
         <div class="ap-plus-toolbar">
           <div class="ap-plus-toolbar-row ap-plus-toolbar-meta">
             <span class="ap-plus-summary-badge" id="apPlusSummaryBadge">達成数: - 曲</span>
-            <label class="checkbox-label ap-plus-chk-label" title="取得日列の表示・非表示を切り替えます">
-              <input type="checkbox" id="chkShowApPlusDate" checked>
-              <span>取得日列を表示</span>
-            </label>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <label class="checkbox-label ap-plus-chk-label" title="取得日列の表示・非表示を切り替えます">
+                <input type="checkbox" id="chkShowApPlusDate" checked>
+                <span>取得日列を表示</span>
+              </label>
+              <label class="checkbox-label ap-plus-chk-label" title="楽曲一覧でIV以上の理論値(AP+)を達成・登録した際、自動的に本日の日付で理論値記録へ追加します">
+                <input type="checkbox" id="chkAutoRecordApPlus" checked>
+                <span>✨ 新規AP+の自動記録</span>
+              </label>
+            </div>
           </div>
           <div class="ap-plus-toolbar-row ap-plus-toolbar-controls">
             <input type="text" id="apPlusSearchInput" class="ap-plus-search-input" placeholder="🔍 曲名・Noで検索...">
@@ -5173,6 +5179,9 @@ const htmlContent = `<!DOCTYPE html>
     const PACK_ORDER_KEY = 'rotaeno_pack_order_v1';
     const AP_PLUS_KEY = 'rotaeno_ap_plus_records_v1';
     const SHOW_DATE_KEY = 'rotaeno_show_ap_plus_date_v1';
+    const AUTO_RECORD_AP_PLUS_KEY = 'rotaeno_auto_record_ap_plus_v1';
+    let savedApPlusRecords = [];
+    let autoRecordApPlus = true;
     const STATS_SCOPE_KEY = 'rotaeno_stats_scope_v1';
     const USER_SHEET_URL_KEY = 'rotaeno_user_sheet_url_v1';
     const GAS_URL_KEY = 'rotaeno_gas_url_v1';
@@ -5596,19 +5605,31 @@ const htmlContent = `<!DOCTYPE html>
         localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
       }
 
+      savedApPlusRecords = JSON.parse(JSON.stringify(apPlusRecords));
+
       const savedDatePref = localStorage.getItem(SHOW_DATE_KEY);
       if (savedDatePref !== null) {
         showApPlusDate = savedDatePref === 'true';
       }
       const chk = document.getElementById('chkShowApPlusDate');
       if (chk) chk.checked = showApPlusDate;
+
+      const savedAutoPref = localStorage.getItem(AUTO_RECORD_AP_PLUS_KEY);
+      if (savedAutoPref !== null) {
+        autoRecordApPlus = savedAutoPref === 'true';
+      }
+      const chkAuto = document.getElementById('chkAutoRecordApPlus');
+      if (chkAuto) chkAuto.checked = autoRecordApPlus;
+
       applyApPlusDateVisibility();
       updateMypageBadges();
     }
 
     function saveApPlusRecords() {
       localStorage.setItem(AP_PLUS_KEY, JSON.stringify(apPlusRecords));
+      savedApPlusRecords = JSON.parse(JSON.stringify(apPlusRecords));
       updateMypageBadges();
+      checkUnsavedChanges();
     }
 
     function applyApPlusDateVisibility() {
@@ -5718,6 +5739,13 @@ const htmlContent = `<!DOCTYPE html>
 
       const isSongsChanged = JSON.stringify(masterSongs) !== JSON.stringify(savedMasterSongs);
       const isPackOrderChanged = JSON.stringify(packOrder) !== JSON.stringify(savedPackOrder);
+      const isApPlusChanged = JSON.stringify(apPlusRecords) !== JSON.stringify(savedApPlusRecords);
+      let apPlusDiffCount = 0;
+      if (isApPlusChanged) {
+        apPlusDiffCount = Math.abs(apPlusRecords.length - savedApPlusRecords.length);
+        if (apPlusDiffCount === 0) apPlusDiffCount = 1;
+      }
+
       const currentSongIds = new Set(masterSongs.map(s => s[7]));
       const savedSongIds = new Set(savedMasterSongs.map(s => s[7]));
       let newSongsCount = 0;
@@ -5729,7 +5757,7 @@ const htmlContent = `<!DOCTYPE html>
         if (!currentSongIds.has(id)) removedSongsCount++;
       });
 
-      const hasUnsaved = scoreDiffCount > 0 || isSongsChanged || isPackOrderChanged;
+      const hasUnsaved = scoreDiffCount > 0 || isSongsChanged || isPackOrderChanged || isApPlusChanged;
 
       if (hasUnsaved) {
         const details = [];
@@ -5738,6 +5766,7 @@ const htmlContent = `<!DOCTYPE html>
         if (isSongsChanged && newSongsCount === 0 && removedSongsCount === 0) details.push('楽曲マスター更新');
         if (scoreDiffCount > 0) details.push('スコア ' + scoreDiffCount + '件');
         if (isPackOrderChanged) details.push('パック順序');
+        if (apPlusDiffCount > 0) details.push('理論値記録 ' + apPlusDiffCount + '件');
         if (countEl) countEl.textContent = details.length ? ('(' + details.join(' / ') + ')') : '';
         unsavedBar.classList.add('visible');
       } else {
@@ -7332,22 +7361,50 @@ const htmlContent = `<!DOCTYPE html>
       applyApPlusDateVisibility();
     }
 
-    function initApPlusForm() {
+    function populateApPlusChartOptions(editingChartId = null) {
       const select = document.getElementById('apPlusChartSelect');
       if (!select) return;
+
       const allSongs = getAllSongs();
       const ivCharts = allSongs.filter(c => c[2] === 'IV' || c[2] === 'IV-α');
 
-      ivCharts.sort((a, b) => {
+      const recordedChartIds = new Set(
+        apPlusRecords
+          .map(r => r.chartId)
+          .filter(id => id && id !== editingChartId)
+      );
+
+      // 理論値(1010000点 or AP+)達成済み かつ 未登録（または編集中譜面）のみを抽出
+      const eligibleCharts = ivCharts.filter(c => {
+        const id = c[0];
+        if (id === editingChartId) return true;
+        if (recordedChartIds.has(id)) return false;
+        const s = userScores[id];
+        return s && (s.score === 1010000 || s.status === 'AP+');
+      });
+
+      eligibleCharts.sort((a, b) => {
         if (b[4] !== a[4]) return b[4] - a[4];
         return a[1].localeCompare(b[1], 'ja');
       });
 
-      let opts = '<option value="">-- 譜面を選択してください --</option>';
-      ivCharts.forEach(c => {
+      if (eligibleCharts.length === 0) {
+        select.innerHTML = '<option value="">-- 理論値達成済みの未登録譜面がありません --</option>';
+        select.disabled = true;
+        return;
+      }
+
+      select.disabled = false;
+      let opts = '<option value="">-- 譜面を選択してください (' + eligibleCharts.length + '曲) --</option>';
+      eligibleCharts.forEach(c => {
         opts += '<option value="' + c[0] + '" data-title="' + escapeHtml(c[1]) + '" data-diff="' + c[2] + '" data-level="' + c[3] + '" data-const="' + c[4] + '" data-pack="' + escapeHtml(c[6]) + '">[' + c[2] + ' Lv.' + c[3] + ' 定数' + c[4].toFixed(1) + '] ' + escapeHtml(c[1]) + ' (' + escapeHtml(c[6]) + ')</option>';
       });
       select.innerHTML = opts;
+    }
+
+    function initApPlusForm() {
+      const select = document.getElementById('apPlusChartSelect');
+      if (!select) return;
 
       select.addEventListener('change', () => {
         const opt = select.selectedOptions[0];
@@ -7373,6 +7430,12 @@ const htmlContent = `<!DOCTYPE html>
       const select = document.getElementById('apPlusChartSelect');
       const noInput = document.getElementById('apPlusNoInput');
       const dateInput = document.getElementById('apPlusDateInput');
+
+      let currentEditingChartId = null;
+      if (editIndex >= 0 && apPlusRecords[editIndex]) {
+        currentEditingChartId = apPlusRecords[editIndex].chartId || null;
+      }
+      populateApPlusChartOptions(currentEditingChartId);
 
       if (editIndex >= 0 && apPlusRecords[editIndex]) {
         const r = apPlusRecords[editIndex];
@@ -7431,10 +7494,11 @@ const htmlContent = `<!DOCTYPE html>
         apPlusRecords.push(record);
       }
 
-      saveApPlusRecords();
       renderApPlusTable();
       renderMypageStats();
+      updateMypageBadges();
       closeAddApPlusModal();
+      checkUnsavedChanges();
     }
 
     window.deleteApPlusRecord = function(index) {
@@ -7442,9 +7506,10 @@ const htmlContent = `<!DOCTYPE html>
       const r = apPlusRecords[index];
       if (confirm('No.' + r.no + ' 「' + r.title + '」 のAP+記録を削除しますか？')) {
         apPlusRecords.splice(index, 1);
-        saveApPlusRecords();
         renderApPlusTable();
         renderMypageStats();
+        updateMypageBadges();
+        checkUnsavedChanges();
       }
     };
 
@@ -7481,10 +7546,11 @@ const htmlContent = `<!DOCTYPE html>
             chartId: c[0]
           });
         });
-        saveApPlusRecords();
         renderApPlusTable();
         renderMypageStats();
-        alert(newToAdd.length + '件の譜面を記録に追加しました！');
+        updateMypageBadges();
+        checkUnsavedChanges();
+        alert(newToAdd.length + '件の譜面を記録に追加しました！\\n※下部の「💾 保存する」で確定してください。');
       }
     }
 
@@ -7625,6 +7691,7 @@ const htmlContent = `<!DOCTYPE html>
 
     document.getElementById('btnModalSave').addEventListener('click', () => {
       if (selectedChart) {
+        const isApPlus = (currentInputScore === 1010000 || currentInputStatus === 'AP+');
         if (currentInputScore === 1010000) {
           currentInputStatus = 'AP+';
         }
@@ -7632,6 +7699,30 @@ const htmlContent = `<!DOCTYPE html>
           score: currentInputScore,
           status: currentInputStatus
         };
+
+        // 自動記録処理 (IV / IV-α かつ 1010000/AP+ 達成時)
+        if (autoRecordApPlus && isApPlus && (selectedChart.diff === 'IV' || selectedChart.diff === 'IV-α')) {
+          const alreadyExists = apPlusRecords.some(r => r.chartId === selectedChart.id);
+          if (!alreadyExists) {
+            const d = new Date();
+            const todayStr = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+            const nextNo = apPlusRecords.reduce((max, r) => Math.max(max, r.no || 0), 0) + 1;
+            apPlusRecords.push({
+              no: nextNo,
+              title: safeSongTitle(selectedChart.title),
+              diff: selectedChart.diff,
+              level: selectedChart.level || calcLevelFromConstant(selectedChart.constant),
+              constant: selectedChart.constant || 0,
+              date: todayStr,
+              chartId: selectedChart.id
+            });
+            renderApPlusTable();
+            renderMypageStats();
+            updateMypageBadges();
+            showSaveToast('🌟 理論値(AP+)記録に自動追加しました！');
+          }
+        }
+
         closeModal();
         refresh();
         checkUnsavedChanges();
@@ -7829,6 +7920,11 @@ const htmlContent = `<!DOCTYPE html>
       showApPlusDate = e.target.checked;
       localStorage.setItem(SHOW_DATE_KEY, String(showApPlusDate));
       applyApPlusDateVisibility();
+    });
+
+    document.getElementById('chkAutoRecordApPlus')?.addEventListener('change', (e) => {
+      autoRecordApPlus = e.target.checked;
+      localStorage.setItem(AUTO_RECORD_AP_PLUS_KEY, String(autoRecordApPlus));
     });
 
     document.getElementById('btnScopeAll')?.addEventListener('click', () => setStatsScope('ALL'));
@@ -9422,6 +9518,7 @@ const htmlContent = `<!DOCTYPE html>
       saveScores();
       saveMasterSongs();
       savePackOrder();
+      saveApPlusRecords();
       checkUnsavedChanges();
       refresh();
       showSaveToast();
@@ -9434,9 +9531,13 @@ const htmlContent = `<!DOCTYPE html>
       userScores = JSON.parse(JSON.stringify(savedScores));
       masterSongs = JSON.parse(JSON.stringify(savedMasterSongs));
       packOrder = JSON.parse(JSON.stringify(savedPackOrder));
+      apPlusRecords = JSON.parse(JSON.stringify(savedApPlusRecords));
       renderPackOrderList();
       initFormDatalists();
       renderEditSongSearchResult();
+      renderApPlusTable();
+      renderMypageStats();
+      updateMypageBadges();
       checkUnsavedChanges();
       refresh();
     });
