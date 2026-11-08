@@ -4673,11 +4673,22 @@ const htmlContent = `<!DOCTYPE html>
         </div>
       </div>
 
-      <div class="settings-panel">
-        <h3>全データリセット</h3>
-        <p>端末に保存されているスコア入力、追加楽曲、パック順序、理論値記録をすべて初期状態に戻します。</p>
-        <div class="action-btn-group">
-          <button class="panel-btn danger-zone" id="btnResetData">全データをリセット</button>
+      <!-- Section: Reset All Data (Collapsible) -->
+      <div class="settings-panel" id="panelResetData">
+        <div class="collapsible-header" id="headerResetData" role="button" tabindex="0">
+          <div class="collapsible-title">
+            <h3 style="margin: 0; font-size: 15px;">全データリセット</h3>
+          </div>
+          <span class="collapsible-toggle-badge" id="badgeResetData">展開する ▼</span>
+        </div>
+
+        <div class="collapsible-content" id="contentResetData" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+          <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">
+            端末に保存されているスコア入力、追加楽曲、パック順序、理論値記録をすべて初期状態に戻します。
+          </p>
+          <div class="action-btn-group">
+            <button class="panel-btn danger-zone" id="btnResetData" type="button">全データをリセット</button>
+          </div>
         </div>
       </div>
 
@@ -9654,14 +9665,18 @@ const htmlContent = `<!DOCTYPE html>
     });
 
     document.getElementById('btnResetData').addEventListener('click', () => {
-      if (confirm('すべての入力済みスコア、設定、理論値記録をリセットし、管理スプレッドシートから最新楽曲データを再取得しますか？この操作は取り消せません。')) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(MASTER_SONGS_KEY);
-        localStorage.removeItem(PACK_ORDER_KEY);
-        localStorage.removeItem(AP_PLUS_KEY);
-        localStorage.removeItem(GAS_LAST_SYNC_KEY);
-        location.reload();
-      }
+      const step1 = confirm('すべての入力済みスコア、設定、理論値記録をリセットし、初期状態に戻しますか？\\nこの操作は取り消せません。');
+      if (!step1) return;
+
+      const step2 = confirm('【最終確認】\\nスプレッドシート連携やJSON保存等でバックアップを行っていない場合、データを元に戻すことは一切できません。\\n\\n本当にすべてのデータを初期化してよろしいですか？');
+      if (!step2) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(MASTER_SONGS_KEY);
+      localStorage.removeItem(PACK_ORDER_KEY);
+      localStorage.removeItem(AP_PLUS_KEY);
+      localStorage.removeItem(GAS_LAST_SYNC_KEY);
+      location.reload();
     });
 
     document.getElementById('btnCommitChanges').addEventListener('click', () => {
@@ -9730,6 +9745,18 @@ const htmlContent = `<!DOCTYPE html>
           const isOpen = contentPackOrder.style.display !== 'none';
           contentPackOrder.style.display = isOpen ? 'none' : 'block';
           if (badgePackOrder) badgePackOrder.textContent = isOpen ? '展開する ▼' : '閉じる ▲';
+        });
+      }
+
+      // 4. Reset data card toggle
+      const headerResetData = document.getElementById('headerResetData');
+      const contentResetData = document.getElementById('contentResetData');
+      const badgeResetData = document.getElementById('badgeResetData');
+      if (headerResetData && contentResetData) {
+        headerResetData.addEventListener('click', () => {
+          const isOpen = contentResetData.style.display !== 'none';
+          contentResetData.style.display = isOpen ? 'none' : 'block';
+          if (badgeResetData) badgeResetData.textContent = isOpen ? '展開する ▼' : '閉じる ▲';
         });
       }
     }
