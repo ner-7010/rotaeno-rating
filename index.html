@@ -261,7 +261,12 @@
         <div class="stats-panel-box">
           <div class="stats-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <div class="stats-panel-title" id="packStatHeaderTitle" style="margin-bottom:0;"><span>🎵</span> ソングパック別 進捗一覧 (全パック)</div>
-            <input type="text" id="packStatSearch" class="pack-stat-search-input" placeholder="🔍 パック名で検索...">
+            <div class="search-input-wrapper pack-stat-search-wrap">
+              <input type="text" id="packStatSearch" class="pack-stat-search-input" placeholder="🔍 パック名で検索...">
+              <button type="button" class="search-clear-btn" id="packStatSearchClear" aria-label="検索ワードをクリア" title="クリア">
+                <svg viewBox="0 0 16 16"><line x1="4" y1="4" x2="12" y2="12"></line><line x1="12" y1="4" x2="4" y2="12"></line></svg>
+              </button>
+            </div>
           </div>
           <div id="packStatContainer">
             <!-- Dynamically populated pack cards -->
@@ -319,7 +324,12 @@
             </div>
           </div>
           <div class="ap-plus-toolbar-row ap-plus-toolbar-controls">
-            <input type="text" id="apPlusSearchInput" class="ap-plus-search-input" placeholder="🔍 曲名・Noで検索...">
+            <div class="search-input-wrapper ap-plus-search-wrap">
+              <input type="text" id="apPlusSearchInput" class="ap-plus-search-input" placeholder="🔍 曲名・Noで検索...">
+              <button type="button" class="search-clear-btn" id="apPlusSearchInputClear" aria-label="検索ワードをクリア" title="クリア">
+                <svg viewBox="0 0 16 16"><line x1="4" y1="4" x2="12" y2="12"></line><line x1="12" y1="4" x2="4" y2="12"></line></svg>
+              </button>
+            </div>
             <select id="apPlusSortSelect" class="ap-plus-select">
               <option value="NO_ASC">No昇順 (達成順)</option>
               <option value="NO_DESC">No降順 (最新順)</option>
@@ -602,7 +612,12 @@
         <p style="font-size: 12px; color: var(--color-text-sub); margin-bottom: 12px;">公式アップデートによる譜面定数の改定や、曲名・パック名・難易度の変更ができます。全楽曲（初期曲・追加曲問わず）を検索して即座に編集できます。</p>
         
         <div style="margin-bottom: 10px;">
-          <input type="text" id="editSongSearchInput" class="form-input" placeholder="🔍 編集したい曲名で検索 (例: -1, Future Strike, 翠杜)" style="width: 100%; box-sizing: border-box;">
+          <div class="search-input-wrapper edit-song-search-wrap">
+            <input type="text" id="editSongSearchInput" class="form-input" placeholder="🔍 編集したい曲名で検索 (例: -1, Future Strike, 翠杜)" style="width: 100%; box-sizing: border-box; padding-right: 32px;">
+            <button type="button" class="search-clear-btn" id="editSongSearchClear" aria-label="検索ワードをクリア" title="クリア">
+              <svg viewBox="0 0 16 16"><line x1="4" y1="4" x2="12" y2="12"></line><line x1="12" y1="4" x2="4" y2="12"></line></svg>
+            </button>
+          </div>
         </div>
 
         <div id="editSongSearchResult" style="display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto;">
@@ -764,6 +779,9 @@
           <div class="search-wrapper">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" class="search-input" placeholder="曲名、ID、パック名、バージョンで検索...">
+            <button type="button" class="search-clear-btn" id="searchInputClear" aria-label="検索ワードをクリア" title="クリア">
+              <svg viewBox="0 0 16 16"><line x1="4" y1="4" x2="12" y2="12"></line><line x1="12" y1="4" x2="4" y2="12"></line></svg>
+            </button>
           </div>
         </div>
 

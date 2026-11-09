@@ -1095,6 +1095,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
           searchQuery = state.searchQuery;
           const searchInput = document.getElementById('searchInput');
           if (searchInput) searchInput.value = searchQuery;
+          if (searchInputClearCtrl) searchInputClearCtrl.updateVisibility();
         }
 
         // Restore Sort
@@ -2083,6 +2084,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       searchQuery = packName;
       const searchInput = document.getElementById('searchInput');
       if (searchInput) searchInput.value = packName;
+      if (searchInputClearCtrl) searchInputClearCtrl.updateVisibility();
 
       if (currentStatsScope === 'IV_PLUS') {
         filterDiffs.clear();
@@ -2578,6 +2580,65 @@ const DEFAULT_AP_PLUS_RECORDS = []
       if (e.target.id === 'inputModal') closeModal();
     });
 
+    // Reusable Clear Button Controller for Search Inputs (Twitter-like clear button)
+    function setupSearchClearButton(inputId, clearBtnId, onClearCallback) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(clearBtnId);
+      if (!input || !btn) return null;
+
+      const updateVisibility = () => {
+        if (input.value && input.value.trim().length > 0) {
+          btn.classList.add('visible');
+        } else {
+          btn.classList.remove('visible');
+        }
+      };
+
+      input.addEventListener('input', updateVisibility);
+      input.addEventListener('change', updateVisibility);
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        updateVisibility();
+        input.focus();
+        if (typeof onClearCallback === 'function') {
+          onClearCallback();
+        } else {
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+
+      updateVisibility();
+      return { updateVisibility };
+    }
+
+    let searchInputClearCtrl = null;
+    let apPlusSearchClearCtrl = null;
+    let packStatSearchClearCtrl = null;
+    let editSongSearchClearCtrl = null;
+
+    function initSearchClearButtons() {
+      searchInputClearCtrl = setupSearchClearButton('searchInput', 'searchInputClear', () => {
+        searchQuery = '';
+        renderSongList();
+      });
+
+      apPlusSearchClearCtrl = setupSearchClearButton('apPlusSearchInput', 'apPlusSearchInputClear', () => {
+        apPlusSearchQuery = '';
+        renderApPlusTable();
+      });
+
+      packStatSearchClearCtrl = setupSearchClearButton('packStatSearch', 'packStatSearchClear', () => {
+        renderPackStats();
+      });
+
+      editSongSearchClearCtrl = setupSearchClearButton('editSongSearchInput', 'editSongSearchClear', () => {
+        renderEditSongSearchResult();
+      });
+    }
+
     document.getElementById('searchInput').addEventListener('input', (e) => {
       searchQuery = e.target.value;
       renderSongList();
@@ -2813,6 +2874,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       collapsedGroupIds.clear();
       searchQuery = '';
       document.getElementById('searchInput').value = '';
+      if (searchInputClearCtrl) searchInputClearCtrl.updateVisibility();
       currentSort = 'DEFAULT';
       document.getElementById('sortSelect').value = 'DEFAULT';
       showDeleted = true;
@@ -5646,6 +5708,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
     initFormDatalists();
     initApPlusForm();
     initCollapsiblePanels();
+    initSearchClearButtons();
     renderPackOrderList();
     renderEditSongSearchResult();
     restoreFilterState();

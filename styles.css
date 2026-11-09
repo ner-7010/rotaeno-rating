@@ -229,7 +229,7 @@
 
     .search-input {
       width: 100%;
-      padding: 11px 14px 11px 36px;
+      padding: 11px 34px 11px 36px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -251,6 +251,78 @@
       transform: translateY(-50%);
       color: var(--color-text-muted);
       font-size: 14px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color-text-muted);
+      color: var(--bg-card);
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      opacity: 0.8;
+      transition: opacity 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    .search-clear-btn:hover {
+      opacity: 1;
+      background: var(--color-text-sub);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .search-clear-btn:active {
+      transform: translateY(-50%) scale(0.92);
+    }
+
+    .search-clear-btn.visible {
+      display: inline-flex;
+    }
+
+    .search-clear-btn::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      bottom: -6px;
+      left: -6px;
+      right: -6px;
+    }
+
+    .search-clear-btn svg {
+      width: 9px;
+      height: 9px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      pointer-events: none;
+    }
+
+    .search-wrapper .search-clear-btn {
+      right: 10px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .search-wrapper .search-clear-btn svg {
+      width: 10px;
+      height: 10px;
     }
 
     .sort-bar {
@@ -1864,13 +1936,19 @@
       min-width: 0;
     }
 
+    .pack-stat-search-wrap {
+      max-width: 180px;
+      flex: 1;
+    }
+
     .pack-stat-search-input {
-      padding: 6px 10px;
+      padding: 6px 28px 6px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 12px;
       outline: none;
-      max-width: 180px;
+      width: 100%;
+      box-sizing: border-box;
       background: var(--bg-surface-soft);
       color: var(--color-text-main);
       transition: border-color var(--theme-transition-time), background var(--theme-transition-time), color var(--theme-transition-time);
@@ -1994,11 +2072,15 @@
       width: 100%;
     }
 
-    .ap-plus-search-input {
+    .ap-plus-search-wrap {
       flex: 1;
       min-width: 0;
+    }
+
+    .ap-plus-search-input {
+      width: 100%;
       box-sizing: border-box;
-      padding: 7px 10px;
+      padding: 7px 28px 7px 10px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 12px;
