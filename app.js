@@ -1759,12 +1759,13 @@ const DEFAULT_AP_PLUS_RECORDS = []
       const totalCount = targetCharts.length;
       const filled = targetCharts.filter(c => c.score > 0);
 
-      const apPlusCount = targetCharts.filter(c => c.score === 1010000 || c.status === 'AP+').length;
-      const apTotalCount = targetCharts.filter(c => c.score === 1010000 || c.status === 'AP' || c.status === 'AP+').length;
+      const apPlusCount = targetCharts.filter(c => c.status === 'AP+').length;
+      const apTotalCount = targetCharts.filter(c => c.status === 'AP' || c.status === 'AP+').length;
       const apOnlyCount = apTotalCount - apPlusCount;
-      const fcCount = targetCharts.filter(c => c.status === 'FC').length;
+      const fcOnlyCount = targetCharts.filter(c => c.status === 'FC').length;
+      const fcTotalCount = targetCharts.filter(c => c.status === 'FC' || c.status === 'AP' || c.status === 'AP+').length;
       const exCount = targetCharts.filter(c => c.score >= 1000000).length;
-      const clearCount = filled.length - apTotalCount - fcCount;
+      const clearCount = filled.length - apTotalCount - fcOnlyCount;
       const unplayedCount = totalCount - filled.length;
 
       const registeredPct = totalCount > 0 ? ((filled.length / totalCount) * 100).toFixed(1) : '0.0';
@@ -1787,7 +1788,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       if (barApPlus && totalCount > 0) {
         barApPlus.style.width = ((apPlusCount / totalCount) * 100) + '%';
         barAp.style.width = ((apOnlyCount / totalCount) * 100) + '%';
-        barFc.style.width = ((fcCount / totalCount) * 100) + '%';
+        barFc.style.width = ((fcOnlyCount / totalCount) * 100) + '%';
         barClear.style.width = ((clearCount / totalCount) * 100) + '%';
       }
 
@@ -1808,8 +1809,8 @@ const DEFAULT_AP_PLUS_RECORDS = []
           '</div>' +
           '<div class="lamp-stat-cell" style="border-color:#0099ff;">' +
             '<span class="lamp-stat-lbl" style="color:#0099ff;">🔷 FC (フルコン)</span>' +
-            '<span class="lamp-stat-val" style="color:#0099ff;">' + fcCount.toLocaleString() + '</span>' +
-            '<span class="lamp-stat-pct">' + pct(fcCount) + '</span>' +
+            '<span class="lamp-stat-val" style="color:#0099ff;">' + fcTotalCount.toLocaleString() + '</span>' +
+            '<span class="lamp-stat-pct">' + pct(fcTotalCount) + '</span>' +
           '</div>' +
           '<div class="lamp-stat-cell" style="border-color:#10b981;">' +
             '<span class="lamp-stat-lbl" style="color:#10b981;">🟢 EX (100万+)</span>' +
@@ -1833,7 +1834,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       const ivCharts = allCharts.filter(c => c.diff === 'IV' || c.diff === 'IV-α');
       const ivFilled = ivCharts.filter(c => c.score > 0);
       const ivAvgScore = ivFilled.length ? Math.round(ivFilled.reduce((sum, c) => sum + c.score, 0) / ivFilled.length) : 0;
-      const ivApCount = ivCharts.filter(c => c.score === 1010000 || c.status === 'AP' || c.status === 'AP+').length;
+      const ivApCount = ivCharts.filter(c => c.status === 'AP' || c.status === 'AP+').length;
       const ivUnApRemaining = ivCharts.length - ivApCount;
       const ivRemaining = ivCharts.length - apPlusRecords.length;
 
@@ -1908,10 +1909,11 @@ const DEFAULT_AP_PLUS_RECORDS = []
           const dCharts = allCharts.filter(c => c.diff === d);
           if (dCharts.length === 0) return;
           const dFilled = dCharts.filter(c => c.score > 0);
-          const dApPlus = dCharts.filter(c => c.score === 1010000 || c.status === 'AP+').length;
-          const dApTotal = dCharts.filter(c => c.score === 1010000 || c.status === 'AP' || c.status === 'AP+').length;
+          const dApPlus = dCharts.filter(c => c.status === 'AP+').length;
+          const dApTotal = dCharts.filter(c => c.status === 'AP' || c.status === 'AP+').length;
           const dApOnly = dApTotal - dApPlus;
-          const dFc = dCharts.filter(c => c.status === 'FC').length;
+          const dFcOnly = dCharts.filter(c => c.status === 'FC').length;
+          const dFcTotal = dCharts.filter(c => c.status === 'FC' || c.status === 'AP' || c.status === 'AP+').length;
           const dAvg = dFilled.length ? Math.round(dFilled.reduce((sum, c) => sum + c.score, 0) / dFilled.length) : 0;
           const dPct = ((dFilled.length / dCharts.length) * 100).toFixed(1);
           const diffClass = getDiffClass(d);
@@ -1925,12 +1927,12 @@ const DEFAULT_AP_PLUS_RECORDS = []
                 '<div class="stacked-bar-wrap" style="height:6px; width:70px; margin:0 auto;">' +
                   '<div class="bar-seg-applus" style="width:' + ((dApPlus/dCharts.length)*100) + '%;"></div>' +
                   '<div class="bar-seg-ap" style="width:' + ((dApOnly/dCharts.length)*100) + '%;"></div>' +
-                  '<div class="bar-seg-fc" style="width:' + ((dFc/dCharts.length)*100) + '%;"></div>' +
+                  '<div class="bar-seg-fc" style="width:' + ((dFcOnly/dCharts.length)*100) + '%;"></div>' +
                 '</div>' +
               '</td>' +
               '<td style="font-weight:800; color:#ff758c;">' + dApPlus + '</td>' +
               '<td style="font-weight:800; color:#ff9900;">' + dApTotal + '</td>' +
-              '<td style="font-weight:800; color:#0099ff;">' + dFc + '</td>' +
+              '<td style="font-weight:800; color:#0099ff;">' + dFcTotal + '</td>' +
               '<td style="font-weight:700;">' + (dAvg > 0 ? dAvg.toLocaleString() : '-') + '</td>' +
             '</tr>';
         });
@@ -1958,8 +1960,8 @@ const DEFAULT_AP_PLUS_RECORDS = []
           const lCharts = targetCharts.filter(c => String(c.level) === lvl);
           if (lCharts.length === 0) return;
           const lFilled = lCharts.filter(c => c.score > 0);
-          const lApPlus = lCharts.filter(c => c.score === 1010000 || c.status === 'AP+').length;
-          const lApTotal = lCharts.filter(c => c.score === 1010000 || c.status === 'AP' || c.status === 'AP+').length;
+          const lApPlus = lCharts.filter(c => c.status === 'AP+').length;
+          const lApTotal = lCharts.filter(c => c.status === 'AP' || c.status === 'AP+').length;
           const lApOnly = lApTotal - lApPlus;
           const lFc = lCharts.filter(c => c.status === 'FC').length;
           const lClear = lFilled.length - lApTotal - lFc;
@@ -2019,8 +2021,8 @@ const DEFAULT_AP_PLUS_RECORDS = []
         const pCharts = targetCharts.filter(c => c.pack === packName);
         if (pCharts.length === 0) return;
         const pFilled = pCharts.filter(c => c.score > 0);
-        const pApPlus = pCharts.filter(c => c.score === 1010000 || c.status === 'AP+').length;
-        const pApTotal = pCharts.filter(c => c.score === 1010000 || c.status === 'AP' || c.status === 'AP+').length;
+        const pApPlus = pCharts.filter(c => c.status === 'AP+').length;
+        const pApTotal = pCharts.filter(c => c.status === 'AP' || c.status === 'AP+').length;
         const pApOnly = pApTotal - pApPlus;
         const pFc = pCharts.filter(c => c.status === 'FC').length;
         const pAvg = pFilled.length ? Math.round(pFilled.reduce((sum, c) => sum + c.score, 0) / pFilled.length) : 0;
