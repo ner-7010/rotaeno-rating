@@ -4,6 +4,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
     const MASTER_SONGS_KEY = 'rotaeno_master_songs_v2';
     const OLD_CUSTOM_SONGS_KEY = 'rotaeno_custom_songs_v1';
     const PACK_ORDER_KEY = 'rotaeno_pack_order_v1';
+    const OFFICIAL_PACK_ORDER_KEY = 'rotaeno_official_pack_order_v1';
     const AP_PLUS_KEY = 'rotaeno_ap_plus_records_v1';
     const SHOW_DATE_KEY = 'rotaeno_show_ap_plus_date_v1';
     const AUTO_RECORD_AP_PLUS_KEY = 'rotaeno_auto_record_ap_plus_v1';
@@ -55,69 +56,34 @@ const DEFAULT_AP_PLUS_RECORDS = []
     let apPlusSearchQuery = '';
     let apPlusSort = 'NO_ASC';
 
-    // Game Official Song Pack Order (Matching in-game selection list)
-    let GAME_PACK_ORDER = [
-      '基本曲',
-      '第1章 - 旅の始まり',
-      '第2章 - 災難と希望',
-      '第3章 - 水と油',
-      '小さなしずくの大冒険',
-      '永久の光、新たな命へ',
-      '空、宇宙船、そして大切なもの――',
-      '果てしなき夏の狂騒曲',
-      'Rotaeno学園祭',
-      '新時代',
-      '二人の出会い',
-      '軌跡：夢が芽生えた日',
-      'maimai コラボ',
-      'WACCA コラボ II',
-      'Mili セレクション',
-      'Cosmic Radio 2025',
-      'Dynamix Universe コラボ',
-      'KALPA: Cosmic Symphony コラボ',
-      'Cytus II コラボ',
-      'Tanchiky セレクション',
-      'NOISZ SL + PK GODHAND コラボ',
-      'Muse Dash コラボ',
-      'DEEMO II コラボ',
-      'Dynamix コラボ',
-      'Rizline コラボ',
-      'Paradigm: Rebootコラボ',
-      'Arcaea コラボ',
-      'LiveMania',
-      'Lanota コラボ',
-      'HARDCORE TANO*C コラボ II',
-      'HARDCORE TANO*C コラボ I',
-      'Phigros コラボ',
-      'KALPA コラボ',
-      'WACCA コラボ I',
-      '明日へ響け',
-      '次元を超える約束',
-      'DECO*27 コラボ',
-      'ピノキオピー コラボ',
-      '未来の歌',
-      '晩夏の夢',
-      '風の向くまま',
-      '迷いのルミナリウム',
-      'ナニコア?!',
-      '黄金時代',
-      '雪の下の思い出',
-      'Ψ: 脳波オーバーロード',
-      '異世界物語：追憶',
-      '音の継承',
-      '熾熱の魂',
-      'パープルレイヴ',
-      'ファンキーパーティー',
-      'オーブの声',
-      '無色透明',
-      'ピアノライフ',
-      'ジオメトリーパルス',
-      '街角のレストラン',
-      '機械都市',
-      'Rock (Y)our World',
-      '星々の声',
-      '星明りの秘蔵'
-    ];
+    // Official Song Pack Order (Loaded dynamically from official spreadsheet Config)
+    function loadOfficialPackOrder() {
+      try {
+        const savedOfficial = localStorage.getItem(OFFICIAL_PACK_ORDER_KEY);
+        if (savedOfficial) {
+          const parsed = JSON.parse(savedOfficial);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+        // Fallback for existing users before first sync
+        const savedUser = localStorage.getItem(PACK_ORDER_KEY);
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          if (Array.isArray(parsedUser) && parsedUser.length > 0) return parsedUser;
+        }
+      } catch (e) {}
+      return [];
+    }
+
+    function saveOfficialPackOrder(order) {
+      try {
+        if (Array.isArray(order) && order.length > 0) {
+          localStorage.setItem(OFFICIAL_PACK_ORDER_KEY, JSON.stringify(order));
+        }
+      } catch (e) {}
+    }
+
+    let GAME_PACK_ORDER = loadOfficialPackOrder();
+
 
     function loadPackOrder() {
       const saved = localStorage.getItem(PACK_ORDER_KEY);
@@ -4100,6 +4066,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       packOrder = mergeOfficialPackOrder(packOrder, officialPackOrder, newPacks);
       if (Array.isArray(officialPackOrder) && officialPackOrder.length > 0) {
         GAME_PACK_ORDER = [...officialPackOrder];
+        saveOfficialPackOrder(GAME_PACK_ORDER);
       }
 
       // Synchronize default order (songInitId) with official spreadsheet
@@ -4432,6 +4399,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(MASTER_SONGS_KEY);
       localStorage.removeItem(PACK_ORDER_KEY);
+      localStorage.removeItem(OFFICIAL_PACK_ORDER_KEY);
       localStorage.removeItem(AP_PLUS_KEY);
       localStorage.removeItem(GAS_LAST_SYNC_KEY);
       location.reload();
@@ -5433,6 +5401,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
                 packOrder = [...liveConfig.packOrder];
                 savedPackOrder = [...packOrder];
                 GAME_PACK_ORDER = [...liveConfig.packOrder];
+                saveOfficialPackOrder(GAME_PACK_ORDER);
                 savePackOrder();
               }
 
