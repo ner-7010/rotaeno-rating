@@ -310,8 +310,8 @@ function readSongsSheet(ss) {
       initId: initId,
       title: title,
       titleAlpha: titleAlpha || '',
-      pack: String((disp && disp[idxPack]) || row[idxPack] || '基本曲'),
-      version: String((disp && disp[idxVer]) || row[idxVer] || 'v5.6.0'),
+      pack: String((disp && disp[idxPack]) || row[idxPack] || '(パック未設定)'),
+      version: String((disp && disp[idxVer]) || row[idxVer] || '(バージョン未設定)'),
       songId: String((disp && disp[idxSongId]) || row[idxSongId] || ('song_' + i)),
       endOfSale: endOfSale,
       diffs: diffs
