@@ -19,27 +19,18 @@
 
 ---
 
-## 2. ディレクトリ構成とビルド方法
+## 2. ディレクトリ構成
 
 ```
-rotaeno-rating-project/
-├── build_app.js          # 全マスタ・CSS・JS・UIを結合し index.html を生成するビルドスクリプト
-├── index.html            # 配布・実行用の最終成果物（単一ファイルWebアプリケーション）
+rotaeno-rating/
+├── index.html            # WebアプリケーションUIマークアップ
+├── styles.css            # スタイルシート（テーマ・レスポンシブデザイン）
+├── app.js                # アプリケーションロジック・計算エンジン・UI制御
 ├── gas_sync.js           # Googleスプレッドシート連携用 Google Apps Script (GAS) スクリプト
-├── songs_master.json     # 全譜面の詳細JSONマスタデータ
-├── default_ap_plus_records.json # 初期AP+理論値記録データ
-├── songs_data.csv        # 元データCSV（必要時の解析用）
-├── parse_csv.js          # CSV解析スクリプト
-├── make_compact.js       # 軽量化スクリプト
 ├── manifest.json         # PWAマニフェスト
 ├── icon.svg / *.png      # アプリアイコン群
+├── generate_icons.ps1    # アイコン生成用スクリプト
 └── README.md             # 本仕様書・設計ドキュメント
-```
-
-### 再ビルド手順
-UIの改修、新機能の追加、マスタデータの更新を行った場合は、Node.js環境で以下のコマンドを実行して `index.html` を再生成します：
-```bash
-node build_app.js
 ```
 
 ---
