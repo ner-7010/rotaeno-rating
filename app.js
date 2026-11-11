@@ -1404,7 +1404,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
       if (c.endOfSale === 1) {
         ratingDisplay = '<span style="color:#dc2626; font-size:11px; font-weight:700;">(販売終了)</span>';
       } else if (c.isExcluded) {
-        ratingDisplay = '<span style="color:#dc2626; font-size:11px; font-weight:700;">(IV除外)</span>';
+        ratingDisplay = '<span style="color:#dc2626; font-size:11px; font-weight:700;">(' + c.diff + '除外)</span>';
       } else if (c.effectiveRating > 0) {
         ratingDisplay = c.effectiveRating.toFixed(4);
       }
