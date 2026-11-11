@@ -3210,7 +3210,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
 
     // Reset Song Pack Order Button
     document.getElementById('btnResetPackOrder').addEventListener('click', () => {
-      if (confirm('ソングパックの並び順をゲーム公式の初期順序に戻しますか？')) {
+      if (confirm('ソングパックの並び順をデフォルトの初期順序に戻しますか？')) {
         packOrder = [...GAME_PACK_ORDER];
         const existingPacks = [...new Set(masterSongs.map(s => s[6]))].filter(Boolean);
         existingPacks.forEach(p => {
