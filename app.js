@@ -1797,34 +1797,34 @@ const DEFAULT_AP_PLUS_RECORDS = []
       if (lampGrid) {
         const pct = (cnt) => totalCount > 0 ? ((cnt / totalCount) * 100).toFixed(1) + '%' : '0.0%';
         lampGrid.innerHTML = 
-          '<div class="lamp-stat-cell" style="border-color:#ff758c;">' +
-            '<span class="lamp-stat-lbl" style="color:#ff758c;">🌟 AP+ (理論値)</span>' +
-            '<span class="lamp-stat-val" style="color:#ff758c;">' + apPlusCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-applus">' +
+            '<span class="lamp-stat-lbl">🌟 AP+ (理論値)</span>' +
+            '<span class="lamp-stat-val">' + apPlusCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(apPlusCount) + '</span>' +
           '</div>' +
-          '<div class="lamp-stat-cell" style="border-color:#ff9900;">' +
-            '<span class="lamp-stat-lbl" style="color:#ff9900;">🔶 AP</span>' +
-            '<span class="lamp-stat-val" style="color:#ff9900;">' + apTotalCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-ap">' +
+            '<span class="lamp-stat-lbl">🔶 AP</span>' +
+            '<span class="lamp-stat-val">' + apTotalCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(apTotalCount) + '</span>' +
           '</div>' +
-          '<div class="lamp-stat-cell" style="border-color:#0099ff;">' +
-            '<span class="lamp-stat-lbl" style="color:#0099ff;">🔷 FC (フルコン)</span>' +
-            '<span class="lamp-stat-val" style="color:#0099ff;">' + fcTotalCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-fc">' +
+            '<span class="lamp-stat-lbl">🔷 FC (フルコン)</span>' +
+            '<span class="lamp-stat-val">' + fcTotalCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(fcTotalCount) + '</span>' +
           '</div>' +
-          '<div class="lamp-stat-cell" style="border-color:#10b981;">' +
-            '<span class="lamp-stat-lbl" style="color:#10b981;">🟢 EX (100万+)</span>' +
-            '<span class="lamp-stat-val" style="color:#10b981;">' + exCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-ex">' +
+            '<span class="lamp-stat-lbl">🟢 EX (100万+)</span>' +
+            '<span class="lamp-stat-val">' + exCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(exCount) + '</span>' +
           '</div>' +
-          '<div class="lamp-stat-cell" style="border-color:#6b7c96;">' +
-            '<span class="lamp-stat-lbl" style="color:#6b7c96;">⚪ CLEAR</span>' +
-            '<span class="lamp-stat-val" style="color:#6b7c96;">' + clearCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-clear">' +
+            '<span class="lamp-stat-lbl">⚪ CLEAR</span>' +
+            '<span class="lamp-stat-val">' + clearCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(clearCount) + '</span>' +
           '</div>' +
-          '<div class="lamp-stat-cell" style="border-color:#cbd5e1;">' +
-            '<span class="lamp-stat-lbl" style="color:#94a3b8;">🔒 未プレイ</span>' +
-            '<span class="lamp-stat-val" style="color:#94a3b8;">' + unplayedCount.toLocaleString() + '</span>' +
+          '<div class="lamp-stat-cell cell-unplayed">' +
+            '<span class="lamp-stat-lbl">🔒 未プレイ</span>' +
+            '<span class="lamp-stat-val">' + unplayedCount.toLocaleString() + '</span>' +
             '<span class="lamp-stat-pct">' + pct(unplayedCount) + '</span>' +
           '</div>';
       }
@@ -1930,9 +1930,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
                   '<div class="bar-seg-fc" style="width:' + ((dFcOnly/dCharts.length)*100) + '%;"></div>' +
                 '</div>' +
               '</td>' +
-              '<td style="font-weight:800; color:#ff758c;">' + dApPlus + '</td>' +
-              '<td style="font-weight:800; color:#ff9900;">' + dApTotal + '</td>' +
-              '<td style="font-weight:800; color:#0099ff;">' + dFcTotal + '</td>' +
+              '<td class="text-lamp-applus" style="font-weight:800;">' + dApPlus + '</td>' +
+              '<td class="text-lamp-ap" style="font-weight:800;">' + dApTotal + '</td>' +
+              '<td class="text-lamp-fc" style="font-weight:800;">' + dFcTotal + '</td>' +
               '<td style="font-weight:700;">' + (dAvg > 0 ? dAvg.toLocaleString() : '-') + '</td>' +
             '</tr>';
         });
@@ -1979,9 +1979,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
                 '<div class="level-stat-meta">' +
                   '<span>進捗 ' + lFilled.length + ' / ' + lTotal + ' (' + (((lFilled.length/lTotal)*100).toFixed(1)) + '%)</span>' +
                   '<span>' +
-                    '<span style="color:#ff758c; font-weight:800;">AP+:' + lApPlus + '</span>' +
-                    '<span style="color:#ff9900; font-weight:800; margin-left:4px;">AP:' + lApTotal + '</span>' +
-                    '<span style="color:#0099ff; font-weight:800; margin-left:4px;">FC:' + lFc + '</span>' +
+                    '<span class="text-lamp-applus" style="font-weight:800;">AP+:' + lApPlus + '</span>' +
+                    '<span class="text-lamp-ap" style="font-weight:800; margin-left:4px;">AP:' + lApTotal + '</span>' +
+                    '<span class="text-lamp-fc" style="font-weight:800; margin-left:4px;">FC:' + lFc + '</span>' +
                   '</span>' +
                 '</div>' +
                 '<div class="stacked-bar-wrap">' +

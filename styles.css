@@ -27,9 +27,13 @@
 
       /* Lamps */
       --lamp-applus: linear-gradient(135deg, #ff758c 0%, #ff8eb3 30%, #54a0ff 70%, #1dd1a1 100%);
+      --lamp-applus-color: #ff758c;
       --lamp-ap: #ff9900;
       --lamp-fc: #0099ff;
+      --lamp-ex: #10b981;
       --lamp-clear: #6b7c96;
+      --lamp-unplayed: #94a3b8;
+      --lamp-unplayed-border: #cbd5e1;
     }
 
     [data-theme="dark"] {
@@ -61,9 +65,13 @@
 
       /* Lamps */
       --lamp-applus: linear-gradient(135deg, #f472b6 0%, #fb7185 30%, #38bdf8 70%, #34d399 100%);
+      --lamp-applus-color: #f472b6;
       --lamp-ap: #fbbf24;
       --lamp-fc: #38bdf8;
+      --lamp-ex: #34d399;
       --lamp-clear: #94a3b8;
+      --lamp-unplayed: #64748b;
+      --lamp-unplayed-border: #475569;
     }
 
     * {
@@ -1787,6 +1795,36 @@
       color: var(--color-text-muted);
       font-weight: 700;
     }
+
+    .lamp-stat-cell.cell-applus { border-color: var(--lamp-applus-color); }
+    .lamp-stat-cell.cell-applus .lamp-stat-lbl,
+    .lamp-stat-cell.cell-applus .lamp-stat-val { color: var(--lamp-applus-color); }
+
+    .lamp-stat-cell.cell-ap { border-color: var(--lamp-ap); }
+    .lamp-stat-cell.cell-ap .lamp-stat-lbl,
+    .lamp-stat-cell.cell-ap .lamp-stat-val { color: var(--lamp-ap); }
+
+    .lamp-stat-cell.cell-fc { border-color: var(--lamp-fc); }
+    .lamp-stat-cell.cell-fc .lamp-stat-lbl,
+    .lamp-stat-cell.cell-fc .lamp-stat-val { color: var(--lamp-fc); }
+
+    .lamp-stat-cell.cell-ex { border-color: var(--lamp-ex); }
+    .lamp-stat-cell.cell-ex .lamp-stat-lbl,
+    .lamp-stat-cell.cell-ex .lamp-stat-val { color: var(--lamp-ex); }
+
+    .lamp-stat-cell.cell-clear { border-color: var(--lamp-clear); }
+    .lamp-stat-cell.cell-clear .lamp-stat-lbl,
+    .lamp-stat-cell.cell-clear .lamp-stat-val { color: var(--lamp-clear); }
+
+    .lamp-stat-cell.cell-unplayed { border-color: var(--lamp-unplayed-border); }
+    .lamp-stat-cell.cell-unplayed .lamp-stat-lbl,
+    .lamp-stat-cell.cell-unplayed .lamp-stat-val { color: var(--lamp-unplayed); }
+
+    .text-lamp-applus { color: var(--lamp-applus-color); }
+    .text-lamp-ap { color: var(--lamp-ap); }
+    .text-lamp-fc { color: var(--lamp-fc); }
+    .text-lamp-ex { color: var(--lamp-ex); }
+    .text-lamp-clear { color: var(--lamp-clear); }
 
     .stats-meta-row {
       display: grid;
