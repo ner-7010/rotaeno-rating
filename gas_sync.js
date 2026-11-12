@@ -159,7 +159,12 @@ function writeSongsSheet(ss, songs) {
     'デフォルト順', '曲名', 'ソングパック', 'バージョン', 'songId', '販売終了',
     'I_定数', 'I_Lv', 'II_定数', 'II_Lv',
     'III_定数', 'III_Lv', 'IV_定数', 'IV_Lv',
-    'IV-α_定数', 'IV-α_Lv', 'IV-α_曲名'
+    'IV-α_定数', 'IV-α_Lv', 'IV-α_曲名',
+    'I_total_notes', 'I_slide_notes',
+    'II_total_notes', 'II_slide_notes',
+    'III_total_notes', 'III_slide_notes',
+    'IV_total_notes', 'IV_slide_notes',
+    'IV-α_total_notes', 'IV-α_slide_notes'
   ];
   const rows = [headers];
 
@@ -187,7 +192,17 @@ function writeSongsSheet(ss, songs) {
       d['IV'] ? d['IV'].level : '',
       d['IV-α'] ? d['IV-α'].constant : '',
       d['IV-α'] ? d['IV-α'].level : '',
-      titleAlphaStr
+      titleAlphaStr,
+      d['I'] ? (d['I'].totalNotes || '') : '',
+      d['I'] ? (d['I'].slideNotes || '') : '',
+      d['II'] ? (d['II'].totalNotes || '') : '',
+      d['II'] ? (d['II'].slideNotes || '') : '',
+      d['III'] ? (d['III'].totalNotes || '') : '',
+      d['III'] ? (d['III'].slideNotes || '') : '',
+      d['IV'] ? (d['IV'].totalNotes || '') : '',
+      d['IV'] ? (d['IV'].slideNotes || '') : '',
+      d['IV-α'] ? (d['IV-α'].totalNotes || '') : '',
+      d['IV-α'] ? (d['IV-α'].slideNotes || '') : ''
     ]);
   });
 
@@ -231,6 +246,16 @@ function readSongsSheet(ss) {
   const colConstIVAlpha = headers.findIndex(h => /^(IV-α_定数|IV-a_定数)$/i.test(h));
   const colLvIVAlpha = headers.findIndex(h => /^(IV-α_Lv|IV-a_Lv)$/i.test(h));
   const colTitleIVAlpha = headers.findIndex(h => /^(IV-α_曲名|IV-a_曲名|IV-α曲名|titleAlpha)$/i.test(h));
+  const colTotalI = headers.findIndex(h => /^(I_total_notes|I_total|I_notes)$/i.test(h));
+  const colSlideI = headers.findIndex(h => /^(I_slide_notes|I_slide)$/i.test(h));
+  const colTotalII = headers.findIndex(h => /^(II_total_notes|II_total|II_notes)$/i.test(h));
+  const colSlideII = headers.findIndex(h => /^(II_slide_notes|II_slide)$/i.test(h));
+  const colTotalIII = headers.findIndex(h => /^(III_total_notes|III_total|III_notes)$/i.test(h));
+  const colSlideIII = headers.findIndex(h => /^(III_slide_notes|III_slide)$/i.test(h));
+  const colTotalIV = headers.findIndex(h => /^(IV_total_notes|IV_total|IV_notes)$/i.test(h));
+  const colSlideIV = headers.findIndex(h => /^(IV_slide_notes|IV_slide)$/i.test(h));
+  const colTotalIVAlpha = headers.findIndex(h => /^(IV-α_total_notes|IV-a_total_notes|IV-α_total|IV-a_total)$/i.test(h));
+  const colSlideIVAlpha = headers.findIndex(h => /^(IV-α_slide_notes|IV-a_slide_notes|IV-α_slide|IV-a_slide)$/i.test(h));
 
   const hasOrderCol = colOrder !== -1;
   const idxTitle = colTitle !== -1 ? colTitle : (hasOrderCol ? 1 : 0);
@@ -277,21 +302,25 @@ function readSongsSheet(ss) {
     }
 
     const diffs = {};
-    function parseDiff(cIdx, lIdx, key) {
+    function parseDiff(cIdx, lIdx, key, tIdx = -1, sIdx = -1) {
       if (cIdx !== -1 && row[cIdx] !== '' && !isNaN(row[cIdx])) {
+        const totalN = (tIdx !== -1 && row[tIdx] !== '' && !isNaN(row[tIdx])) ? Number(row[tIdx]) : 0;
+        const slideN = (sIdx !== -1 && row[sIdx] !== '' && !isNaN(row[sIdx])) ? Number(row[sIdx]) : 0;
         diffs[key] = {
           constant: Number(row[cIdx]),
-          level: String((lIdx !== -1 && disp && disp[lIdx]) || (lIdx !== -1 && row[lIdx]) || '')
+          level: String((lIdx !== -1 && disp && disp[lIdx]) || (lIdx !== -1 && row[lIdx]) || ''),
+          totalNotes: totalN,
+          slideNotes: slideN
         };
       }
     }
 
     if (colConstI !== -1) {
-      parseDiff(colConstI, colLvI, 'I');
-      parseDiff(colConstII, colLvII, 'II');
-      parseDiff(colConstIII, colLvIII, 'III');
-      parseDiff(colConstIV, colLvIV, 'IV');
-      parseDiff(colConstIVAlpha, colLvIVAlpha, 'IV-α');
+      parseDiff(colConstI, colLvI, 'I', colTotalI, colSlideI);
+      parseDiff(colConstII, colLvII, 'II', colTotalII, colSlideII);
+      parseDiff(colConstIII, colLvIII, 'III', colTotalIII, colSlideIII);
+      parseDiff(colConstIV, colLvIV, 'IV', colTotalIV, colSlideIV);
+      parseDiff(colConstIVAlpha, colLvIVAlpha, 'IV-α', colTotalIVAlpha, colSlideIVAlpha);
     } else {
       // Legacy positional layout fallback
       const baseDiffIdx = (colEndOfSale !== -1 && colEndOfSale < 6) ? 6 : (hasOrderCol ? 5 : 4);

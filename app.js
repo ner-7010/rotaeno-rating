@@ -236,7 +236,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
         }
         const diffEntry = {
           constant: t[4],
-          level: t[3]
+          level: t[3],
+          totalNotes: (t[13] !== undefined && !isNaN(t[13])) ? Number(t[13]) : 0,
+          slideNotes: (t[14] !== undefined && !isNaN(t[14])) ? Number(t[14]) : 0
         };
         if (t[2] === 'IV-α') {
           diffEntry.title = chartTitle;
@@ -834,6 +836,8 @@ const DEFAULT_AP_PLUS_RECORDS = []
         const endOfSale = s[8];
         const version = s[11];
         const initId = s[12];
+        const totalNotes = (s[13] !== undefined && !isNaN(s[13])) ? Number(s[13]) : 0;
+        const slideNotes = (s[14] !== undefined && !isNaN(s[14])) ? Number(s[14]) : 0;
 
         const record = userScores[id] || { score: 0, status: '' };
         const score = record.score || 0;
@@ -844,7 +848,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
 
         const chart = {
           id, title, diff, level, constant, notes, pack, songId, endOfSale,
-          version, initId,
+          version, initId, totalNotes, slideNotes,
           score, status, rawRating,
           effectiveRating: rawRating,
           isExcluded: false,
@@ -1372,9 +1376,35 @@ const DEFAULT_AP_PLUS_RECORDS = []
       return SCORE_GRADE_TIERS[SCORE_GRADE_TIERS.length - 1];
     }
 
+    function calcMaxMinus(score, totalNotes, slideNotes) {
+      if (!totalNotes || totalNotes <= 0) return null;
+      const s = (slideNotes !== undefined && !isNaN(slideNotes)) ? Number(slideNotes) : 0;
+      const a = totalNotes - s;
+      const weight = a + s / 4;
+      if (weight <= 0) return null;
+      const unitScore = THEORY_SCORE / weight;
+      const lossPerPerfect = unitScore * 0.01;
+      if (lossPerPerfect <= 0) return null;
+      const lost = THEORY_SCORE - score;
+      if (lost <= 0) return 0;
+      return Math.round(lost / lossPerPerfect);
+    }
+
     function renderSongRow(c) {
       const inB40 = currentCalc && currentCalc.b40Set ? currentCalc.b40Set.has(c.id) : false;
       const diffClass = getDiffClass(c.diff);
+      const isApOrAbove = (c.status === 'AP' || c.status === 'AP+');
+      let maxMinusHtml = '';
+      if (isApOrAbove && c.score >= 1000000) {
+        const p = calcMaxMinus(c.score, c.totalNotes, c.slideNotes);
+        if (p === null) {
+          maxMinusHtml = '<span class="badge-max-minus">MAX-??</span>';
+        } else if (p === 0) {
+          maxMinusHtml = '<span class="badge-max-minus">MAX+0</span>';
+        } else {
+          maxMinusHtml = '<span class="badge-max-minus">MAX-' + p + '</span>';
+        }
+      }
       const statusHtml = c.status ? ('<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>') : '';
       const scoreDisplay = c.score > 0 ? c.score.toLocaleString() : '-';
       let ratingDisplay = '-';
@@ -1412,7 +1442,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
             '</div>' +
           '</div>' +
           '<div class="song-right-col">' +
-            '<div class="score-display-text">' + scoreDisplay + ' ' + (c.status ? '<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>' : '') + '</div>' +
+            '<div class="score-display-text">' + scoreDisplay + ' ' + (c.status ? '<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>' : '') + (maxMinusHtml ? (' ' + maxMinusHtml) : '') + '</div>' +
             '<div class="rating-display-text">' + ratingDisplay + '</div>' +
             rateUpHtml +
           '</div>' +
@@ -1676,6 +1706,18 @@ const DEFAULT_AP_PLUS_RECORDS = []
         return items.map((c, i) => {
           const rank = startRank + i;
           const statusHtml = c.status ? `<span class="lamp-tag lamp-${c.status.replace('+', '-plus')}">${c.status}</span>` : '';
+          const isApOrAbove = (c.status === 'AP' || c.status === 'AP+');
+          let maxMinusHtml = '';
+          if (isApOrAbove && c.score >= 1000000) {
+            const p = calcMaxMinus(c.score, c.totalNotes, c.slideNotes);
+            if (p === null) {
+              maxMinusHtml = '<span class="badge-max-minus">MAX-??</span>';
+            } else if (p === 0) {
+              maxMinusHtml = '<span class="badge-max-minus">MAX+0</span>';
+            } else {
+              maxMinusHtml = '<span class="badge-max-minus">MAX-' + p + '</span>';
+            }
+          }
           const isB10 = rank <= 10;
           return `
             <div class="b40-card" onclick="openInputModal('${c.id}')">
@@ -1685,7 +1727,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
                   ${escapeHtml(c.title)}
                 </div>
                 <div style="font-size: 11px; color: var(--color-text-sub); font-weight:600;">
-                  <span class="ver-tag">v${c.version}</span> ${c.diff} ${c.constant.toFixed(1)} | ${c.score.toLocaleString()} ${statusHtml}
+                  <span class="ver-tag">v${c.version}</span> ${c.diff} ${c.constant.toFixed(1)} | ${c.score.toLocaleString()} ${statusHtml}${maxMinusHtml ? ' ' + maxMinusHtml : ''}
                 </div>
               </div>
               <div style="text-align: right;">
@@ -3728,9 +3770,14 @@ const DEFAULT_AP_PLUS_RECORDS = []
               } else {
                 const exConst = Number(exT[4]) || 0;
                 const exLv = String(exT[3] || '').trim();
+                const exTotal = (exT[13] !== undefined && !isNaN(exT[13])) ? Number(exT[13]) : 0;
+                const exSlide = (exT[14] !== undefined && !isNaN(exT[14])) ? Number(exT[14]) : 0;
+                const offTotal = (offD.totalNotes !== undefined && !isNaN(offD.totalNotes)) ? Number(offD.totalNotes) : 0;
+                const offSlide = (offD.slideNotes !== undefined && !isNaN(offD.slideNotes)) ? Number(offD.slideNotes) : 0;
 
                 const constDiff = Math.abs(exConst - offConst) > 0.001;
                 const lvDiff = offD.level && exLv !== offLv;
+                const notesDiff = (exTotal !== offTotal || exSlide !== offSlide) && (offTotal > 0 || exTotal > 0);
 
                 if (constDiff || lvDiff) {
                   changes.push({
@@ -3741,6 +3788,16 @@ const DEFAULT_AP_PLUS_RECORDS = []
                     newVal: offConst + (offLv ? ' (Lv.' + offLv + ')' : ''),
                     newConst: offConst,
                     newLevel: offLv
+                  });
+                }
+
+                if (notesDiff) {
+                  changes.push({
+                    field: 'notes_update',
+                    diff: diff,
+                    label: diff + ' ノーツ数',
+                    oldVal: exTotal > 0 ? (exTotal + ' (SL:' + exSlide + ')') : '未登録',
+                    newVal: offTotal > 0 ? (offTotal + ' (SL:' + offSlide + ')') : '未登録'
                   });
                 }
               }
@@ -3990,7 +4047,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
               0,
               '',
               song.version || DEFAULT_VERSION,
-              songInitId
+              songInitId,
+              (dObj.totalNotes !== undefined && !isNaN(dObj.totalNotes)) ? Number(dObj.totalNotes) : 0,
+              (dObj.slideNotes !== undefined && !isNaN(dObj.slideNotes)) ? Number(dObj.slideNotes) : 0
             ]);
           });
 
@@ -4020,12 +4079,18 @@ const DEFAULT_AP_PLUS_RECORDS = []
               s[8] = Number(officialSong.endOfSale) || 0;
             }
 
-            // Update constants / levels if revised
+            // Update constants / levels / notes if revised
             if (officialSong.diffs && officialSong.diffs[s[2]]) {
               const d = officialSong.diffs[s[2]];
               if (!isNaN(d.constant) && Number(d.constant) > 0) {
                 s[4] = Number(d.constant);
                 s[3] = d.level || calcLevelFromConstant(s[4]);
+              }
+              if (d.totalNotes !== undefined && !isNaN(d.totalNotes)) {
+                s[13] = Number(d.totalNotes);
+              }
+              if (d.slideNotes !== undefined && !isNaN(d.slideNotes)) {
+                s[14] = Number(d.slideNotes);
               }
             }
           });
@@ -4049,7 +4114,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
                 0,
                 '',
                 officialSong.version || baseTuple[11],
-                (baseTuple[12] || 0)
+                (baseTuple[12] || 0),
+                (d.totalNotes !== undefined && !isNaN(d.totalNotes)) ? Number(d.totalNotes) : 0,
+                (d.slideNotes !== undefined && !isNaN(d.slideNotes)) ? Number(d.slideNotes) : 0
               ];
               masterSongs.push(newTuple);
             }
@@ -4721,7 +4788,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
                   0,
                   '',
                   song.version || DEFAULT_VERSION,
-                  songInitId
+                  songInitId,
+                  (diffObj.totalNotes !== undefined && !isNaN(diffObj.totalNotes)) ? Number(diffObj.totalNotes) : 0,
+                  (diffObj.slideNotes !== undefined && !isNaN(diffObj.slideNotes)) ? Number(diffObj.slideNotes) : 0
                 ]);
               });
             });
@@ -5386,7 +5455,9 @@ const DEFAULT_AP_PLUS_RECORDS = []
                   0,
                   '',
                   song.version || DEFAULT_VERSION,
-                  songInitId
+                  songInitId,
+                  (d.totalNotes !== undefined && !isNaN(d.totalNotes)) ? Number(d.totalNotes) : 0,
+                  (d.slideNotes !== undefined && !isNaN(d.slideNotes)) ? Number(d.slideNotes) : 0
                 ]);
               });
             });
