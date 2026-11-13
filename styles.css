@@ -718,7 +718,16 @@
       gap: 6px;
       align-items: center;
       font-weight: 600;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .song-pack-tag {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
     }
 
     .ver-tag {
@@ -729,26 +738,38 @@
       padding: 0 4px;
       border-radius: 4px;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .song-right-col {
       text-align: right;
       flex-shrink: 0;
-      margin-left: 12px;
-    }
-
-    .score-display-text {
-      font-size: 14px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      color: var(--color-text-main);
+      margin-left: 8px;
     }
 
     .rating-display-text {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--color-primary-dark);
       font-weight: 800;
-      margin-top: 1px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+
+    .score-display-text {
+      font-size: 13px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-main);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .score-display-text .lamp-tag,
+    .score-display-text .badge-max-minus {
+      margin-left: 0;
     }
 
     /* Rate +0.001 Target Displays */

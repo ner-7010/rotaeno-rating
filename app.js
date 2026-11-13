@@ -1482,13 +1482,13 @@ const DEFAULT_AP_PLUS_RECORDS = []
               '<div class="song-sub-text">' +
                 '<span class="ver-tag">v' + c.version + '</span>' +
                 '<span>Lv.' + c.level + '</span>' +
-                '<span>' + escapeHtml(c.pack) + '</span>' +
+                '<span class="song-pack-tag">' + escapeHtml(c.pack) + '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
           '<div class="song-right-col">' +
-            '<div class="score-display-text">' + scoreDisplay + ' ' + (c.status ? '<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>' : '') + (maxMinusHtml ? (' ' + maxMinusHtml) : '') + '</div>' +
             '<div class="rating-display-text">' + ratingDisplay + '</div>' +
+            '<div class="score-display-text">' + (maxMinusHtml ? (maxMinusHtml + ' ') : '') + (c.status ? '<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span> ' : '') + scoreDisplay + '</div>' +
             rateUpHtml +
           '</div>' +
         '</div>'
