@@ -1390,6 +1390,43 @@ const DEFAULT_AP_PLUS_RECORDS = []
       return Math.round(lost / lossPerPerfect);
     }
 
+    function calcApMinusRaw(score, totalNotes, slideNotes) {
+      if (!totalNotes || totalNotes <= 0) return null;
+      const s = (slideNotes !== undefined && !isNaN(slideNotes)) ? Number(slideNotes) : 0;
+      const a = totalNotes - s;
+      const weight = a + s / 4;
+      if (weight <= 0) return null;
+      const unitScore = THEORY_SCORE / weight;
+      const lossPerGood = unitScore * 0.75;
+      if (lossPerGood <= 0) return null;
+      const lost = THEORY_SCORE - score;
+      if (lost <= 0) return 0;
+      return lost / lossPerGood;
+    }
+
+    function getLossNotesRank(c) {
+      if ((c.score === undefined || c.score <= 0) && !c.status) {
+        return { tier: 4, val: Infinity };
+      }
+      const isAp = (c.status === 'AP' || c.status === 'AP+' || c.score === THEORY_SCORE);
+      const isFc = (c.status === 'FC');
+      const hasNotes = c.totalNotes && c.totalNotes > 0;
+
+      if (isAp) {
+        if (c.score === THEORY_SCORE) return { tier: 1, val: 0 };
+        if (!hasNotes) return { tier: 1, val: 9999 + (THEORY_SCORE - c.score) };
+        const p = calcMaxMinus(c.score, c.totalNotes, c.slideNotes);
+        return { tier: 1, val: p !== null ? p : (9999 + (THEORY_SCORE - c.score)) };
+      }
+
+      const tier = isFc ? 2 : 3;
+      if (!hasNotes) {
+        return { tier: tier, val: 9999 + (THEORY_SCORE - c.score) };
+      }
+      const rawAp = calcApMinusRaw(c.score, c.totalNotes, c.slideNotes);
+      return { tier: tier, val: rawAp !== null ? rawAp : (9999 + (THEORY_SCORE - c.score)) };
+    }
+
     function renderSongRow(c) {
       const inB40 = currentCalc && currentCalc.b40Set ? currentCalc.b40Set.has(c.id) : false;
       const diffClass = getDiffClass(c.diff);
@@ -1403,6 +1440,14 @@ const DEFAULT_AP_PLUS_RECORDS = []
           maxMinusHtml = '<span class="badge-max-minus">MAX+0</span>';
         } else {
           maxMinusHtml = '<span class="badge-max-minus">MAX-' + p + '</span>';
+        }
+      } else if (c.status === 'FC') {
+        const rawAp = calcApMinusRaw(c.score, c.totalNotes, c.slideNotes);
+        if (rawAp === null) {
+          maxMinusHtml = '<span class="badge-max-minus">AP-??</span>';
+        } else {
+          const floorAp = Math.floor(rawAp);
+          maxMinusHtml = '<span class="badge-max-minus">AP-' + floorAp + '</span>';
         }
       }
       const statusHtml = c.status ? ('<span class="lamp-tag lamp-' + c.status.replace('+', '-plus') + '">' + c.status + '</span>') : '';
@@ -1498,6 +1543,15 @@ const DEFAULT_AP_PLUS_RECORDS = []
       if (!isGroupedSort || list.length === 0) {
         // Flat sort for DEFAULT, RATING, or RATE_UP
         list.sort((a, b) => {
+          if (currentSort === 'LOSS_NOTES') {
+            const rankA = getLossNotesRank(a);
+            const rankB = getLossNotesRank(b);
+            if (rankA.tier !== rankB.tier) return rankA.tier - rankB.tier;
+            if (rankA.val !== rankB.val) return rankA.val - rankB.val;
+            if (b.constant !== a.constant) return b.constant - a.constant;
+            if (b.score !== a.score) return b.score - a.score;
+            return compareDefaultOrder(a, b);
+          }
           if (currentSort === 'RATE_UP') {
             const aHas = !!a.rateUp;
             const bHas = !!b.rateUp;
@@ -1716,6 +1770,14 @@ const DEFAULT_AP_PLUS_RECORDS = []
               maxMinusHtml = '<span class="badge-max-minus">MAX+0</span>';
             } else {
               maxMinusHtml = '<span class="badge-max-minus">MAX-' + p + '</span>';
+            }
+          } else if (c.status === 'FC') {
+            const rawAp = calcApMinusRaw(c.score, c.totalNotes, c.slideNotes);
+            if (rawAp === null) {
+              maxMinusHtml = '<span class="badge-max-minus">AP-??</span>';
+            } else {
+              const floorAp = Math.floor(rawAp);
+              maxMinusHtml = '<span class="badge-max-minus">AP-' + floorAp + '</span>';
             }
           }
           const isB10 = rank <= 10;
