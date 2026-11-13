@@ -5075,8 +5075,19 @@ const DEFAULT_AP_PLUS_RECORDS = []
     }
 
     let generatedB40Blob = null;
+    const B40_IMAGE_THEME_KEY = 'rotaeno_b40_image_theme';
 
-    function generateB40Canvas() {
+    function getB40ImageTheme() {
+      const saved = localStorage.getItem(B40_IMAGE_THEME_KEY);
+      return saved === 'dark' ? 'dark' : 'light';
+    }
+
+    function setB40ImageTheme(theme) {
+      localStorage.setItem(B40_IMAGE_THEME_KEY, theme);
+    }
+
+    function generateB40Canvas(theme = getB40ImageTheme()) {
+      const isDark = (theme === 'dark');
       const W = 1600;
       const H = 2040;
       const canvas = document.createElement('canvas');
@@ -5084,49 +5095,55 @@ const DEFAULT_AP_PLUS_RECORDS = []
       canvas.height = H;
       const ctx = canvas.getContext('2d');
 
-      // 1. Background (Cosmic Deep Space Gradient)
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, '#060b13');
-      bgGrad.addColorStop(0.3, '#0b1422');
-      bgGrad.addColorStop(0.7, '#08111e');
-      bgGrad.addColorStop(1, '#050911');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, W, H);
+      // 1. Background
+      if (isDark) {
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#060b13');
+        bgGrad.addColorStop(0.3, '#0b1422');
+        bgGrad.addColorStop(0.7, '#08111e');
+        bgGrad.addColorStop(1, '#050911');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
 
-      // Subtle celestial particles
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-      for (let p = 0; p < 80; p++) {
-        const px = (p * 7919) % W;
-        const py = (p * 6397) % H;
-        const pr = ((p % 3) + 1) * 0.8;
-        ctx.beginPath();
-        ctx.arc(px, py, pr, 0, Math.PI * 2);
-        ctx.fill();
+        // Subtle celestial particles
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        for (let p = 0; p < 80; p++) {
+          const px = (p * 7919) % W;
+          const py = (p * 6397) % H;
+          const pr = ((p % 3) + 1) * 0.8;
+          ctx.beginPath();
+          ctx.arc(px, py, pr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        // App-aligned Light Mode Background (#cce3f8)
+        ctx.fillStyle = '#cce3f8';
+        ctx.fillRect(0, 0, W, H);
       }
 
       // 2. Header Box (Y: 0 - 200px)
       const headY = 40;
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0284c7';
       ctx.font = '800 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.fillText('ROTAENO RATING TRACKER', 45, headY + 16);
 
       // Total Rating
       const trStr = currentCalc ? currentCalc.totalRating.toFixed(4) : '0.0000';
-      ctx.fillStyle = '#fbbf24';
+      ctx.fillStyle = isDark ? '#fbbf24' : '#d97706';
       ctx.font = '900 60px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.fillText(trStr, 45, headY + 80);
 
       // Theo Rating & Completion
       const theoRate = calcTheoreticalMaxRating();
       const trWidth = ctx.measureText(trStr).width;
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
       ctx.font = '700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.fillText('/ 理論値 ' + theoRate.toFixed(4), 45 + trWidth + 14, headY + 68);
 
       const compSum = currentCalc ? currentCalc.totalCompletionSum.toFixed(3) : '0.000';
       const maxComp = getMaxCompletionCount();
       const compPct = maxComp > 0 ? ((parseFloat(compSum) / maxComp) * 100).toFixed(2) : '0.00';
-      ctx.fillStyle = '#cbd5e1';
+      ctx.fillStyle = isDark ? '#cbd5e1' : '#334155';
       ctx.font = '700 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.fillText('完成度: ' + compSum + ' / ' + maxComp + ' (' + compPct + '%)', 45, headY + 115);
 
@@ -5140,9 +5157,27 @@ const DEFAULT_AP_PLUS_RECORDS = []
       const b40Cont = (parseFloat(b40Sum) * 0.01).toFixed(4);
 
       const pills = [
-        { label: 'BEST 1-10 (×0.06)', sum: b10Sum, cont: b10Cont, bg: 'rgba(251, 191, 36, 0.12)', border: '#f59e0b', color: '#fbbf24' },
-        { label: 'BEST 11-20 (×0.02)', sum: b20Sum, cont: b20Cont, bg: 'rgba(56, 189, 248, 0.12)', border: '#0284c7', color: '#38bdf8' },
-        { label: 'BEST 21-40 (×0.01)', sum: b40Sum, cont: b40Cont, bg: 'rgba(148, 163, 184, 0.12)', border: '#475569', color: '#cbd5e1' }
+        {
+          label: 'BEST 1-10 (×0.06)', sum: b10Sum, cont: b10Cont,
+          bg: isDark ? 'rgba(251, 191, 36, 0.12)' : '#fffbeb',
+          border: '#f59e0b',
+          color: isDark ? '#fbbf24' : '#b45309',
+          sumColor: isDark ? '#ffffff' : '#0f172a'
+        },
+        {
+          label: 'BEST 11-20 (×0.02)', sum: b20Sum, cont: b20Cont,
+          bg: isDark ? 'rgba(56, 189, 248, 0.12)' : '#f0f9ff',
+          border: '#0284c7',
+          color: isDark ? '#38bdf8' : '#0369a1',
+          sumColor: isDark ? '#ffffff' : '#0f172a'
+        },
+        {
+          label: 'BEST 21-40 (×0.01)', sum: b40Sum, cont: b40Cont,
+          bg: isDark ? 'rgba(148, 163, 184, 0.12)' : '#f8fafc',
+          border: isDark ? '#475569' : '#cbd5e1',
+          color: isDark ? '#cbd5e1' : '#475569',
+          sumColor: isDark ? '#ffffff' : '#0f172a'
+        }
       ];
 
       pills.forEach((p, idx) => {
@@ -5159,7 +5194,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
         ctx.font = '800 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText(p.label, px + 8, py + 22);
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = p.sumColor;
         ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText(p.sum, px + 8, py + 48);
 
@@ -5179,9 +5214,15 @@ const DEFAULT_AP_PLUS_RECORDS = []
 
       // Header Separator Line
       const sepGrad = ctx.createLinearGradient(45, 175, W - 45, 175);
-      sepGrad.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
-      sepGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.6)');
-      sepGrad.addColorStop(1, 'rgba(148, 163, 184, 0.3)');
+      if (isDark) {
+        sepGrad.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+        sepGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.6)');
+        sepGrad.addColorStop(1, 'rgba(148, 163, 184, 0.3)');
+      } else {
+        sepGrad.addColorStop(0, '#0284c7');
+        sepGrad.addColorStop(0.5, '#f59e0b');
+        sepGrad.addColorStop(1, '#cbd5e1');
+      }
       ctx.strokeStyle = sepGrad;
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -5211,18 +5252,34 @@ const DEFAULT_AP_PLUS_RECORDS = []
 
         let borderColor = '#253549';
         let cardBgGrad = ctx.createLinearGradient(x, y, x, y + cardH);
-        if (isB10) {
-          borderColor = '#f59e0b';
-          cardBgGrad.addColorStop(0, '#172233');
-          cardBgGrad.addColorStop(1, '#0e1826');
-        } else if (isB20) {
-          borderColor = '#0284c7';
-          cardBgGrad.addColorStop(0, '#131e2e');
-          cardBgGrad.addColorStop(1, '#0c1522');
+        if (isDark) {
+          if (isB10) {
+            borderColor = '#f59e0b';
+            cardBgGrad.addColorStop(0, '#172233');
+            cardBgGrad.addColorStop(1, '#0e1826');
+          } else if (isB20) {
+            borderColor = '#0284c7';
+            cardBgGrad.addColorStop(0, '#131e2e');
+            cardBgGrad.addColorStop(1, '#0c1522');
+          } else {
+            borderColor = '#1e293b';
+            cardBgGrad.addColorStop(0, '#0f1724');
+            cardBgGrad.addColorStop(1, '#090e17');
+          }
         } else {
-          borderColor = '#1e293b';
-          cardBgGrad.addColorStop(0, '#0f1724');
-          cardBgGrad.addColorStop(1, '#090e17');
+          if (isB10) {
+            borderColor = '#f59e0b';
+            cardBgGrad.addColorStop(0, '#ffffff');
+            cardBgGrad.addColorStop(1, '#fffdf7');
+          } else if (isB20) {
+            borderColor = '#0284c7';
+            cardBgGrad.addColorStop(0, '#ffffff');
+            cardBgGrad.addColorStop(1, '#f7fbff');
+          } else {
+            borderColor = '#cbd5e1';
+            cardBgGrad.addColorStop(0, '#ffffff');
+            cardBgGrad.addColorStop(1, '#f8fafc');
+          }
         }
 
         ctx.fillStyle = cardBgGrad;
@@ -5243,17 +5300,17 @@ const DEFAULT_AP_PLUS_RECORDS = []
         }
 
         if (!c) {
-          ctx.fillStyle = '#475569';
+          ctx.fillStyle = isDark ? '#475569' : '#94a3b8';
           ctx.font = '800 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
           ctx.fillText('#' + rank, x + 14, y + 36);
-          ctx.fillStyle = '#334155';
+          ctx.fillStyle = isDark ? '#334155' : '#cbd5e1';
           ctx.font = '700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
           ctx.fillText('NO RECORD', x + 14, y + 70);
           continue;
         }
 
         // Rank Number
-        ctx.fillStyle = isB10 ? '#fbbf24' : (isB20 ? '#38bdf8' : '#94a3b8');
+        ctx.fillStyle = isB10 ? (isDark ? '#fbbf24' : '#d97706') : (isB20 ? '#0284c7' : (isDark ? '#94a3b8' : '#64748b'));
         ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('#' + rank, x + 12, y + 34);
 
@@ -5294,22 +5351,22 @@ const DEFAULT_AP_PLUS_RECORDS = []
         ctx.fillStyle = '#ffffff';
         ctx.fillText(diffStr, dPillX + 7, dPillY + 16);
 
-        // Song Title
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = '800 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif';
+        // Song Title (Enlarged to 18px bold)
+        ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+        ctx.font = '800 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif';
         const maxTitleW = cardW - 24;
         const fitTitle = truncateCanvasText(ctx, c.title, maxTitleW);
         ctx.fillText(fitTitle, x + 12, y + 68);
 
         // Pack & Version
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
         ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif';
         const metaStr = 'v' + c.version + ' | ' + c.pack;
         const fitMeta = truncateCanvasText(ctx, metaStr, maxTitleW);
-        ctx.fillText(fitMeta, x + 12, y + 90);
+        ctx.fillText(fitMeta, x + 12, y + 91);
 
         // Score (Large)
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
         ctx.font = '900 23px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         const scoreStr = (c.score || 0).toLocaleString();
         ctx.fillText(scoreStr, x + 12, y + 128);
@@ -5349,7 +5406,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
         ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('RATING', x + cardW - 12, y + 158);
 
-        ctx.fillStyle = isB10 ? '#fbbf24' : (isB20 ? '#38bdf8' : '#7dd3fc');
+        ctx.fillStyle = isB10 ? (isDark ? '#fbbf24' : '#d97706') : (isB20 ? (isDark ? '#38bdf8' : '#0284c7') : (isDark ? '#7dd3fc' : '#0369a1'));
         ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText(rateValStr, x + cardW - 12, y + 180);
         ctx.textAlign = 'left';
@@ -5365,22 +5422,30 @@ const DEFAULT_AP_PLUS_RECORDS = []
       return canvas;
     }
 
-    function openB40ImageModal() {
-      const modal = document.getElementById('b40ImageModal');
+    function renderB40Image() {
       const img = document.getElementById('b40ImageResult');
       const loading = document.getElementById('b40ImageLoading');
       const btnDownload = document.getElementById('btnB40ImageDownload');
       const btnShare = document.getElementById('btnB40ImageShare');
 
-      if (!modal) return;
-      modal.classList.add('open');
-
       if (img) img.style.display = 'none';
-      if (loading) loading.style.display = 'block';
+      if (loading) {
+        loading.style.display = 'block';
+        loading.textContent = 'BEST 40 高解像度画像を生成中...';
+      }
+
+      const currentTheme = getB40ImageTheme();
+      document.querySelectorAll('.b40-theme-btn').forEach(btn => {
+        if (btn.getAttribute('data-b40-theme') === currentTheme) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
 
       setTimeout(() => {
         try {
-          const canvas = generateB40Canvas();
+          const canvas = generateB40Canvas(currentTheme);
           const dataUrl = canvas.toDataURL('image/png');
 
           if (img) {
@@ -5409,7 +5474,14 @@ const DEFAULT_AP_PLUS_RECORDS = []
           console.error('B40 image generation failed:', err);
           if (loading) loading.textContent = '画像の生成に失敗しました: ' + err.message;
         }
-      }, 80);
+      }, 60);
+    }
+
+    function openB40ImageModal() {
+      const modal = document.getElementById('b40ImageModal');
+      if (!modal) return;
+      modal.classList.add('open');
+      renderB40Image();
     }
 
     function closeB40ImageModal() {
@@ -5433,6 +5505,15 @@ const DEFAULT_AP_PLUS_RECORDS = []
       });
     }
 
+    document.querySelectorAll('.b40-theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.getAttribute('data-b40-theme') || 'light';
+        if (t === getB40ImageTheme()) return;
+        setB40ImageTheme(t);
+        renderB40Image();
+      });
+    });
+
     const btnB40Share = document.getElementById('btnB40ImageShare');
     if (btnB40Share) {
       btnB40Share.addEventListener('click', async () => {
@@ -5442,7 +5523,7 @@ const DEFAULT_AP_PLUS_RECORDS = []
           const file = new File([generatedB40Blob], filename, { type: 'image/png' });
           await navigator.share({
             title: 'Rotaeno BEST 40',
-            text: '私の Rotaeno BEST 40 (Rating: ' + (currentCalc ? currentCalc.totalRating.toFixed(4) : '') + ') #Rotaeno',
+            text: '私の Rotaeno BEST 40' + (currentCalc ? ' (Rating: ' + currentCalc.totalRating.toFixed(4) + ')' : '') + '\n使用Web : https://ner-7010.github.io/rotaeno-rating/',
             files: [file]
           });
         } catch (err) {
